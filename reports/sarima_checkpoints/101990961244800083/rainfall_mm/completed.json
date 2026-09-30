@@ -1,0 +1,82 @@
+{
+  "metrics": {
+    "device_id": "101990961244800083",
+    "variable": "rainfall_mm",
+    "status": "ok",
+    "rmse": 0.08299338720813176,
+    "mae": 0.03035568739437938,
+    "mape": 93.11543914424166,
+    "rmse_naive": 0.10954155675817595,
+    "skill_score": 0.24235705914470385,
+    "test_hours": 1443,
+    "test_observed_hours": 487,
+    "evaluated_hours": 414,
+    "mape_hours": 3,
+    "excluded_test_hours": 1029,
+    "error": "",
+    "elapsed_seconds": 804.4635926999999
+  },
+  "params": {
+    "device_id": "101990961244800083",
+    "variable": "rainfall_mm",
+    "status": "ok",
+    "p": 1,
+    "d": 0,
+    "q": 0,
+    "P": 1,
+    "D": 1,
+    "Q": 1,
+    "s": 24,
+    "validation_aic": 1521.5953687076321,
+    "validation_loglikelihood": -756.7976843538161,
+    "parameter_count": 4,
+    "train_aic": 20879.93453958776,
+    "error": "",
+    "successful_candidates": 8,
+    "adf_pvalue": 1.1676980050780473e-09,
+    "adf_status": "ok",
+    "final_train_aic": 22366.23109132613
+  },
+  "adf": {
+    "device_id": "101990961244800083",
+    "variable": "rainfall_mm",
+    "adf_statistic": -6.917734125983274,
+    "adf_pvalue": 1.1676980050780473e-09,
+    "adf_lags": 18,
+    "adf_sample_hours": 1477,
+    "adf_sample_start": "2025-12-01 15:00:00+00:00",
+    "adf_sample_end": "2026-02-01 03:00:00+00:00",
+    "adf_status": "ok",
+    "adf_critical_5pct": -2.8635243777871286,
+    "d": 0
+  },
+  "splits": [
+    {
+      "device_id": "101990961244800083",
+      "variable": "rainfall_mm",
+      "split": "train",
+      "hours": 6728,
+      "observed_hours": 5720,
+      "start_utc": "2025-08-10 06:00:00+00:00",
+      "end_utc": "2026-05-17 13:00:00+00:00"
+    },
+    {
+      "device_id": "101990961244800083",
+      "variable": "rainfall_mm",
+      "split": "validation",
+      "hours": 1441,
+      "observed_hours": 566,
+      "start_utc": "2026-05-17 14:00:00+00:00",
+      "end_utc": "2026-07-16 14:00:00+00:00"
+    },
+    {
+      "device_id": "101990961244800083",
+      "variable": "rainfall_mm",
+      "split": "test",
+      "hours": 1443,
+      "observed_hours": 487,
+      "start_utc": "2026-07-16 15:00:00+00:00",
+      "end_utc": "2026-09-14 17:00:00+00:00"
+    }
+  ]
+}

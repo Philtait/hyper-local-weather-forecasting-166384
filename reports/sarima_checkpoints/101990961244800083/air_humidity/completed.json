@@ -1,0 +1,82 @@
+{
+  "metrics": {
+    "device_id": "101990961244800083",
+    "variable": "air_humidity",
+    "status": "ok",
+    "rmse": 5.2116095239848885,
+    "mae": 3.356032931196647,
+    "mape": 5.3673642444558185,
+    "rmse_naive": 7.22580081878911,
+    "skill_score": 0.2787499054176471,
+    "test_hours": 1443,
+    "test_observed_hours": 498,
+    "evaluated_hours": 421,
+    "mape_hours": 421,
+    "excluded_test_hours": 1022,
+    "error": "",
+    "elapsed_seconds": 767.7753551000005
+  },
+  "params": {
+    "device_id": "101990961244800083",
+    "variable": "air_humidity",
+    "status": "ok",
+    "p": 1,
+    "d": 1,
+    "q": 2,
+    "P": 1,
+    "D": 1,
+    "Q": 1,
+    "s": 24,
+    "validation_aic": 3363.1752271013524,
+    "validation_loglikelihood": -1675.5876135506762,
+    "parameter_count": 6,
+    "train_aic": 31849.328650560336,
+    "error": "",
+    "successful_candidates": 9,
+    "adf_pvalue": 0.06723366251905859,
+    "adf_status": "ok",
+    "final_train_aic": 35184.45825296923
+  },
+  "adf": {
+    "device_id": "101990961244800083",
+    "variable": "air_humidity",
+    "adf_statistic": -2.7408410819745184,
+    "adf_pvalue": 0.06723366251905859,
+    "adf_lags": 24,
+    "adf_sample_hours": 1477,
+    "adf_sample_start": "2025-12-01 15:00:00+00:00",
+    "adf_sample_end": "2026-02-01 03:00:00+00:00",
+    "adf_status": "ok",
+    "adf_critical_5pct": -2.8635325860671696,
+    "d": 1
+  },
+  "splits": [
+    {
+      "device_id": "101990961244800083",
+      "variable": "air_humidity",
+      "split": "train",
+      "hours": 6728,
+      "observed_hours": 5730,
+      "start_utc": "2025-08-10 06:00:00+00:00",
+      "end_utc": "2026-05-17 13:00:00+00:00"
+    },
+    {
+      "device_id": "101990961244800083",
+      "variable": "air_humidity",
+      "split": "validation",
+      "hours": 1441,
+      "observed_hours": 574,
+      "start_utc": "2026-05-17 14:00:00+00:00",
+      "end_utc": "2026-07-16 14:00:00+00:00"
+    },
+    {
+      "device_id": "101990961244800083",
+      "variable": "air_humidity",
+      "split": "test",
+      "hours": 1443,
+      "observed_hours": 498,
+      "start_utc": "2026-07-16 15:00:00+00:00",
+      "end_utc": "2026-09-14 17:00:00+00:00"
+    }
+  ]
+}
