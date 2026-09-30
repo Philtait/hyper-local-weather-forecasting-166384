@@ -1,0 +1,82 @@
+{
+  "metrics": {
+    "device_id": "101990961244800083",
+    "variable": "air_temperature",
+    "status": "ok",
+    "rmse": 1.2416167393069024,
+    "mae": 0.7479384284031678,
+    "mape": 3.172932270663535,
+    "rmse_naive": 1.8689424107497972,
+    "skill_score": 0.33565810687083675,
+    "test_hours": 1443,
+    "test_observed_hours": 498,
+    "evaluated_hours": 421,
+    "mape_hours": 421,
+    "excluded_test_hours": 1022,
+    "error": "",
+    "elapsed_seconds": 611.0344243
+  },
+  "params": {
+    "device_id": "101990961244800083",
+    "variable": "air_temperature",
+    "status": "ok",
+    "p": 1,
+    "d": 0,
+    "q": 0,
+    "P": 1,
+    "D": 1,
+    "Q": 1,
+    "s": 24,
+    "validation_aic": 1734.8294417951556,
+    "validation_loglikelihood": -863.4147208975778,
+    "parameter_count": 4,
+    "train_aic": 15807.479165743398,
+    "error": "",
+    "successful_candidates": 9,
+    "adf_pvalue": 0.01877486031924163,
+    "adf_status": "ok",
+    "final_train_aic": 17532.248869628176
+  },
+  "adf": {
+    "device_id": "101990961244800083",
+    "variable": "air_temperature",
+    "adf_statistic": -3.2214737405680873,
+    "adf_pvalue": 0.01877486031924163,
+    "adf_lags": 24,
+    "adf_sample_hours": 1477,
+    "adf_sample_start": "2025-12-01 15:00:00+00:00",
+    "adf_sample_end": "2026-02-01 03:00:00+00:00",
+    "adf_status": "ok",
+    "adf_critical_5pct": -2.8635325860671696,
+    "d": 0
+  },
+  "splits": [
+    {
+      "device_id": "101990961244800083",
+      "variable": "air_temperature",
+      "split": "train",
+      "hours": 6728,
+      "observed_hours": 5730,
+      "start_utc": "2025-08-10 06:00:00+00:00",
+      "end_utc": "2026-05-17 13:00:00+00:00"
+    },
+    {
+      "device_id": "101990961244800083",
+      "variable": "air_temperature",
+      "split": "validation",
+      "hours": 1441,
+      "observed_hours": 574,
+      "start_utc": "2026-05-17 14:00:00+00:00",
+      "end_utc": "2026-07-16 14:00:00+00:00"
+    },
+    {
+      "device_id": "101990961244800083",
+      "variable": "air_temperature",
+      "split": "test",
+      "hours": 1443,
+      "observed_hours": 498,
+      "start_utc": "2026-07-16 15:00:00+00:00",
+      "end_utc": "2026-09-14 17:00:00+00:00"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "metrics": {
+    "device_id": "101990961244800083",
+    "variable": "barometric_pressure_hpa",
+    "status": "ok",
+    "rmse": 0.3276854872627573,
+    "mae": 0.236582175664388,
+    "mape": 0.027031890471095495,
+    "rmse_naive": 0.6131326211633756,
+    "skill_score": 0.46555528779239086,
+    "test_hours": 1443,
+    "test_observed_hours": 481,
+    "evaluated_hours": 409,
+    "mape_hours": 409,
+    "excluded_test_hours": 1034,
+    "error": "",
+    "elapsed_seconds": 709.8576040000007
+  },
+  "params": {
+    "device_id": "101990961244800083",
+    "variable": "barometric_pressure_hpa",
+    "status": "ok",
+    "p": 1,
+    "d": 0,
+    "q": 0,
+    "P": 1,
+    "D": 1,
+    "Q": 1,
+    "s": 24,
+    "validation_aic": 337.75382998516886,
+    "validation_loglikelihood": -164.87691499258443,
+    "parameter_count": 4,
+    "train_aic": 1388.655312493696,
+    "error": "",
+    "successful_candidates": 8,
+    "adf_pvalue": 2.4153348866656904e-05,
+    "adf_status": "ok",
+    "final_train_aic": 1716.2641854362191
+  },
+  "adf": {
+    "device_id": "101990961244800083",
+    "variable": "barometric_pressure_hpa",
+    "adf_statistic": -4.981398599801636,
+    "adf_pvalue": 2.4153348866656904e-05,
+    "adf_lags": 24,
+    "adf_sample_hours": 1477,
+    "adf_sample_start": "2025-12-01 15:00:00+00:00",
+    "adf_sample_end": "2026-02-01 03:00:00+00:00",
+    "adf_status": "ok",
+    "adf_critical_5pct": -2.8635325860671696,
+    "d": 0
+  },
+  "splits": [
+    {
+      "device_id": "101990961244800083",
+      "variable": "barometric_pressure_hpa",
+      "split": "train",
+      "hours": 6728,
+      "observed_hours": 5699,
+      "start_utc": "2025-08-10 06:00:00+00:00",
+      "end_utc": "2026-05-17 13:00:00+00:00"
+    },
+    {
+      "device_id": "101990961244800083",
+      "variable": "barometric_pressure_hpa",
+      "split": "validation",
+      "hours": 1441,
+      "observed_hours": 566,
+      "start_utc": "2026-05-17 14:00:00+00:00",
+      "end_utc": "2026-07-16 14:00:00+00:00"
+    },
+    {
+      "device_id": "101990961244800083",
+      "variable": "barometric_pressure_hpa",
+      "split": "test",
+      "hours": 1443,
+      "observed_hours": 481,
+      "start_utc": "2026-07-16 15:00:00+00:00",
+      "end_utc": "2026-09-14 17:00:00+00:00"
+    }
+  ]
+}

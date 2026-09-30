@@ -1,0 +1,82 @@
+{
+  "metrics": {
+    "device_id": "101990961244800083",
+    "variable": "wind_speed",
+    "status": "ok",
+    "rmse": 0.5059229168280446,
+    "mae": 0.3635693902152759,
+    "mape": 59.02888165860733,
+    "rmse_naive": 0.6646971125067549,
+    "skill_score": 0.23886698571613973,
+    "test_hours": 1443,
+    "test_observed_hours": 498,
+    "evaluated_hours": 421,
+    "mape_hours": 282,
+    "excluded_test_hours": 1022,
+    "error": "",
+    "elapsed_seconds": 557.3315758000008
+  },
+  "params": {
+    "device_id": "101990961244800083",
+    "variable": "wind_speed",
+    "status": "ok",
+    "p": 1,
+    "d": 0,
+    "q": 1,
+    "P": 1,
+    "D": 1,
+    "Q": 1,
+    "s": 24,
+    "validation_aic": 615.201803886863,
+    "validation_loglikelihood": -302.6009019434315,
+    "parameter_count": 5,
+    "train_aic": 5802.826492925489,
+    "error": "",
+    "successful_candidates": 9,
+    "adf_pvalue": 0.0008692638550857501,
+    "adf_status": "ok",
+    "final_train_aic": 6404.474789814513
+  },
+  "adf": {
+    "device_id": "101990961244800083",
+    "variable": "wind_speed",
+    "adf_statistic": -4.128312170190796,
+    "adf_pvalue": 0.0008692638550857501,
+    "adf_lags": 23,
+    "adf_sample_hours": 1477,
+    "adf_sample_start": "2025-12-01 15:00:00+00:00",
+    "adf_sample_end": "2026-02-01 03:00:00+00:00",
+    "adf_status": "ok",
+    "adf_critical_5pct": -2.8635312133080046,
+    "d": 0
+  },
+  "splits": [
+    {
+      "device_id": "101990961244800083",
+      "variable": "wind_speed",
+      "split": "train",
+      "hours": 6728,
+      "observed_hours": 5730,
+      "start_utc": "2025-08-10 06:00:00+00:00",
+      "end_utc": "2026-05-17 13:00:00+00:00"
+    },
+    {
+      "device_id": "101990961244800083",
+      "variable": "wind_speed",
+      "split": "validation",
+      "hours": 1441,
+      "observed_hours": 574,
+      "start_utc": "2026-05-17 14:00:00+00:00",
+      "end_utc": "2026-07-16 14:00:00+00:00"
+    },
+    {
+      "device_id": "101990961244800083",
+      "variable": "wind_speed",
+      "split": "test",
+      "hours": 1443,
+      "observed_hours": 498,
+      "start_utc": "2026-07-16 15:00:00+00:00",
+      "end_utc": "2026-09-14 17:00:00+00:00"
+    }
+  ]
+}
