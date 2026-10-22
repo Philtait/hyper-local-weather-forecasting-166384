@@ -1,4 +1,4 @@
-# Imarika — Hyper-Localised Agricultural Weather Forecasting
+# Hyper-Localised Agricultural Weather Forecasting
 **A Case Study of Busia County, Kenya**
 
 Imarika is a farm-level weather forecasting system for smallholder farmers in Busia County, Western Kenya. It combines real-time data from 26 IoT weather stations with satellite reanalysis datasets to deliver 7-day forecasts, planting advisories, flood alerts, and SMS notifications.
