@@ -219,3 +219,6 @@ __marimo__/
 
 # Project data files (too large for GitHub)
 data/
+
+# Course reference material (do not publish)
+docs/reference/
