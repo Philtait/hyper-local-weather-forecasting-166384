@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd  # pyright: ignore[reportMissingModuleSource]
 
 from preprocess import (
-    IOT_WEATHER, add_time_features, derive_rainfall, hourly_iot,
+    IOT_WEATHER, add_time_features, convert_units, derive_rainfall, hourly_iot,
     interpolate_iot, interpolate_short_gaps, merge_sources, read_source,
 )
 
@@ -36,6 +36,35 @@ class PreprocessingTests(unittest.TestCase):
         self.assertEqual(result.rainfall_mm.iloc[:4].tolist(), [0, 2, 0, 2])
         self.assertTrue(result.rainfall_mm.iloc[4:6].isna().all())
         self.assertEqual(result.rainfall_mm.iloc[6:].tolist(), [0, 3])
+
+    def test_pressure_below_850_hpa_becomes_missing(self):
+        frame = pd.DataFrame({"barometric_pressure": [44700.0, 84999.0, 85000.0, 88000.0]})
+        result = convert_units(frame)
+        self.assertTrue(result.barometric_pressure.iloc[:2].isna().all())
+        self.assertEqual(result.barometric_pressure.iloc[2:].tolist(), [850.0, 880.0])
+
+    def test_rain_after_gap_over_six_hours_is_missing(self):
+        frame = pd.DataFrame({
+            "device_id": ["A"] * 4,
+            "received_at": pd.to_datetime([
+                "2026-01-01 00:00Z", "2026-01-01 00:15Z",
+                "2026-01-01 06:15Z", "2026-01-01 12:16Z",
+            ]),
+            "rain_accumulation": [10.0, 11.0, 12.0, 400.0],
+        })
+        result = derive_rainfall(frame)
+        # Exactly six hours is kept; six hours and one minute is not.
+        self.assertEqual(result.rainfall_mm.iloc[:3].tolist(), [0, 1, 1])
+        self.assertTrue(pd.isna(result.rainfall_mm.iloc[3]))
+
+    def test_large_increment_at_normal_cadence_is_kept(self):
+        frame = pd.DataFrame({
+            "device_id": ["A"] * 2,
+            "received_at": pd.to_datetime(["2026-01-01 00:00Z", "2026-01-01 00:15Z"]),
+            "rain_accumulation": [5.0, 65.0],
+        })
+        result = derive_rainfall(frame)
+        self.assertEqual(result.rainfall_mm.tolist(), [0, 60])
 
     def test_interpolation_does_not_cross_stations_or_rain_segments(self):
         frame = pd.DataFrame({

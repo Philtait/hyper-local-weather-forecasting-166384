@@ -23,6 +23,9 @@ import pandas as pd  # pyright: ignore[reportMissingModuleSource]
 DATA_DIR = Path(__file__).resolve().parent / "data"
 LOCAL_TZ = "Africa/Nairobi"
 MAX_INTERPOLATION_GAP = pd.Timedelta(hours=6)
+# Lower plausibility bound for station pressure in hPa; readings below it are
+# treated as sensor faults. Project choice, not taken from a published source.
+PRESSURE_MIN_HPA = 850.0
 TEST_DEVICE = "test-spatial-check-device"
 IOT_WEATHER = [
     "air_temperature", "air_humidity", "barometric_pressure", "wind_speed",
@@ -110,10 +113,17 @@ def derive_rainfall(frame):
         group["rainfall_mm"] = segments.rain_accumulation.diff().clip(lower=0)
         # This convention also sets the station's first retained reading to zero.
         group.loc[segments.cumcount().eq(0), "rainfall_mm"] = 0.0
+        # A difference taken across a long outage lumps all rain from the outage
+        # into one reading and cannot be placed in time, so leave it unknown.
+        long_gap = segments.received_at.diff().gt(MAX_INTERPOLATION_GAP)
+        group["rain_after_long_gap"] = long_gap
+        group.loc[long_gap, "rainfall_mm"] = float("nan")
         parts.append(group)
     result = pd.concat(parts, ignore_index=True)
     print(f"Rain counter transitions segmented: {int(result.rain_reset.sum()):,}")
-    return result
+    print(f"Rainfall set to NaN after gaps over {MAX_INTERPOLATION_GAP}: "
+          f"{int(result.rain_after_long_gap.sum()):,}")
+    return result.drop(columns="rain_after_long_gap")
 
 
 # =============================================================================
@@ -123,6 +133,11 @@ def convert_units(frame):
     frame = frame.copy()
     # Keep the original column name; barometric_pressure now has units of hPa.
     frame["barometric_pressure"] = frame.barometric_pressure / 100.0
+    # Mask faulty pressure here, before interpolation and hourly means, so that
+    # a fault is treated as a missing reading rather than averaged in.
+    faulty = frame.barometric_pressure.lt(PRESSURE_MIN_HPA)
+    frame.loc[faulty, "barometric_pressure"] = float("nan")
+    print(f"Pressure set to NaN below {PRESSURE_MIN_HPA:g} hPa: {int(faulty.sum()):,}")
     return frame
 
 
@@ -268,8 +283,11 @@ def print_summary(name, frame, time_column):
     print(missing.to_string())
 
 
-def main(data_dir=DATA_DIR):
-    clean = filter_iot(read_source(data_dir / "all_readings.csv"))
+def main(data_dir=DATA_DIR, iot_csv=None, clean_out=None, unified_out=None):
+    iot_csv = iot_csv or data_dir / "all_readings.csv"
+    clean_path = clean_out or data_dir / "iot_clean.csv"
+    unified_path = unified_out or data_dir / "unified_dataset.csv"
+    clean = filter_iot(read_source(iot_csv))
     clean = derive_rainfall(clean)
     clean = convert_units(clean)
     clean = interpolate_iot(clean)
@@ -277,8 +295,6 @@ def main(data_dir=DATA_DIR):
     meteo, nasa, chirps = load_references(data_dir)
     unified = merge_sources(hourly_iot(clean), meteo, nasa, chirps)
 
-    clean_path = data_dir / "iot_clean.csv"
-    unified_path = data_dir / "unified_dataset.csv"
     clean.to_csv(clean_path, index=False)
     unified.to_csv(unified_path, index=False)
     print_summary("Clean IoT", clean, "received_at")
@@ -291,5 +307,13 @@ def main(data_dir=DATA_DIR):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
-    main(parser.parse_args().data_dir)
+    parser.add_argument("--data-dir", type=Path, default=DATA_DIR,
+                        help="folder with the input CSVs (default: data/)")
+    parser.add_argument("--iot-csv", type=Path,
+                        help="raw IoT readings (default: DATA_DIR/all_readings.csv)")
+    parser.add_argument("--clean-out", type=Path,
+                        help="cleaned readings output (default: DATA_DIR/iot_clean.csv)")
+    parser.add_argument("--unified-out", type=Path,
+                        help="unified hourly output (default: DATA_DIR/unified_dataset.csv)")
+    args = parser.parse_args()
+    main(args.data_dir, args.iot_csv, args.clean_out, args.unified_out)
