@@ -1,19 +1,24 @@
-"""Offline Streamlit presentation dashboard for the Imarika project.
+"""Streamlit dashboard for the Imarika project.
 
 Run: streamlit run app.py
-Reads local CSV/JSON/Markdown/PNG files only; imports or runs no trained models.
-The station map uses local Plotly coordinates rather than st.map's network tile
-service, so the presentation remains usable with the network disconnected.
+Reads saved results in reports/, exported forecasts in deploy_data/ (the only
+forecast source in the deployed app) and, when present locally, data/. It runs
+no trained models. Maps use local Plotly coordinates rather than web tiles.
+Test SMS sending goes through sms_sender.py and needs a confirm click.
 """
 
 import json
 import re
+from datetime import date, timedelta
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
+
+from insights import generate_insights, sms_text
+from sms_sender import send_with_fallback, validate_phone
 
 
 # =============================================================================
@@ -25,7 +30,22 @@ REPORTS = ROOT / "reports"
 GREEN = "#2E7D32"
 RED = "#B3261E"
 REPRESENTATIVE = "101990961244800083"
-LOCAL_TZ = "Africa/Nairobi"
+GREY = "#9E9E9E"
+# Forecast export contract: the only files the forecast pages read.
+DEPLOY = ROOT / "deploy_data"
+DEPLOY_FILES = {
+    "forecast_daily.csv": ["device_id", "date", "rain_mm", "rain_upper", "temp_min", "temp_max", "wind_max"],
+    "station_status.csv": ["device_id", "latitude", "longitude", "last_reading_utc", "active", "reason"],
+    "insights_latest.csv": ["device_id", "type", "severity", "start_date", "message", "basis", "as_of", "caveat"],
+    "README.md": None,
+}
+NOT_GENERATED = "Forecasts have not been generated yet."
+FORECAST_CAVEATS = [
+    "Model orders are reused from one station and not tuned per station.",
+    "Rainfall forecasts are less reliable than temperature forecasts.",
+    "The rain upper envelope is not a statistical interval.",
+]
+INSIGHT_LABELS = {"flood_alert": "Flood alert", "planting_window": "Planting window", "rain_delay": "Rain delay"}
 VARIABLES = {
     "air_temperature": ("Temperature", "°C", ["air_temperature", "iot_air_temperature"]),
     "air_humidity": ("Humidity", "%", ["air_humidity", "iot_air_humidity"]),
@@ -33,7 +53,7 @@ VARIABLES = {
     "wind_speed": ("Wind speed", "m/s", ["wind_speed", "iot_wind_speed"]),
     "rainfall_mm": ("Rainfall", "mm", ["rainfall_mm", "iot_rainfall_mm"]),
 }
-PAGES = ["Project Overview", "Data Collection", "Model Results", "Live Demo", "About"]
+PAGES = ["Project Overview", "Data Collection", "Model Results", "Forecast and Advisories", "Network Status", "About"]
 
 # Collection snapshot from the supplied files. IoT count is BEFORE Busia/QC
 # filtering; the quality report instead counts 717,471 geographically valid rows.
@@ -114,7 +134,13 @@ def station_coordinates(records):
 
 
 def load_stations():
-    text = load_text(DATA / "busia_stations.json")
+    path = DATA / "busia_stations.json"
+    if not path.is_file():
+        st.info("The station registry (data/busia_stations.json) is only available when the app runs "
+                "locally with the data/ folder, so the map is not shown here. The Network Status page "
+                "shows the stations from the exported forecast files.")
+        return None
+    text = load_text(path)
     if text is None:
         return None
     try:
@@ -124,44 +150,6 @@ def load_stations():
         return stations
     except (ValueError, TypeError, KeyError) as error:
         st.warning(f"Cannot parse data/busia_stations.json: {error}")
-        return None
-
-
-@st.cache_data(show_spinner=False)
-def read_unified_cached(path, signature):
-    columns = pd.read_csv(path, nrows=0).columns
-    timestamp = next((c for c in ["timestamp", "hour", "received_at"] if c in columns), None)
-    if timestamp is None or "device_id" not in columns:
-        raise ValueError("expected device_id and timestamp/hour columns")
-    aliases = {}
-    for target, (_, _, candidates) in VARIABLES.items():
-        source = next((c for c in candidates if c in columns), None)
-        if source:
-            aliases[source] = target
-    if not aliases:
-        raise ValueError("none of the five weather variables are available")
-    frame = pd.read_csv(path, usecols=["device_id", timestamp] + list(aliases),
-                        dtype={"device_id": "string"}, low_memory=False)
-    frame = frame.rename(columns={timestamp: "timestamp", **aliases})
-    frame["device_id"] = clean_ids(frame.device_id)
-    frame["timestamp"] = pd.to_datetime(frame.timestamp, format="mixed", utc=True, errors="coerce")
-    if frame.timestamp.isna().any() or frame.device_id.isna().any() or frame.device_id.eq("").any():
-        raise ValueError("missing/invalid timestamps or station identifiers")
-    if not frame.timestamp.eq(frame.timestamp.dt.floor("h")).all():
-        raise ValueError("unified timestamps must lie on hourly boundaries")
-    if frame.duplicated(["device_id", "timestamp"]).any():
-        raise ValueError("duplicate station/hour records")
-    for target in aliases.values():
-        frame[target] = pd.to_numeric(frame[target], errors="coerce").replace([np.inf, -np.inf], np.nan)
-    return frame.loc[frame.device_id.ne("test-spatial-check-device")].sort_values(["device_id", "timestamp"])
-
-
-def load_unified():
-    path = DATA / "unified_dataset.csv"
-    try:
-        return read_unified_cached(str(path), file_signature(path))
-    except (OSError, ValueError, pd.errors.ParserError) as error:
-        st.warning(f"Cannot load {display_path(path)}: {error}")
         return None
 
 
@@ -200,57 +188,6 @@ def skill_colour(value):
     if pd.isna(value):
         return ""
     return f"color: {GREEN if value > 0 else RED if value < 0 else '#526159'}; font-weight: 600"
-
-
-def seasonal_persistence(series):
-    """Last seven available days and next-day persistence, compared in UTC.
-
-    Accept timezone-aware strings as well as DatetimeIndex input. Convert every
-    timestamp to the same timezone BEFORE sorting, filtering, or reindexing;
-    merely stripping an offset would change the instant it represents. The end
-    is the selected variable's latest non-null reading, not today's date or a
-    trailing placeholder row. Missing measurements remain missing.
-    """
-    if series.empty:
-        raise ValueError("An hourly time series is required")
-    series = series.copy()
-    series.index = pd.DatetimeIndex(pd.to_datetime(series.index, format="mixed", utc=True, errors="coerce"))
-    if series.index.isna().any():
-        raise ValueError("Invalid hourly timestamps")
-    if series.index.has_duplicates:
-        raise ValueError("Duplicate hourly timestamps")
-    series = series.sort_index()
-    end = series.last_valid_index()
-    if end is None:
-        end = series.index.max()
-    # Open left / closed right gives exactly 168 clock hours, including end.
-    # Use datetime comparisons, never string/date-only comparisons or wall time.
-    start = end - pd.Timedelta(days=7)
-    window = series.loc[(series.index > start) & (series.index <= end)]
-    actual_index = pd.date_range(end=end, periods=168, freq="h")
-    actual = window.reindex(actual_index)
-    previous_day = pd.date_range(end - pd.Timedelta(hours=23), end, freq="h")
-    future = pd.date_range(end + pd.Timedelta(hours=1), periods=24, freq="h")
-    forecast = pd.Series(actual.reindex(previous_day).to_numpy(), index=future, name="Persistence baseline forecast")
-    return actual, forecast
-
-
-def demo_figure(actual, forecast, label, unit):
-    figure = go.Figure()
-    local_actual = actual.index.tz_convert(LOCAL_TZ).tz_localize(None)
-    local_future = forecast.index.tz_convert(LOCAL_TZ).tz_localize(None)
-    figure.add_trace(go.Scatter(x=local_actual, y=actual, mode="lines", name="Actual readings",
-                               line={"color": GREEN, "width": 2}, connectgaps=False))
-    # Include the final historical point solely to visually join the forecast.
-    figure.add_trace(go.Scatter(x=[local_actual[-1], *local_future], y=[actual.iloc[-1], *forecast],
-                               mode="lines", name="Persistence baseline forecast",
-                               line={"color": "#D9822B", "width": 2.5, "dash": "dot"}, connectgaps=False))
-    figure.add_vrect(x0=local_actual[-1], x1=local_future[-1], fillcolor="#EDF5ED", opacity=.6,
-                    layer="below", line_width=0)
-    figure.update_xaxes(title="Time · Africa/Nairobi (UTC+3)")
-    figure.update_yaxes(title=f"{label} ({unit})")
-    figure.update_layout(hovermode="x unified")
-    return style_figure(figure, height=460)
 
 
 # =============================================================================
@@ -416,61 +353,265 @@ def model_results():
 
 
 # =============================================================================
-# Page 4. Historical interactive demo and next-day seasonal persistence
+# Forecast export (deploy_data/): readers and labels
 # =============================================================================
-def live_demo():
-    st.title("Live Demo")
-    st.write("Explore the latest saved station readings and a transparent next-day baseline.")
-    frame = load_unified()
-    if frame is None or frame.empty:
-        st.warning("No unified readings are available for the demo.")
+def deploy_missing():
+    return [name for name in DEPLOY_FILES if not (DEPLOY / name).is_file()]
+
+
+def deploy_notice(missing):
+    st.info(f"{NOT_GENERATED} The forecast export writes these files to deploy_data/; "
+            f"missing: {', '.join(missing)}.")
+
+
+def load_deploy_csv(name, allow_empty=False):
+    """Read one export CSV, or return None (absent files are reported by deploy_notice)."""
+    path = DEPLOY / name
+    if not path.is_file():
+        return None
+    try:
+        frame = read_csv_cached(str(path), file_signature(path)).copy()
+    except (OSError, ValueError, pd.errors.ParserError) as error:
+        st.warning(f"Cannot read deploy_data/{name}: {error}")
+        return None
+    absent = set(DEPLOY_FILES[name]) - set(frame.columns)
+    if absent:
+        st.warning(f"deploy_data/{name} is missing columns: {', '.join(sorted(absent))}")
+        return None
+    if frame.empty and not allow_empty:
+        st.warning(f"deploy_data/{name} contains no rows.")
+        return None
+    frame["device_id"] = clean_ids(frame.device_id)
+    return frame.loc[frame.device_id.notna() & frame.device_id.ne("")]
+
+
+def prepare_forecast(frame):
+    frame = frame.copy()
+    frame["date"] = pd.to_datetime(frame.date, errors="coerce").dt.date
+    for column in ["rain_mm", "rain_upper", "temp_min", "temp_max", "wind_max"]:
+        frame[column] = pd.to_numeric(frame[column], errors="coerce").replace([np.inf, -np.inf], np.nan)
+    return frame.loc[frame.date.notna()].sort_values(["device_id", "date"])
+
+
+def prepare_status(frame):
+    frame = frame.copy()
+    for column in ["latitude", "longitude"]:
+        frame[column] = pd.to_numeric(frame[column], errors="coerce")
+    frame["last_seen"] = pd.to_datetime(frame.last_reading_utc, utc=True, errors="coerce", format="mixed")
+    frame["is_active"] = frame.active.astype("string").str.strip().str.lower().isin(["true", "1", "yes", "active"])
+    frame["reason"] = frame.reason.fillna("").astype(str)
+    return frame.sort_values("device_id")
+
+
+def station_area(device_id, status):
+    """Area name if the export provides an optional 'area' column, else None."""
+    if status is None or "area" not in status:
+        return None
+    match = status.loc[status.device_id.eq(device_id), "area"].dropna().astype(str).str.strip()
+    return match.iloc[0] if len(match) and match.iloc[0] else None
+
+
+def station_label(device_id, status):
+    label = f"Station {device_id}"
+    area = station_area(device_id, status)
+    if area:
+        return f"{area} · {label}"
+    if status is not None:
+        row = status.loc[status.device_id.eq(device_id)]
+        if len(row) and row.latitude.notna().iloc[0] and row.longitude.notna().iloc[0]:
+            return f"{label} ({row.latitude.iloc[0]:.3f}°N, {row.longitude.iloc[0]:.3f}°E)"
+    return label
+
+
+def forecast_figures(rows):
+    days = [str(day) for day in rows.date]
+    rain = go.Figure()
+    rain.add_trace(go.Bar(x=days, y=rows.rain_mm, name="Rain forecast", marker_color=GREEN))
+    rain.add_trace(go.Scatter(x=days, y=rows.rain_upper, name="Upper envelope (not a statistical interval)",
+                              mode="lines+markers", line={"color": "#D9822B", "dash": "dash"}))
+    rain.update_yaxes(title="Rain (mm/day)", rangemode="tozero")
+    temperature = go.Figure()
+    temperature.add_trace(go.Scatter(x=days, y=rows.temp_max, name="Maximum", mode="lines+markers",
+                                     line={"color": RED}))
+    temperature.add_trace(go.Scatter(x=days, y=rows.temp_min, name="Minimum", mode="lines+markers",
+                                     line={"color": "#1565C0"}))
+    temperature.update_yaxes(title="Temperature (°C)")
+    wind = go.Figure(go.Scatter(x=days, y=rows.wind_max, name="Maximum wind", mode="lines+markers",
+                                line={"color": "#526159"}))
+    wind.update_yaxes(title="Wind (m/s)", rangemode="tozero")
+    return [style_figure(figure, 320) for figure in (rain, temperature, wind)]
+
+
+def render_insight(item):
+    with st.container(border=True):
+        st.markdown(f"**{INSIGHT_LABELS.get(item['type'], item['type'])} · {item['severity']}** "
+                    f"· from {item['start_date']}")
+        st.write(item["message"])
+        st.caption(f"Basis: {item['basis']}")
+        st.caption(f"Caveat: {item['caveat']}")
+
+
+def insight_name(item):
+    return f"{INSIGHT_LABELS.get(item['type'], item['type'])} ({item['severity']}) from {item['start_date']}"
+
+
+def sms_control(insights, area):
+    st.header("Send test SMS")
+    if not insights:
+        st.caption("There is no advisory to send for this station.")
         return
-    stations = load_stations()
-    if stations is not None:
-        frame = frame.loc[frame.device_id.isin(stations.device_id)]
-    if frame.empty:
-        st.warning("No readings match the available Busia station registry.")
+    choice = st.selectbox("Advisory", list(range(len(insights))), key="sms_advisory",
+                          format_func=lambda index: insight_name(insights[index]))
+    text = sms_text(insights[choice], area=area)
+    st.text_area("Message preview", text, disabled=True, key="sms_preview")
+    st.caption(f"{len(text)} characters (single SMS).")
+    phone = st.text_input("Phone number (+254 format)", key="sms_phone", placeholder="+254712345678")
+    if st.button("Confirm and send", key="sms_confirm"):
+        try:
+            number = validate_phone(phone)
+        except ValueError as error:
+            st.error(str(error))
+            return
+        result = send_with_fallback(number, text)
+        if result.sent:
+            st.success(result.detail)
+        else:
+            st.warning(result.detail)
+            st.code(result.text, language=None)
+    st.caption("Nothing is sent until Confirm and send is pressed.")
+
+
+# =============================================================================
+# Page 4. Forecast and advisories (with scenario mode)
+# =============================================================================
+def scenario_mode():
+    st.subheader("Scenario, not a forecast")
+    st.warning("Scenario, not a forecast: enter seven daily rainfall amounts to see which advisories "
+               "the rules would issue. Nothing here comes from a model, and no SMS is sent.")
+    columns = st.columns(7)
+    start = date.today() + timedelta(days=1)
+    dates = [start + timedelta(days=offset) for offset in range(7)]
+    values = [column.number_input(f"Day {index + 1} ({day:%d %b}) mm", min_value=0.0, max_value=1000.0,
+                                  value=0.0, step=1.0, key=f"scenario_rain_{index}")
+              for index, (column, day) in enumerate(zip(columns, dates))]
+    frame = pd.DataFrame({"device_id": "Scenario", "date": dates, "rain_mm": values, "rain_upper": values,
+                          "temp_min": np.nan, "temp_max": np.nan, "wind_max": np.nan})
+    insights = generate_insights(frame)
+    st.header("Scenario advisories")
+    if not insights:
+        st.success("Scenario: no advisory would be issued for these rainfall values.")
+    for item in insights:
+        render_insight(item)
+        st.text_area(f"Scenario SMS preview: {insight_name(item)}", sms_text(item, area="Scenario"),
+                     disabled=True, key=f"scenario_sms_{item['type']}_{item['start_date']}")
+
+
+def forecast_and_advisories():
+    st.title("Forecast and Advisories")
+    mode = st.radio("Mode", ["Forecast", "Scenario"], horizontal=True, key="advisory_mode")
+    if mode == "Scenario":
+        scenario_mode()
         return
-    options = sorted(frame.device_id.unique())
-    left, right = st.columns(2)
-    with left:
-        station = st.selectbox("Station", options, index=options.index(REPRESENTATIVE) if REPRESENTATIVE in options else 0)
-    with right:
-        available = [target for target in VARIABLES if target in frame]
-        variable = st.selectbox("Weather variable", available, format_func=lambda target: VARIABLES[target][0])
-    label, unit, _ = VARIABLES[variable]
-    series = frame.loc[frame.device_id.eq(station)].set_index("timestamp")[variable]
-    actual, forecast = seasonal_persistence(series)
-    observed = actual.dropna()
-    if observed.empty:
-        st.warning("No observed values are available for this station and variable.")
-    cards = st.columns(3)
-    cards[0].metric("Latest observed value", f"{observed.iloc[-1]:.2f} {unit}" if len(observed) else "Unavailable")
-    cards[1].metric("Hours in displayed window", str(len(actual)))
-    cards[2].metric("Forecast horizon", "24 hours")
-    st.plotly_chart(demo_figure(actual, forecast, label, unit), width="stretch",
-                    config={"displayModeBar": False})
-    start = actual.index.min().tz_convert(LOCAL_TZ)
-    cutoff = actual.index.max().tz_convert(LOCAL_TZ)
-    dataset_end = frame.timestamp.max().tz_convert(LOCAL_TZ)
-    st.caption(f"Displayed window: {start:%d %b %Y, %H:%M} – {cutoff:%d %b %Y, %H:%M} EAT. "
-               f"Dataset latest timestamp: {dataset_end:%d %b %Y, %H:%M} EAT. "
-               "The window ends at this station/variable's latest available reading. Solid green: actual data. "
-                "Dotted orange: Persistence baseline forecast.")
-    missing_actual = int(actual.isna().sum())
-    st.caption(f"Observed readings: {len(observed)} / {len(actual)} hourly slots. Missing values: {missing_actual}.")
-    if missing_actual:
-        st.info(f"The full seven-day window is displayed, but {missing_actual} hourly measurements are missing "
-                "in the saved data. Gaps in the line reflect unavailable readings, not timezone filtering.")
-    st.info("Persistence baseline forecast: each of the next 24 hours repeats the corresponding value from the previous 24 hours. "
-            "This is seasonal persistence, displayed from saved data without model inference.")
-    missing = int(forecast.isna().sum())
+    missing = deploy_missing()
     if missing:
-        st.warning(f"{missing} forecast hour(s) remain missing because the corresponding previous-day reading is missing. No values are fabricated.")
+        deploy_notice(missing)
+    forecast = load_deploy_csv("forecast_daily.csv")
+    if forecast is None:
+        st.caption("Scenario mode works without exported forecasts.")
+        return
+    forecast = prepare_forecast(forecast)
+    status = load_deploy_csv("station_status.csv")
+    status = prepare_status(status) if status is not None else None
+    stations = sorted(forecast.device_id.unique())
+    if not stations:
+        st.warning("deploy_data/forecast_daily.csv has no rows with a usable date.")
+        return
+    station = st.selectbox("Station", stations, key="forecast_station",
+                           format_func=lambda device_id: station_label(device_id, status))
+    rows = forecast.loc[forecast.device_id.eq(station)]
+    try:
+        insights = generate_insights(rows)
+    except ValueError as error:
+        st.warning(f"Advisories could not be produced: {error}")
+        insights = []
+    as_of = rows.date.min() - timedelta(days=1)
+    cards = st.columns(3)
+    cards[0].metric("Forecast as of", f"{as_of:%d %b %Y}")
+    cards[1].metric("Forecast days", str(rows.date.nunique()))
+    cards[2].metric("Advisories", str(len(insights)))
+    st.info("Caveats:\n\n" + "\n".join(f"- {caveat}" for caveat in FORECAST_CAVEATS))
+
+    st.header("7-day forecast")
+    table = rows[["date", "rain_mm", "rain_upper", "temp_min", "temp_max", "wind_max"]].rename(columns={
+        "date": "Date", "rain_mm": "Rain (mm)", "rain_upper": "Rain upper envelope (mm)",
+        "temp_min": "Min temp (°C)", "temp_max": "Max temp (°C)", "wind_max": "Max wind (m/s)"})
+    st.dataframe(table, hide_index=True, width="stretch")
+    for tab, figure in zip(st.tabs(["Rainfall", "Temperature", "Wind"]), forecast_figures(rows)):
+        with tab:
+            st.plotly_chart(figure, width="stretch", config={"displayModeBar": False})
+
+    st.header("Advisories")
+    if not insights:
+        st.success("No advisories for this station in the forecast period.")
+    for item in insights:
+        render_insight(item)
+    exported = load_deploy_csv("insights_latest.csv", allow_empty=True)
+    if exported is not None:
+        saved = exported.loc[exported.device_id.eq(station)]
+        if sorted(zip(saved.type, saved.start_date.astype(str))) != sorted(
+                (item["type"], item["start_date"]) for item in insights):
+            st.warning("deploy_data/insights_latest.csv differs from the advisories recomputed from "
+                       "forecast_daily.csv for this station; the export may be out of date.")
+
+    sms_control(insights, station_area(station, status) or f"Station {station}")
+    readme = DEPLOY / "README.md"
+    if readme.is_file():
+        with st.expander("About this forecast export"):
+            st.markdown(load_text(readme) or "")
 
 
 # =============================================================================
-# Page 5. Academic attribution
+# Page 5. Network status from the forecast export
+# =============================================================================
+def network_status():
+    st.title("Network Status")
+    missing = deploy_missing()
+    if missing:
+        deploy_notice(missing)
+    status = load_deploy_csv("station_status.csv")
+    if status is None:
+        return
+    status = prepare_status(status)
+    active, inactive = status.loc[status.is_active], status.loc[~status.is_active]
+    cards = st.columns(3)
+    cards[0].metric("Active stations", str(len(active)))
+    cards[1].metric("Inactive stations", str(len(inactive)))
+    cards[2].metric("Stations listed", str(len(status)))
+    figure = go.Figure()
+    for subset, name, colour in [(active, "Active", GREEN), (inactive, "Inactive", GREY)]:
+        mapped = subset.loc[subset.latitude.notna() & subset.longitude.notna()]
+        seen = mapped.last_seen.dt.strftime("%Y-%m-%d %H:%M UTC").fillna("never")
+        figure.add_trace(go.Scatter(
+            x=mapped.longitude, y=mapped.latitude, mode="markers", name=name,
+            customdata=np.column_stack([mapped.device_id, seen, mapped.reason]) if len(mapped) else None,
+            marker={"color": colour, "size": 12, "line": {"color": "white", "width": 1.5}},
+            hovertemplate=(f"Station %{{customdata[0]}}<br>{name}<br>Last seen %{{customdata[1]}}"
+                           "<br>%{customdata[2]}<extra></extra>")))
+    figure.update_xaxes(title="Longitude (°E)", range=[34.1, 34.6])
+    figure.update_yaxes(title="Latitude (°N)", range=[0.1, 0.7], scaleanchor="x", scaleratio=1)
+    st.plotly_chart(style_figure(figure, 460), width="stretch", config={"displayModeBar": False})
+    unmapped = int((status.latitude.isna() | status.longitude.isna()).sum())
+    if unmapped:
+        st.caption(f"{unmapped} station(s) have no usable coordinates and are not mapped.")
+    st.caption("Offline coordinate map within the study bounding box. Green: active. Grey: inactive.")
+    st.dataframe(status.assign(last_seen=status.last_seen.dt.strftime("%Y-%m-%d %H:%M UTC"))[
+        ["device_id", "is_active", "last_seen", "reason"]].rename(columns={
+            "device_id": "Station", "is_active": "Active", "last_seen": "Last reading", "reason": "Reason"}),
+        hide_index=True, width="stretch")
+
+
+# =============================================================================
+# Page 6. Academic attribution
 # =============================================================================
 def about():
     st.title("About the Project")
@@ -522,7 +663,8 @@ def main():
         "Project Overview": project_overview,
         "Data Collection": data_collection,
         "Model Results": model_results,
-        "Live Demo": live_demo,
+        "Forecast and Advisories": forecast_and_advisories,
+        "Network Status": network_status,
         "About": about,
     }[page]()
 
