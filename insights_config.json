@@ -1,0 +1,29 @@
+{
+  "forecast": {
+    "horizon_days": 7,
+    "source": "Project objective: 7-day forecasts. Days after the horizon are ignored."
+  },
+  "flood_alert": {
+    "watch_mm": 20,
+    "warning_mm": 50,
+    "source": "Kenya Meteorological Department heavy rainfall advisories: heavy rainfall above 20 mm and very heavy rainfall above 50 mm in 24 hours. Applied here as rain_mm >= 20 (watch) and rain_mm >= 50 (warning)."
+  },
+  "planting_window": {
+    "window_days": 5,
+    "min_total_mm": 20,
+    "min_rain_days": 3,
+    "rain_day_mm": 1,
+    "source": "Published rainy-season onset definitions: 20 mm over 5 days with at least 3 rain days (rain day = at least 1 mm).",
+    "limitation": "Published definitions also require that no long dry spell follows, which needs 21 to 30 days of look-ahead. The forecast covers 7 days, so no dry-spell check is made."
+  },
+  "rain_delay": {
+    "lookahead_days": 3,
+    "rain_day_mm": 1,
+    "source": "application-defined, not a published standard"
+  },
+  "sms": {
+    "max_chars": 159,
+    "source": "A single GSM-7 SMS holds 160 characters; the limit is one lower so every message is strictly under 160."
+  },
+  "caveat": "Rainfall forecasts are less reliable than temperature forecasts."
+}
