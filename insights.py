@@ -196,12 +196,13 @@ def sms_action(insight, config):
     day = short_date(pd.Timestamp(insight["start_date"]).date())
     kind, severity = insight["type"], insight["severity"]
     if kind == "flood_alert" and severity == "warning":
-        return f"Flood warning {day}: very heavy rain expected. Move people and livestock to higher ground."
+        return (f"Flood warning {day}: very heavy rain expected. "
+                "If you are in a flood-prone area, move to higher ground.")
     if kind == "flood_alert":
-        return f"Flood watch {day}: heavy rain expected. Clear drains and keep off low-lying fields."
+        return f"Flood watch {day}: heavy rain expected. Clear drains and avoid low-lying fields."
     if kind == "planting_window":
         horizon = config["forecast"]["horizon_days"]
-        return f"Good rains from {day}: you can plant. Dry spells after {horizon} days not checked."
+        return f"Rain from {day} may suit planting. Dry spells beyond {horizon} days are not checked."
     if kind == "rain_delay":
         return f"Rain expected from {day}: delay spraying and harvesting on rainy days."
     raise ValueError(f"unknown insight type: {kind!r}")

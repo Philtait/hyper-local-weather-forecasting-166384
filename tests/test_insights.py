@@ -113,6 +113,28 @@ class InsightsTests(unittest.TestCase):
             short_text = sms_text(item, area="")
             self.assertTrue(long_text.endswith(short_text))
 
+    def test_sms_wording_is_conditional_and_never_truncated(self):
+        insights = generate_insights(forecast([3, 2, 4, 25, 55, 0, 0]))
+        expected = {
+            ("flood_alert", "warning"): "Flood warning 28 Nov: very heavy rain expected. "
+                                        "If you are in a flood-prone area, move to higher ground.",
+            ("flood_alert", "watch"): "Flood watch 27 Nov: heavy rain expected. "
+                                      "Clear drains and avoid low-lying fields.",
+            ("planting_window", "advisory"): "Rain from 24 Nov may suit planting. "
+                                             "Dry spells beyond 7 days are not checked.",
+            ("rain_delay", "advisory"): "Rain expected from 24 Nov: delay spraying and "
+                                        "harvesting on rainy days.",
+        }
+        self.assertEqual({(item["type"], item["severity"]) for item in insights}, set(expected))
+        long_area = "Nambale Township Ward, Busia County, Western Kenya " * 10
+        for item in insights:
+            action = expected[(item["type"], item["severity"])]
+            self.assertEqual(sms_text(item, area=""), action)
+            for area in [None, "Busia", long_area]:
+                text = sms_text(item, area=area)
+                self.assertLess(len(text), 160)
+                self.assertTrue(text.endswith(action))
+
     def test_every_config_section_has_a_source(self):
         config = load_config()
         for section in ["forecast", "flood_alert", "planting_window", "rain_delay", "sms"]:
