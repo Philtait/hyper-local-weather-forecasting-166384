@@ -1,69 +1,62 @@
-"""Dashboard navigation, absent-file handling, and faithful persistence/audit data."""
+"""Dashboard navigation, absent-file handling, forecast export pages and test SMS."""
 
 import tempfile
 import unittest
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 from streamlit.testing.v1 import AppTest
 
-from app import ROOT, demo_figure, parse_audit, read_unified_cached, seasonal_persistence, station_coordinates
+from app import FORECAST_CAVEATS, NOT_GENERATED, PAGES, ROOT, parse_audit, station_coordinates
+from insights import generate_insights
+
+
+def write_fixture(root):
+    """Small synthetic forecast export in a temporary folder (tests only)."""
+    deploy = root / "deploy_data"
+    deploy.mkdir()
+    dates = pd.date_range("2026-11-24", periods=7, freq="D").strftime("%Y-%m-%d")
+    forecast = pd.concat([
+        pd.DataFrame({"device_id": "A", "date": dates, "rain_mm": [0, 0, 5, 25, 55, 0, 0],
+                      "rain_upper": [0, 1, 8, 40, 80, 2, 0]}),
+        pd.DataFrame({"device_id": "B", "date": dates, "rain_mm": [0.0] * 7, "rain_upper": [0.5] * 7}),
+    ]).assign(temp_min=16.0, temp_max=29.0, wind_max=4.0)
+    forecast.to_csv(deploy / "forecast_daily.csv", index=False)
+    pd.DataFrame({
+        "device_id": ["A", "B"], "latitude": [0.45, 0.30], "longitude": [34.2, 34.4],
+        "last_reading_utc": ["2026-11-23T18:00:00Z", "2026-09-07T16:02:00Z"],
+        "active": [True, False], "reason": ["", "No readings since 7 Sep 2026"], "area": ["Nambale", None],
+    }).to_csv(deploy / "station_status.csv", index=False)
+    pd.DataFrame(generate_insights(forecast)).to_csv(deploy / "insights_latest.csv", index=False)
+    (deploy / "README.md").write_text("Synthetic test export.\n", encoding="utf-8")
+    return deploy
+
+
+def script(deploy, data=None, reports=None):
+    """App script with deploy_data (and optionally data/ and reports/) redirected.
+
+    SMS credentials are forced absent and the SDK is replaced by a mock that
+    fails if touched, so no test can reach the network or read real secrets.
+    """
+    patches = [f"patch.object(app, 'DEPLOY', Path({str(deploy)!r}))",
+               "patch.object(sms_sender, 'load_credentials', return_value=None)",
+               "patch.dict(sys.modules, {'africastalking': NO_NETWORK})"]
+    if data:
+        patches.append(f"patch.object(app, 'DATA', Path({str(data)!r}))")
+    if reports:
+        patches.append(f"patch.object(app, 'REPORTS', Path({str(reports)!r}))")
+    return ("import sys\nfrom pathlib import Path\nfrom unittest.mock import MagicMock, patch\n"
+            "import app, sms_sender\n"
+            "NO_NETWORK = MagicMock()\n"
+            "NO_NETWORK.initialize.side_effect = AssertionError('network access in a test')\n"
+            f"with {', '.join(patches)}:\n    app.main()\n")
+
+
+def values(elements):
+    return [element.value for element in elements]
 
 
 class DashboardTests(unittest.TestCase):
-    def test_persistence_repeats_clock_hours_including_gaps(self):
-        index = pd.date_range("2026-01-01", periods=200, freq="h", tz="UTC")
-        series = pd.Series(np.arange(200, dtype=float), index=index).drop(index[185])
-        actual, forecast = seasonal_persistence(series)
-        self.assertEqual(len(actual), 168)
-        self.assertEqual(len(forecast), 24)
-        self.assertEqual(forecast.index.min(), index[-1] + pd.Timedelta(hours=1))
-        self.assertEqual(forecast.index.max(), index[-1] + pd.Timedelta(hours=24))
-        np.testing.assert_allclose(forecast.to_numpy(), series.reindex(index[-24:]).to_numpy(), equal_nan=True)
-        self.assertTrue(pd.isna(forecast.iloc[9]))
-        figure = demo_figure(actual, forecast, "Temperature", "°C")
-        self.assertEqual(figure.data[1].line.dash, "dot")
-        self.assertEqual(figure.data[1].name, "Persistence baseline forecast")
-
-    def test_seven_day_window_is_identical_for_mixed_timezone_strings(self):
-        index = pd.date_range(end="2026-09-14 17:00:00Z", periods=240, freq="h")
-        baseline = pd.Series(np.arange(240, dtype=float), index=index)
-        actual, forecast = seasonal_persistence(baseline)
-        zones = ["UTC", "Africa/Nairobi", "America/New_York", "Asia/Kolkata"]
-        timestamps = [time.tz_convert(zones[i % len(zones)]).isoformat() for i, time in enumerate(index)]
-        strings = pd.Series(baseline.to_numpy(), index=timestamps).iloc[::-1]
-        converted, predicted = seasonal_persistence(strings)
-        pd.testing.assert_series_equal(actual, converted)
-        pd.testing.assert_series_equal(forecast, predicted)
-        self.assertEqual(converted.index.min(), pd.Timestamp("2026-09-07 18:00:00Z"))
-        self.assertEqual(converted.index.max(), pd.Timestamp("2026-09-14 17:00:00Z"))
-        self.assertEqual(converted.notna().sum(), 168)
-
-    def test_trailing_placeholders_do_not_move_window_past_available_readings(self):
-        index = pd.date_range(end="2026-09-16 17:00:00Z", periods=240, freq="h")
-        series = pd.Series(np.arange(240, dtype=float), index=index)
-        series.loc[series.index > pd.Timestamp("2026-09-14 17:00:00Z")] = np.nan
-        actual, forecast = seasonal_persistence(series)
-        self.assertEqual(actual.index.max(), pd.Timestamp("2026-09-14 17:00:00Z"))
-        self.assertEqual(actual.notna().sum(), 168)
-        self.assertEqual(forecast.index.min(), pd.Timestamp("2026-09-14 18:00:00Z"))
-
-    def test_csv_loader_handles_mixed_offsets_before_filtering(self):
-        index = pd.date_range(end="2026-09-14 17:00:00Z", periods=200, freq="h")
-        with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / "unified.csv"
-            pd.DataFrame({
-                "device_id": ["101990961244800083"] * len(index),
-                "timestamp": [time.tz_convert("Africa/Nairobi" if i % 2 else "UTC").isoformat()
-                              for i, time in enumerate(index)],
-                "air_temperature": np.arange(len(index), dtype=float),
-            }).to_csv(path, index=False)
-            frame = read_unified_cached(str(path), (path.stat().st_mtime_ns, path.stat().st_size))
-        actual, _ = seasonal_persistence(frame.set_index("timestamp").air_temperature)
-        self.assertEqual(actual.notna().sum(), 168)
-        self.assertEqual(actual.index.max(), pd.Timestamp("2026-09-14 17:00:00Z"))
-
     def test_registry_filter_removes_test_device_and_outside_coordinates(self):
         records = [
             {"device_id": "'good'", "lat": .4, "lon": 34.3},
@@ -82,43 +75,105 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(metrics["reset_candidates"], 2)
         self.assertTrue(all(value is None for value in parse_audit("unrecognized report").values()))
 
-    def test_all_five_pages_render_and_live_demo_controls_work(self):
-        app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=30).run()
-        self.assertFalse(app.exception)
-        self.assertEqual([metric.value for metric in app.metric], ["26", "764,309", "13 months", "4", "1,146,327"])
-        for page in ["Data Collection", "Model Results", "Live Demo", "About"]:
-            app.sidebar.radio[0].set_value(page).run()
-            self.assertFalse(app.exception, f"Page failed: {page}: {app.exception}")
-            if page == "Data Collection":
-                self.assertEqual(app.metric[0].value, "26")
-                self.assertEqual(app.metric[1].value, "94.93%")
-            if page == "Model Results":
-                self.assertEqual(len(app.tabs), 5)
-                app.selectbox[0].set_value("ALL_STATIONS_MEAN").run()
-                self.assertFalse(app.exception)
-                self.assertTrue(any("station(s)" in message.value for message in app.info))
-            if page == "Live Demo":
-                self.assertEqual(len(app.selectbox[0].options), 26)
-                self.assertEqual(app.metric[1].value, "168")
-                self.assertTrue(any("Observed readings: 4 / 168" in caption.value for caption in app.caption))
-                self.assertTrue(any("14 Sep 2026" in caption.value for caption in app.caption))
-                app.selectbox[1].set_value("rainfall_mm").run()
-                self.assertFalse(app.exception)
-                app.selectbox[0].set_value("101990961244800361").run()
-                self.assertFalse(app.exception)
+    def test_real_pages_render_without_deploy_data(self):
+        with tempfile.TemporaryDirectory() as empty:
+            app = AppTest.from_string(script(empty), default_timeout=30).run()
+            self.assertFalse(app.exception)
+            self.assertEqual(values(app.metric), ["26", "764,309", "13 months", "4", "1,146,327"])
+            for page in PAGES[1:]:
+                app.sidebar.radio[0].set_value(page).run()
+                self.assertFalse(app.exception, f"Page failed: {page}: {app.exception}")
+                if page == "Data Collection" and (ROOT / "data/busia_stations.json").is_file():
+                    self.assertEqual(app.metric[0].value, "26")
+                    self.assertEqual(app.metric[1].value, "94.93%")
+                if page == "Model Results":
+                    self.assertEqual(len(app.tabs), 5)
+                    app.selectbox[0].set_value("ALL_STATIONS_MEAN").run()
+                    self.assertFalse(app.exception)
+                    self.assertTrue(any("station(s)" in message for message in values(app.info)))
+                if page in ("Forecast and Advisories", "Network Status"):
+                    self.assertTrue(any(NOT_GENERATED in message for message in values(app.info)))
 
-    def test_missing_artifacts_show_warnings_without_page_exceptions(self):
+    def test_forecast_page_renders_from_synthetic_deploy_data(self):
         with tempfile.TemporaryDirectory() as directory:
-            code = (
-                "from pathlib import Path\nfrom unittest.mock import patch\nimport app\n"
-                f"with patch.object(app, 'DATA', Path({directory!r})), patch.object(app, 'REPORTS', Path({directory!r})):\n"
-                "    app.main()\n"
-            )
-            app = AppTest.from_string(code, default_timeout=30).run()
-            for page in ["Data Collection", "Model Results", "Live Demo"]:
+            deploy = write_fixture(Path(directory))
+            app = AppTest.from_string(script(deploy), default_timeout=30).run()
+            app.sidebar.radio[0].set_value("Forecast and Advisories").run()
+            self.assertFalse(app.exception)
+            self.assertFalse(any(NOT_GENERATED in message for message in values(app.info)))
+            picker = app.selectbox(key="forecast_station")
+            self.assertEqual(picker.options, ["Nambale · Station A", "Station B (0.300°N, 34.400°E)"])
+            metrics = {metric.label: metric.value for metric in app.metric}
+            self.assertEqual(metrics["Forecast as of"], "23 Nov 2026")
+            self.assertEqual(metrics["Advisories"], "4")
+            for caveat in FORECAST_CAVEATS:
+                self.assertTrue(any(caveat in message for message in values(app.info)), caveat)
+            text = " ".join(values(app.markdown))
+            self.assertIn("Flood alert · warning", text)
+            self.assertIn("Rain delay · advisory", text)
+            self.assertEqual(len(app.tabs), 3)
+            self.assertFalse(any("differs" in message for message in values(app.warning)))
+            picker.set_value("B").run()
+            self.assertFalse(app.exception)
+            self.assertTrue(any("No advisories" in message for message in values(app.success)))
+
+    def test_network_status_counts_from_synthetic_deploy_data(self):
+        with tempfile.TemporaryDirectory() as directory:
+            deploy = write_fixture(Path(directory))
+            app = AppTest.from_string(script(deploy), default_timeout=30).run()
+            app.sidebar.radio[0].set_value("Network Status").run()
+            self.assertFalse(app.exception)
+            metrics = {metric.label: metric.value for metric in app.metric}
+            self.assertEqual((metrics["Active stations"], metrics["Inactive stations"]), ("1", "1"))
+            self.assertEqual(metrics["Stations listed"], "2")
+
+    def test_no_crash_when_deploy_data_and_data_are_missing(self):
+        with tempfile.TemporaryDirectory() as empty:
+            app = AppTest.from_string(script(empty, data=empty, reports=empty), default_timeout=30).run()
+            self.assertFalse(app.exception)
+            for page in PAGES:
                 app.sidebar.radio[0].set_value(page).run()
                 self.assertFalse(app.exception, page)
-                self.assertGreater(len(app.warning), 0)
+                if page == "Data Collection":
+                    self.assertTrue(any("busia_stations.json" in message for message in values(app.info)))
+                if page == "Model Results":
+                    self.assertGreater(len(app.warning), 0)
+                if page in ("Forecast and Advisories", "Network Status"):
+                    self.assertTrue(any(NOT_GENERATED in message for message in values(app.info)))
+            app.sidebar.radio[0].set_value("Forecast and Advisories").run()
+            app.radio(key="advisory_mode").set_value("Scenario").run()
+            self.assertFalse(app.exception)
+            self.assertTrue(any("Scenario, not a forecast" in message for message in values(app.warning)))
+
+    def test_scenario_mode_produces_expected_advisory(self):
+        with tempfile.TemporaryDirectory() as empty:
+            app = AppTest.from_string(script(empty), default_timeout=30).run()
+            app.sidebar.radio[0].set_value("Forecast and Advisories").run()
+            app.radio(key="advisory_mode").set_value("Scenario").run()
+            self.assertTrue(any("no advisory" in message for message in values(app.success)))
+            app.number_input(key="scenario_rain_3").set_value(55.0).run()
+            self.assertFalse(app.exception)
+            text = " ".join(values(app.markdown))
+            self.assertIn("Flood alert · warning", text)
+            self.assertNotIn("Rain delay", text)
+            self.assertTrue(any(value.startswith("Scenario: Flood warning") for value in values(app.text_area)))
+            self.assertEqual(len(app.button), 0)  # scenario mode never offers sending
+
+    def test_test_sms_needs_valid_number_and_falls_back_to_preview(self):
+        with tempfile.TemporaryDirectory() as directory:
+            deploy = write_fixture(Path(directory))
+            app = AppTest.from_string(script(deploy), default_timeout=30).run()
+            app.sidebar.radio[0].set_value("Forecast and Advisories").run()
+            preview = app.text_area(key="sms_preview").value
+            self.assertLess(len(preview), 160)
+            app.text_input(key="sms_phone").set_value("0712345678").run()
+            app.button(key="sms_confirm").click().run()
+            self.assertTrue(any("+254" in message for message in values(app.error)))
+            app.text_input(key="sms_phone").set_value("+254712345678").run()
+            app.button(key="sms_confirm").click().run()
+            self.assertFalse(app.exception)
+            self.assertTrue(any("not configured" in message for message in values(app.warning)))
+            self.assertIn(preview, values(app.code))
 
 
 if __name__ == "__main__":
