@@ -4,7 +4,7 @@ Pulls all readings from all 31 devices, saves raw JSON per device,
 then combines into a single CSV. Resumable — skips already-saved devices.
 """
 
-import requests, json, os, time, csv
+import argparse, requests, json, os, time, csv
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -14,8 +14,15 @@ API_KEY  = os.getenv("ANGA_API_KEY")
 BASE     = "https://api.wirelessplanet.co.ke"
 HEADERS  = {"X-API-Key": API_KEY, "Accept": "application/json"}
 
-RAW_DIR  = "data/raw"          # one JSON file per device
-CSV_PATH = "data/all_readings.csv"
+parser = argparse.ArgumentParser(description="Extract all Anga readings.")
+parser.add_argument("--raw-dir", default="data/raw",
+                    help="folder for one raw JSON file per device (default: data/raw)")
+parser.add_argument("--csv-path", default="data/all_readings.csv",
+                    help="combined CSV output (default: data/all_readings.csv)")
+args = parser.parse_args()
+
+RAW_DIR  = args.raw_dir        # one JSON file per device
+CSV_PATH = args.csv_path
 
 os.makedirs(RAW_DIR, exist_ok=True)
 
