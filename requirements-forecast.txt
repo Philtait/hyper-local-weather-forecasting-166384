@@ -1,0 +1,8 @@
+# Forecasting pipeline (preprocess.py, sarima_model.py), pinned to the
+# environment that produced the SARIMA results. The dashboard uses
+# requirements.txt; LSTM training uses requirements-lstm.txt.
+pandas==2.3.3
+numpy==2.3.5
+statsmodels==0.14.5
+scikit-learn==1.7.2
+matplotlib==3.10.7
