@@ -123,6 +123,9 @@
     "legend": "What the colours mean",
     "all_stations": "All weather stations",
     "cluster": "{count} stations here. Tap to zoom in.",
+    "cluster_status": "{count} stations here, most serious: {status}. Tap to zoom in.",
+    "day_quiet": "Quiet day",
+    "no_value": "No data",
     "tiles_offline": "The background map is not available, so only the area outlines are shown.",
     "loading": "Loading the forecast."
   },

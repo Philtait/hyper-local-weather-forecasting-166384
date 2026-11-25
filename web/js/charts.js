@@ -125,7 +125,23 @@
     });
     var yh = y(heavy);
     f.svg.appendChild(el("line", { x1: 0, x2: f.W, y1: yh, y2: yh, stroke: C.heavy, "stroke-width": 1.5, "stroke-dasharray": "6 4" }));
-    label(f.svg, f.W - 4, yh - 5, t("charts.heavy_line"), { "text-anchor": "end", fill: C.heavy, "font-weight": 600,
+    // Put the line's label at an end where no bar or value label reaches up into it.
+    var text = t("charts.heavy_line"), width = text.length * 8 + 8;
+    function clear(x0, x1, lowest) {
+      return days.every(function (d, i) {
+        var cx = f.x(i);
+        if (cx + bw / 2 < x0 || cx - bw / 2 > x1) return true;
+        var tall = d.rain == null ? (bottom - top) * 0.62 : bottom - y(d.rain) + 22;
+        return bottom - tall > lowest;
+      });
+    }
+    var spot = null;
+    [[yh - 5, yh - 2], [yh + 17, yh + 20]].some(function (row) {
+      for (var x0 = f.W - width; x0 >= 0 && !spot; x0 -= 4) if (clear(x0, x0 + width, row[1])) spot = [x0 + 4, row[0]];
+      return spot;
+    });
+    spot = spot || [f.W - width + 4, yh - 5];
+    label(f.svg, spot[0], spot[1], text, { "text-anchor": "start", fill: C.heavy, "font-weight": 600,
       stroke: "#ffffff", "stroke-width": 4, "paint-order": "stroke" });
     divider(f, data.split, top - 10, bottom, true);
     axisDays(f, days, data.split > 0);

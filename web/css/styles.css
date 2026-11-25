@@ -131,7 +131,7 @@ main:focus { outline: none; }
 
 /* ---------------------------------------------------------------- weather map page */
 .area-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
-.area-btn { font: inherit; font-size: 17px; font-weight: 500; min-height: 48px; padding: 10px 16px; border-radius: var(--radius);
+.area-btn { font: inherit; font-size: 17px; font-weight: 500; min-height: 48px; padding: 10px 16px; border-radius: 10px;
   border: 2px solid var(--border); background: var(--white); color: var(--text); cursor: pointer; }
 .area-btn:hover { border-color: var(--leaf); }
 .area-btn[aria-pressed="true"] { background: var(--leaf); border-color: var(--leaf); color: var(--white); }
@@ -148,23 +148,34 @@ main:focus { outline: none; }
 .station-line { color: var(--text-2); font-size: 16px; margin-bottom: 14px; }
 .action { font-size: 20px; font-weight: 500; margin: 16px 0 24px; }
 .result-card h3 { font-size: 18px; margin: 24px 0 10px; color: var(--text); }
-.days-big { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.days-small { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.day { border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 10px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+/* One row per day: weekday, status, rain, temperature. Rows reflow by the card's own width. */
+.result-card { container-type: inline-size; }
+.day-rows { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.day { display: grid; grid-template-columns: 6.2em minmax(0, 1fr) 4.6em 7.4em; align-items: center; gap: 4px 12px;
+  min-height: 48px; padding: 8px 12px; border: 1px solid var(--border); border-left-width: 6px; border-radius: var(--radius); background: var(--white); }
 .day-name { font-weight: 600; }
-.day-rain { display: flex; align-items: center; gap: 6px; font-weight: 600; }
-.day-rain .icon { width: 20px; height: 20px; }
-.day-mm { font-size: 14px; font-weight: 400; color: var(--text-2); }
-.day-temp { color: var(--text-2); font-size: 16px; }
-.days-big .day-name { font-size: 18px; }
-.days-small .day { padding: 8px; font-size: 16px; }
-.days-small .day-temp, .days-small .day-mm { font-size: 14px; }
-.days-small .day-rain .icon { width: 16px; height: 16px; }
-.day.rain-heavy { background: var(--st-watch-bg); border-color: #f3d3a8; }
-.day.rain-very_heavy { background: var(--st-warning-bg); border-color: #f2c2bd; }
-.day.rain-heavy .day-rain { color: var(--st-watch-fg); }
-.day.rain-very_heavy .day-rain { color: var(--st-warning-fg); }
-.day.rain-some .day-rain, .day.rain-dry .day-rain { color: var(--forest); }
+.day-status, .day-mm, .day-temp { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.day-status { font-weight: 600; line-height: 1.25; }
+.day .icon { width: 18px; height: 18px; flex: none; }
+.day-mm, .day-temp { color: var(--text-2); font-size: 16px; white-space: nowrap; }
+.day-mm .icon, .day-temp .icon { color: var(--leaf); }
+.day-warning { border-left-color: var(--st-warning-fg); background: var(--st-warning-bg); }
+.day-watch { border-left-color: var(--st-watch-fg); background: var(--st-watch-bg); }
+.day-planting { border-left-color: var(--st-planting-fg); }
+.day-delay { border-left-color: var(--st-delay-fg); }
+.day-none { border-left-color: var(--border); }
+.day-warning .day-status { color: var(--st-warning-fg); }
+.day-watch .day-status { color: var(--st-watch-fg); }
+.day-planting .day-status { color: var(--st-planting-fg); }
+.day-delay .day-status { color: var(--st-delay-fg); }
+.day-none .day-status { color: var(--text-2); font-weight: 500; }
+@container (max-width: 460px) {
+  .day { grid-template-columns: minmax(0, 1fr) auto auto; gap: 2px 12px; }
+  .day-name { grid-column: 1; grid-row: 1; }
+  .day-mm { grid-column: 2; grid-row: 1; }
+  .day-temp { grid-column: 3; grid-row: 1; }
+  .day-status { grid-column: 1 / -1; grid-row: 2; }
+}
 
 .now-list, .ops-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
 .now-list li { display: flex; align-items: center; gap: 10px; }
@@ -199,12 +210,16 @@ main:focus { outline: none; }
 .mk-delay { background: var(--st-delay-fg); }
 .mk-none { background: var(--st-none-fg); }
 .mk-offline { background: var(--st-offline-fg); border: 2px dashed var(--white); }
-.mk.is-selected { outline: 3px solid var(--forest); outline-offset: 2px; }
-.mk-count { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--forest);
+.mk-count { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
   color: var(--white); font-weight: 700; font-size: 16px; border: 2px solid var(--white); }
+.mk-count.mk-offline { border: 2px dashed var(--white); }
+.mk.in-area, .mk-count.in-area { outline: 4px solid var(--forest); outline-offset: 1px; }
+.mk.is-selected { outline: 4px solid var(--forest); outline-offset: 1px; transform: scale(1.25); }
 .leaflet-container { font-family: inherit; }
+.leaflet-tile-pane { filter: grayscale(0.7) brightness(1.06) contrast(0.92); }
 .leaflet-container .area-label { background: transparent; border: 0; box-shadow: none; padding: 0; color: var(--forest);
-  font-weight: 600; font-size: 14px; text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff; }
+  font-weight: 700; font-size: 14px; paint-order: stroke; -webkit-text-stroke: 4px #fff;
+  text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #fff; }
 .leaflet-container .area-label::before { display: none; }
 .leaflet-marker-icon:focus-visible { outline: 3px solid var(--focus); border-radius: 50%; }
 
@@ -237,10 +252,6 @@ main:focus { outline: none; }
   .hero-actions .btn { width: 100%; justify-content: center; }
   .numbers strong { font-size: 34px; }
   .result-card { padding: 18px; }
-  .days-big { gap: 6px; }
-  .days-big .day { padding: 10px 8px; }
-  .days-big .day-name { font-size: 16px; }
-  .days-small { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #map { height: 380px; }
   .bottom-nav { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000; background: var(--white);
     border-top: 1px solid var(--border); }
@@ -251,33 +262,13 @@ main:focus { outline: none; }
   .bottom-nav a[aria-current="page"] .icon { background: var(--mint); border-radius: var(--radius); }
   .bottom-nav .icon { width: 40px; height: 28px; padding: 2px 8px; }
 }
-@media (max-width: 400px) {
-  .days-big .day-mm { display: block; }
-}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 .status-counts li { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 
-/* Day tiles: rain word, then the amount, then the temperature, each on its own line. */
-.day-rain { align-items: flex-start; line-height: 1.25; }
-.day-rain .icon { margin-top: 1px; }
-.days-small { grid-template-columns: minmax(0, 1fr); gap: 6px; }
-.days-small .day { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) auto; align-items: center; gap: 4px 10px; padding: 8px 12px; }
-.days-small .day-rain { align-items: center; }
-.days-small .day-mm { grid-column: 2; grid-row: 2; margin-top: -4px; }
-.days-small .day-temp { grid-column: 3; grid-row: 1; }
 @media (min-width: 1001px) { .map-col { position: sticky; top: 84px; } }
-@media (max-width: 760px) {
-  .days-small { grid-template-columns: minmax(0, 1fr); }
-  .days-small .day { grid-template-columns: 6.5em minmax(0, 1fr) auto; }
-}
-@media (max-width: 760px) {
-  .days-small .day { grid-template-columns: 7em minmax(0, 1fr); }
-  .days-small .day-temp { grid-column: 1; grid-row: 2; }
-}
-.days-big, .days-small { list-style: none; padding: 0; margin: 0; }
 
 /* ---------------------------------------------------------------- How it works, SMS demo, Contact */
 .sub-title { font-size: 24px; margin-top: 32px; }
@@ -376,3 +367,7 @@ textarea.field { max-width: 640px; resize: vertical; }
   .phone { max-width: none; }
 }
 @media (max-width: 760px) { .media-small img { max-width: 180px; } }
+
+/* ---------------------------------------------------------------- polish */
+[id] { scroll-margin-top: 88px; }
+@media (max-width: 760px) { [id] { scroll-margin-top: 72px; } }

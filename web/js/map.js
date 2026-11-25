@@ -6,20 +6,33 @@
   var TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
   var TILE_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
   var CLUSTER_PX = 34;
-  var state = { meta: null, stations: [], areas: [], selected: null, map: null, layer: null, tilesOff: false };
+  var state = { meta: null, stations: [], areas: [], selected: null, map: null, layer: null, tilesOff: false, areaLayers: {} };
+  var AREA_STYLE = { color: "#1f7a4d", weight: 1.2, dashArray: "4 4", fillColor: "#e8f5ee", fillOpacity: 0.35 };
+  var AREA_CHOSEN = { color: "#0f3d2e", weight: 4, dashArray: null, fillColor: "#e8f5ee", fillOpacity: 0.55 };
 
   function byId(id) { return state.stations.filter(function (s) { return s.id === id; })[0]; }
   function inArea(area) { return state.stations.filter(function (s) { return s.area === area; }).sort(I.bySeverity); }
   function reduceMotion() { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
 
   /* ------------------------------------------------------------ result card */
-  function dayTile(day) {
-    var kind = I.rainClass(day.rain_mm);
-    var mm = day.rain_mm >= 1 ? '<span class="day-mm">' + esc(I.round(day.rain_mm)) + " " + esc(t("rain.unit")) + "</span>" : "";
+  /* A day's status follows the engine's order: flood warning, flood watch, planting window, rain delay, quiet. */
+  function dayStatus(day) {
+    if (day.alert === "warning" || day.alert === "watch") return day.alert;
+    if (day.planting) return "planting";
+    if (day.alert === "delay") return "delay";
+    return "none";
+  }
+
+  function dayRow(day) {
+    var code = dayStatus(day);
+    var word = code === "none" ? t("map.day_quiet") : t("status." + code);
+    var mm = day.rain_mm != null ? I.round(day.rain_mm) + " " + t("rain.unit") : t("map.no_value");
     var temp = day.temp_min != null && day.temp_max != null
-      ? '<span class="day-temp">' + esc(t("time.temp_range", { min: I.round(day.temp_min), max: I.round(day.temp_max) })) + "</span>" : "";
-    return '<li class="day rain-' + kind + '"><span class="day-name">' + esc(I.weekday(day.date)) + "</span>" +
-      '<span class="day-rain">' + icon("drop") + "<span>" + esc(t("rain." + kind)) + "</span></span>" + mm + temp + "</li>";
+      ? t("time.temp_range", { min: I.round(day.temp_min), max: I.round(day.temp_max) }) : t("map.no_value");
+    return '<li class="day day-' + code + '"><span class="day-name">' + esc(I.weekday(day.date)) + "</span>" +
+      '<span class="day-status">' + icon(I.STATUS_ICON[code]) + "<span>" + esc(word) + "</span></span>" +
+      '<span class="day-mm">' + icon("drop") + "<span>" + esc(mm) + "</span></span>" +
+      '<span class="day-temp">' + icon("thermometer") + "<span>" + esc(temp) + "</span></span></li>";
   }
 
   function nowList(latest) {
@@ -59,8 +72,8 @@
     } else {
       html += '<p class="station-line">' + esc(t("map.station_updated", { station: s.label, time: I.whenSeen(s.last_reading_utc, state.meta.as_of) })) + "</p>" +
         I.badge(s.status.code) + '<p class="action">' + esc(s.what_to_do) + "</p>" +
-        "<h3>" + esc(t("map.next_days")) + '</h3><ul class="days-big" role="list">' + s.forecast.slice(0, 3).map(dayTile).join("") + "</ul>" +
-        (s.forecast.length > 3 ? "<h3>" + esc(t("map.later")) + '</h3><ul class="days-small" role="list">' + s.forecast.slice(3).map(dayTile).join("") + "</ul>" : "") +
+        "<h3>" + esc(t("map.next_days")) + '</h3><ul class="day-rows" role="list">' + s.forecast.slice(0, 3).map(dayRow).join("") + "</ul>" +
+        (s.forecast.length > 3 ? "<h3>" + esc(t("map.later")) + '</h3><ul class="day-rows day-rows-later" role="list">' + s.forecast.slice(3).map(dayRow).join("") + "</ul>" : "") +
         nowList(s.latest) +
         '<div class="chart-slot" id="chart-slot"></div>' +
         opsList(s.operations);
@@ -87,8 +100,14 @@
     Array.prototype.forEach.call(document.querySelectorAll(".station-row"), function (b) {
       if (b.getAttribute("data-station") === id) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
     });
+    highlightArea(s.area);
     drawMarkers();
-    if (opts.pan && state.map && s.lat != null) state.map.panTo([s.lat, s.lon], { animate: !reduceMotion() });
+    var areaLayer = state.areaLayers[s.area];
+    if (opts.zoomArea && state.map && areaLayer) {
+      state.map.flyToBounds(areaLayer.getBounds(), { padding: [24, 24], maxZoom: 12, animate: !reduceMotion() });
+    } else if (opts.pan && state.map && s.lat != null) {
+      state.map.panTo([s.lat, s.lon], { animate: !reduceMotion() });
+    }
     if (opts.scroll) document.getElementById("result").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
     if (history.replaceState) history.replaceState(null, "", "#station-" + id);
   }
@@ -116,6 +135,14 @@
   }
 
   /* ------------------------------------------------------------ map */
+  function highlightArea(area) {
+    Object.keys(state.areaLayers).forEach(function (name) {
+      var layer = state.areaLayers[name];
+      layer.setStyle(name === area ? AREA_CHOSEN : AREA_STYLE);
+      if (name === area) layer.bringToFront();
+    });
+  }
+
   function addTiles(map) {
     var tiles = null, loaded = 0, failed = 0;
     function off() {
@@ -146,10 +173,10 @@
       var level = f.properties.level;
       if (level !== "county" && level !== "sub-county") return;
       var layer = L.geoJSON(f, { interactive: false, style: level === "county"
-        ? { color: "#0f3d2e", weight: 3, fill: false }
-        : { color: "#1f7a4d", weight: 1.2, dashArray: "4 4", fillColor: "#e8f5ee", fillOpacity: 0.35 } }).addTo(map);
+        ? { color: "#0f3d2e", weight: 3, fill: false } : AREA_STYLE }).addTo(map);
       if (level === "county") bounds = layer.getBounds();
       if (level === "sub-county") {
+        state.areaLayers[f.properties.name] = layer;
         L.tooltip({ permanent: true, direction: "center", className: "area-label", interactive: false })
           .setLatLng(layer.getBounds().getCenter()).setContent(esc(f.properties.name)).addTo(map);
       }
@@ -161,23 +188,30 @@
     drawMarkers();
   }
 
+  function selectedArea() { var s = byId(state.selected); return s ? s.area : null; }
+
   function stationMarker(s) {
     var code = s.status.code, label = s.label + ", " + (s.area || "") + ": " + t("status." + code);
+    var cls = "mk mk-" + code + (s.area && s.area === selectedArea() ? " in-area" : "") + (s.id === state.selected ? " is-selected" : "");
     var marker = L.marker([s.lat, s.lon], {
       icon: L.divIcon({ className: "", iconSize: [28, 28], iconAnchor: [14, 14],
-        html: '<span class="mk mk-' + code + (s.id === state.selected ? " is-selected" : "") + '">' + icon(I.STATUS_ICON[code]) + "</span>" }),
+        html: '<span class="' + cls + '">' + icon(I.STATUS_ICON[code]) + "</span>" }),
       title: label, alt: label, keyboard: true, zIndexOffset: s.id === state.selected ? 1000 : (5 - I.ORDER[code]) * 10
     });
     marker.on("click", function () { select(s.id, { scroll: window.matchMedia("(max-width: 1000px)").matches }); });
     return marker;
   }
 
+  /* The cluster takes the colour of the most serious status inside it (same order as everywhere else). */
   function clusterMarker(group) {
-    var lat = 0, lon = 0;
+    var lat = 0, lon = 0, area = selectedArea();
     group.forEach(function (s) { lat += s.lat; lon += s.lon; });
-    var label = t("map.cluster", { count: group.length });
+    var code = group.slice().sort(I.bySeverity)[0].status.code;
+    var chosen = group.some(function (s) { return s.area && s.area === area; });
+    var label = t("map.cluster_status", { count: group.length, status: t("status." + code) });
     var marker = L.marker([lat / group.length, lon / group.length], {
-      icon: L.divIcon({ className: "", iconSize: [34, 34], iconAnchor: [17, 17], html: '<span class="mk-count">' + group.length + "</span>" }),
+      icon: L.divIcon({ className: "", iconSize: [34, 34], iconAnchor: [17, 17],
+        html: '<span class="mk-count mk-' + code + (chosen ? " in-area" : "") + '">' + group.length + "</span>" }),
       title: label, alt: label, keyboard: true, zIndexOffset: 2000
     });
     marker.on("click", function () {
@@ -222,7 +256,7 @@
       var area = event.target.closest(".area-btn");
       if (area) {
         var first = inArea(area.getAttribute("data-area"))[0];
-        if (first) select(first.id, { pan: true });
+        if (first) select(first.id, { pan: true, zoomArea: true });
         return;
       }
       var row = event.target.closest("[data-station]");
