@@ -1,0 +1,16 @@
+{
+  "name": "Imarika: Busia County weather",
+  "short_name": "Imarika",
+  "description": "Seven-day weather advice for smallholder farmers in Busia County, Kenya.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f9f9ff",
+  "theme_color": "#0b2e6b",
+  "lang": "en",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

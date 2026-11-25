@@ -1,0 +1,4093 @@
+{
+  "synthetic": false,
+  "stations": [
+    {
+      "id": "001",
+      "label": "Station 001",
+      "name": "Station 001, Butula",
+      "area": "Butula",
+      "lat": 0.331768,
+      "lon": 34.252754,
+      "active": true,
+      "last_reading_utc": "2026-11-23T16:55:22Z",
+      "status": {
+        "code": "none",
+        "label": "No alerts this week",
+        "colour": "#5B7A99"
+      },
+      "what_to_do": "No rain alerts for this station this week.",
+      "latest": {
+        "time_utc": "2026-11-23T16:55:22Z",
+        "temperature_c": 21.2,
+        "humidity_pct": 85.0,
+        "rain_since_morning_mm": null,
+        "uv_index": 0.0,
+        "pressure_hpa": 873.0
+      },
+      "forecast": [
+        {
+          "date": "2026-11-25",
+          "rain_mm": 8.0,
+          "temp_min": null,
+          "temp_max": 29.4,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-26",
+          "rain_mm": 8.0,
+          "temp_min": null,
+          "temp_max": 29.4,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-27",
+          "rain_mm": 8.0,
+          "temp_min": null,
+          "temp_max": 29.4,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-28",
+          "rain_mm": 8.0,
+          "temp_min": null,
+          "temp_max": 29.4,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-29",
+          "rain_mm": 8.0,
+          "temp_min": null,
+          "temp_max": 29.4,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-30",
+          "rain_mm": 8.0,
+          "temp_min": null,
+          "temp_max": 29.4,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-12-01",
+          "rain_mm": 8.0,
+          "temp_min": null,
+          "temp_max": 29.4,
+          "alert": null,
+          "planting": false
+        }
+      ],
+      "forecast_status": "ok",
+      "insights": [],
+      "flat": true,
+      "forecast_variation_mm": 0.0,
+      "advice_note": "The forecast shows no day-to-day change, so we are not giving planting or spraying advice.",
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": 7.1,
+          "temp_min": 18.6,
+          "temp_max": 26.7,
+          "humidity_mean": 78.0,
+          "readings_received": 9
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": 8.4,
+          "temp_min": 18.6,
+          "temp_max": 29.4,
+          "humidity_mean": 77.0,
+          "readings_received": 6
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": 0.0,
+          "temp_min": 22.9,
+          "temp_max": 28.9,
+          "humidity_mean": 75.0,
+          "readings_received": 8
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": 0.0,
+          "temp_min": 21.2,
+          "temp_max": 31.2,
+          "humidity_mean": 60.0,
+          "readings_received": 7
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 4
+    },
+    {
+      "id": "005",
+      "label": "Station 005",
+      "name": "Station 005, Nambale",
+      "area": "Nambale",
+      "lat": 0.47525,
+      "lon": 34.375556,
+      "active": false,
+      "last_reading_utc": "2026-11-20T16:27:31Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": 0.0,
+          "temp_min": 19.3,
+          "temp_max": 29.0,
+          "humidity_mean": 73.0,
+          "readings_received": 6
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": 0.0,
+          "temp_min": 22.4,
+          "temp_max": 27.1,
+          "humidity_mean": 78.0,
+          "readings_received": 3
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 2
+    },
+    {
+      "id": "061",
+      "label": "Station 061",
+      "name": "Station 061, Butula",
+      "area": "Butula",
+      "lat": 0.340694,
+      "lon": 34.333333,
+      "active": true,
+      "last_reading_utc": "2026-11-23T17:33:40Z",
+      "status": {
+        "code": "none",
+        "label": "No alerts this week",
+        "colour": "#5B7A99"
+      },
+      "what_to_do": "No rain alerts for this station this week.",
+      "latest": {
+        "time_utc": "2026-11-23T17:33:40Z",
+        "temperature_c": 21.2,
+        "humidity_pct": 84.0,
+        "rain_since_morning_mm": null,
+        "uv_index": 0.0,
+        "pressure_hpa": null
+      },
+      "forecast": [
+        {
+          "date": "2026-11-25",
+          "rain_mm": 5.8,
+          "temp_min": null,
+          "temp_max": 29.1,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-26",
+          "rain_mm": 5.8,
+          "temp_min": null,
+          "temp_max": 29.1,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-27",
+          "rain_mm": 5.8,
+          "temp_min": null,
+          "temp_max": 29.1,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-28",
+          "rain_mm": 5.8,
+          "temp_min": null,
+          "temp_max": 29.1,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-29",
+          "rain_mm": 5.8,
+          "temp_min": null,
+          "temp_max": 29.1,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-30",
+          "rain_mm": 5.8,
+          "temp_min": null,
+          "temp_max": 29.1,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-12-01",
+          "rain_mm": 5.8,
+          "temp_min": null,
+          "temp_max": 29.1,
+          "alert": null,
+          "planting": false
+        }
+      ],
+      "forecast_status": "partial",
+      "insights": [],
+      "flat": true,
+      "forecast_variation_mm": 0.0,
+      "advice_note": "The forecast shows no day-to-day change, so we are not giving planting or spraying advice.",
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": 0.0,
+          "temp_min": 19.8,
+          "temp_max": 28.8,
+          "humidity_mean": 83.0,
+          "readings_received": 5
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": 0.0,
+          "temp_min": 21.3,
+          "temp_max": 31.2,
+          "humidity_mean": 60.0,
+          "readings_received": 8
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 2
+    },
+    {
+      "id": "083",
+      "label": "Station 083",
+      "name": "Station 083, Butula",
+      "area": "Butula",
+      "lat": 0.391,
+      "lon": 34.304639,
+      "active": false,
+      "last_reading_utc": "2026-11-21T16:56:00Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": 0.0,
+          "temp_min": 18.2,
+          "temp_max": 26.6,
+          "humidity_mean": 73.0,
+          "readings_received": 7
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": 0.0,
+          "temp_min": 18.1,
+          "temp_max": 26.9,
+          "humidity_mean": 81.0,
+          "readings_received": 10
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": 0.0,
+          "temp_min": 18.7,
+          "temp_max": 28.8,
+          "humidity_mean": 67.0,
+          "readings_received": 9
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": 0.0,
+          "temp_min": 23.4,
+          "temp_max": 30.8,
+          "humidity_mean": 64.0,
+          "readings_received": 7
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": 0.0,
+          "temp_min": 23.1,
+          "temp_max": 29.9,
+          "humidity_mean": 67.0,
+          "readings_received": 8
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 5
+    },
+    {
+      "id": "101",
+      "label": "Station 101",
+      "name": "Station 101, Butula",
+      "area": "Butula",
+      "lat": 0.368194,
+      "lon": 34.262,
+      "active": false,
+      "last_reading_utc": "2026-11-22T16:59:20Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": 2.5,
+          "temp_min": 19.6,
+          "temp_max": 28.9,
+          "humidity_mean": 73.0,
+          "readings_received": 9
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": 0.0,
+          "temp_min": 22.8,
+          "temp_max": 29.2,
+          "humidity_mean": 76.0,
+          "readings_received": 9
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": 3.3,
+          "temp_min": 20.9,
+          "temp_max": 30.7,
+          "humidity_mean": 75.0,
+          "readings_received": 6
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 3
+    },
+    {
+      "id": "102",
+      "label": "Station 102",
+      "name": "Station 102, Butula",
+      "area": "Butula",
+      "lat": 0.376194,
+      "lon": 34.318111,
+      "active": false,
+      "last_reading_utc": "2026-11-21T17:21:34Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": 0.5,
+          "temp_min": 19.0,
+          "temp_max": 19.5,
+          "humidity_mean": 93.0,
+          "readings_received": 5
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": 24.6,
+          "temp_min": 18.5,
+          "temp_max": 28.9,
+          "humidity_mean": 73.0,
+          "readings_received": 9
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": 10.4,
+          "temp_min": 18.9,
+          "temp_max": 30.0,
+          "humidity_mean": 68.0,
+          "readings_received": 9
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": 0.0,
+          "temp_min": 22.6,
+          "temp_max": 29.5,
+          "humidity_mean": 76.0,
+          "readings_received": 8
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 4
+    },
+    {
+      "id": "113",
+      "label": "Station 113",
+      "name": "Station 113, Butula",
+      "area": "Butula",
+      "lat": 0.317222,
+      "lon": 34.283333,
+      "active": true,
+      "last_reading_utc": "2026-11-24T17:26:33Z",
+      "status": {
+        "code": "none",
+        "label": "No alerts this week",
+        "colour": "#5B7A99"
+      },
+      "what_to_do": "No rain alerts for this station this week.",
+      "latest": {
+        "time_utc": "2026-11-24T17:26:33Z",
+        "temperature_c": 18.7,
+        "humidity_pct": 93.0,
+        "rain_since_morning_mm": 5.1,
+        "uv_index": 0.0,
+        "pressure_hpa": null
+      },
+      "forecast": [
+        {
+          "date": "2026-11-25",
+          "rain_mm": 5.7,
+          "temp_min": null,
+          "temp_max": 29.2,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-26",
+          "rain_mm": 5.7,
+          "temp_min": null,
+          "temp_max": 29.2,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-27",
+          "rain_mm": 5.7,
+          "temp_min": null,
+          "temp_max": 29.2,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-28",
+          "rain_mm": 5.7,
+          "temp_min": null,
+          "temp_max": 29.2,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-29",
+          "rain_mm": 5.7,
+          "temp_min": null,
+          "temp_max": 29.2,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-30",
+          "rain_mm": 5.7,
+          "temp_min": null,
+          "temp_max": 29.2,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-12-01",
+          "rain_mm": 5.7,
+          "temp_min": null,
+          "temp_max": 29.2,
+          "alert": null,
+          "planting": false
+        }
+      ],
+      "forecast_status": "ok",
+      "insights": [],
+      "flat": true,
+      "forecast_variation_mm": 0.0,
+      "advice_note": "The forecast shows no day-to-day change, so we are not giving planting or spraying advice.",
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": 0.0,
+          "temp_min": 23.1,
+          "temp_max": 23.1,
+          "humidity_mean": 86.0,
+          "readings_received": 2
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": 0.0,
+          "temp_min": 22.8,
+          "temp_max": 27.9,
+          "humidity_mean": 74.0,
+          "readings_received": 10
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": 0.0,
+          "temp_min": 22.1,
+          "temp_max": 29.4,
+          "humidity_mean": 68.0,
+          "readings_received": 6
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": 5.1,
+          "temp_min": 18.8,
+          "temp_max": 31.9,
+          "humidity_mean": 66.0,
+          "readings_received": 11
+        }
+      ],
+      "days_with_data_14d": 4
+    },
+    {
+      "id": "131",
+      "label": "Station 131",
+      "name": "Station 131, Nambale",
+      "area": "Nambale",
+      "lat": 0.446315,
+      "lon": 34.356995,
+      "active": false,
+      "last_reading_utc": "2026-11-14T15:01:21Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": 0.0,
+          "temp_min": 18.9,
+          "temp_max": 20.4,
+          "humidity_mean": 92.0,
+          "readings_received": 6
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 1
+    },
+    {
+      "id": "184",
+      "label": "Station 184",
+      "name": "Station 184, Butula",
+      "area": "Butula",
+      "lat": 0.3445,
+      "lon": 34.3364,
+      "active": true,
+      "last_reading_utc": "2026-11-22T19:26:17Z",
+      "status": {
+        "code": "none",
+        "label": "No alerts this week",
+        "colour": "#5B7A99"
+      },
+      "what_to_do": "No rain alerts for this station this week.",
+      "latest": {
+        "time_utc": "2026-11-22T19:26:17Z",
+        "temperature_c": 20.8,
+        "humidity_pct": 84.0,
+        "rain_since_morning_mm": null,
+        "uv_index": 0.0,
+        "pressure_hpa": 873.0
+      },
+      "forecast": [
+        {
+          "date": "2026-11-25",
+          "rain_mm": 5.7,
+          "temp_min": null,
+          "temp_max": 29.3,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-26",
+          "rain_mm": 5.7,
+          "temp_min": null,
+          "temp_max": 29.3,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-27",
+          "rain_mm": 5.7,
+          "temp_min": null,
+          "temp_max": 29.3,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-28",
+          "rain_mm": 5.7,
+          "temp_min": null,
+          "temp_max": 29.3,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-29",
+          "rain_mm": 5.7,
+          "temp_min": null,
+          "temp_max": 29.3,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-30",
+          "rain_mm": 5.7,
+          "temp_min": null,
+          "temp_max": 29.3,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-12-01",
+          "rain_mm": 5.7,
+          "temp_min": null,
+          "temp_max": 29.3,
+          "alert": null,
+          "planting": false
+        }
+      ],
+      "forecast_status": "ok",
+      "insights": [],
+      "flat": true,
+      "forecast_variation_mm": 0.0,
+      "advice_note": "The forecast shows no day-to-day change, so we are not giving planting or spraying advice.",
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": 0.0,
+          "temp_min": 19.9,
+          "temp_max": 29.8,
+          "humidity_mean": 70.0,
+          "readings_received": 5
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": 6.9,
+          "temp_min": 19.9,
+          "temp_max": 30.8,
+          "humidity_mean": 69.0,
+          "readings_received": 10
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": 0.0,
+          "temp_min": 21.0,
+          "temp_max": 29.6,
+          "humidity_mean": 76.0,
+          "readings_received": 11
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 3
+    },
+    {
+      "id": "201",
+      "label": "Station 201",
+      "name": "Station 201, Nambale",
+      "area": "Nambale",
+      "lat": 0.444917,
+      "lon": 34.240333,
+      "active": false,
+      "last_reading_utc": "2026-11-21T17:38:32Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": 1.8,
+          "temp_min": 19.9,
+          "temp_max": 28.8,
+          "humidity_mean": 87.0,
+          "readings_received": 4
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": 0.0,
+          "temp_min": 21.7,
+          "temp_max": 29.0,
+          "humidity_mean": 70.0,
+          "readings_received": 8
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": 10.7,
+          "temp_min": 19.3,
+          "temp_max": 29.5,
+          "humidity_mean": 75.0,
+          "readings_received": 8
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 1
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": 0.0,
+          "temp_min": 22.4,
+          "temp_max": 29.8,
+          "humidity_mean": 72.0,
+          "readings_received": 9
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 5
+    },
+    {
+      "id": "207",
+      "label": "Station 207",
+      "name": "Station 207, Nambale",
+      "area": "Nambale",
+      "lat": 0.4445,
+      "lon": 34.332944,
+      "active": false,
+      "last_reading_utc": "2026-11-20T16:07:02Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": 0.0,
+          "temp_min": 18.6,
+          "temp_max": 27.0,
+          "humidity_mean": 75.0,
+          "readings_received": 6
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": 0.0,
+          "temp_min": 19.1,
+          "temp_max": 27.2,
+          "humidity_mean": 85.0,
+          "readings_received": 9
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": 0.0,
+          "temp_min": 23.0,
+          "temp_max": 29.4,
+          "humidity_mean": 70.0,
+          "readings_received": 6
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 3
+    },
+    {
+      "id": "222",
+      "label": "Station 222",
+      "name": "Station 222, Nambale",
+      "area": "Nambale",
+      "lat": 0.504528,
+      "lon": 34.391667,
+      "active": false,
+      "last_reading_utc": "2026-09-07T16:26:59Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 0
+    },
+    {
+      "id": "246",
+      "label": "Station 246",
+      "name": "Station 246, Nambale",
+      "area": "Nambale",
+      "lat": 0.398389,
+      "lon": 34.264028,
+      "active": false,
+      "last_reading_utc": "2026-11-22T16:31:49Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": 0.0,
+          "temp_min": 23.4,
+          "temp_max": 27.5,
+          "humidity_mean": 68.0,
+          "readings_received": 4
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": 1.8,
+          "temp_min": 19.6,
+          "temp_max": 27.8,
+          "humidity_mean": 80.0,
+          "readings_received": 4
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": 0.0,
+          "temp_min": 19.4,
+          "temp_max": 26.0,
+          "humidity_mean": 86.0,
+          "readings_received": 7
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": 19.6,
+          "temp_min": 18.6,
+          "temp_max": 29.0,
+          "humidity_mean": 69.0,
+          "readings_received": 6
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": 0.0,
+          "temp_min": 24.3,
+          "temp_max": 29.8,
+          "humidity_mean": 70.0,
+          "readings_received": 6
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": 0.0,
+          "temp_min": 21.2,
+          "temp_max": 30.3,
+          "humidity_mean": 76.0,
+          "readings_received": 6
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 6
+    },
+    {
+      "id": "270",
+      "label": "Station 270",
+      "name": "Station 270, Nambale",
+      "area": "Nambale",
+      "lat": 0.473389,
+      "lon": 34.291556,
+      "active": true,
+      "last_reading_utc": "2026-11-24T16:25:17Z",
+      "status": {
+        "code": "none",
+        "label": "No alerts this week",
+        "colour": "#5B7A99"
+      },
+      "what_to_do": "No rain alerts for this station this week.",
+      "latest": {
+        "time_utc": "2026-11-24T16:25:17Z",
+        "temperature_c": 21.8,
+        "humidity_pct": 84.0,
+        "rain_since_morning_mm": 0.0,
+        "uv_index": 0.0,
+        "pressure_hpa": 879.0
+      },
+      "forecast": [
+        {
+          "date": "2026-11-25",
+          "rain_mm": 6.7,
+          "temp_min": null,
+          "temp_max": 30.0,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-26",
+          "rain_mm": 6.6,
+          "temp_min": null,
+          "temp_max": 30.1,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-27",
+          "rain_mm": 6.6,
+          "temp_min": null,
+          "temp_max": 30.1,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-28",
+          "rain_mm": 6.6,
+          "temp_min": null,
+          "temp_max": 30.1,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-29",
+          "rain_mm": 6.6,
+          "temp_min": null,
+          "temp_max": 30.1,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-30",
+          "rain_mm": 6.6,
+          "temp_min": null,
+          "temp_max": 30.1,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-12-01",
+          "rain_mm": 6.6,
+          "temp_min": null,
+          "temp_max": 30.1,
+          "alert": null,
+          "planting": false
+        }
+      ],
+      "forecast_status": "ok",
+      "insights": [],
+      "flat": true,
+      "forecast_variation_mm": 0.1,
+      "advice_note": "The forecast shows no day-to-day change, so we are not giving planting or spraying advice.",
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 1
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": 0.0,
+          "temp_min": 21.8,
+          "temp_max": 31.3,
+          "humidity_mean": 70.0,
+          "readings_received": 5
+        }
+      ],
+      "days_with_data_14d": 2
+    },
+    {
+      "id": "281",
+      "label": "Station 281",
+      "name": "Station 281, Butula",
+      "area": "Butula",
+      "lat": 0.313291,
+      "lon": 34.265972,
+      "active": false,
+      "last_reading_utc": "2026-11-02T16:40:31Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 0
+    },
+    {
+      "id": "302",
+      "label": "Station 302",
+      "name": "Station 302, Nambale",
+      "area": "Nambale",
+      "lat": 0.479778,
+      "lon": 34.3615,
+      "active": false,
+      "last_reading_utc": "2026-11-22T16:48:43Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": 24.1,
+          "temp_min": 18.1,
+          "temp_max": 27.0,
+          "humidity_mean": 83.0,
+          "readings_received": 10
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": 2.0,
+          "temp_min": 20.8,
+          "temp_max": 30.4,
+          "humidity_mean": 71.0,
+          "readings_received": 8
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": 0.0,
+          "temp_min": 21.8,
+          "temp_max": 30.0,
+          "humidity_mean": 69.0,
+          "readings_received": 5
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 3
+    },
+    {
+      "id": "306",
+      "label": "Station 306",
+      "name": "Station 306, Matayos",
+      "area": "Matayos",
+      "lat": 0.416,
+      "lon": 34.2,
+      "active": false,
+      "last_reading_utc": "2026-11-21T17:26:01Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": 18.3,
+          "temp_min": 18.1,
+          "temp_max": 25.9,
+          "humidity_mean": 88.0,
+          "readings_received": 10
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": 5.3,
+          "temp_min": 19.4,
+          "temp_max": 28.3,
+          "humidity_mean": 75.0,
+          "readings_received": 5
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": 0.0,
+          "temp_min": 19.4,
+          "temp_max": 27.1,
+          "humidity_mean": 88.0,
+          "readings_received": 8
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": 25.4,
+          "temp_min": 18.8,
+          "temp_max": 28.7,
+          "humidity_mean": 75.0,
+          "readings_received": 5
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": 0.0,
+          "temp_min": 22.9,
+          "temp_max": 29.3,
+          "humidity_mean": 69.0,
+          "readings_received": 9
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": 0.0,
+          "temp_min": 22.7,
+          "temp_max": 29.4,
+          "humidity_mean": 74.0,
+          "readings_received": 9
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 6
+    },
+    {
+      "id": "317",
+      "label": "Station 317",
+      "name": "Station 317, Nambale",
+      "area": "Nambale",
+      "lat": 0.470306,
+      "lon": 34.324694,
+      "active": false,
+      "last_reading_utc": "2026-11-21T18:41:58Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": 2.3,
+          "temp_min": 19.5,
+          "temp_max": 28.8,
+          "humidity_mean": 74.0,
+          "readings_received": 11
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": 0.0,
+          "temp_min": 21.1,
+          "temp_max": 29.1,
+          "humidity_mean": 79.0,
+          "readings_received": 12
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 2
+    },
+    {
+      "id": "336",
+      "label": "Station 336",
+      "name": "Station 336, Butula",
+      "area": "Butula",
+      "lat": 0.315778,
+      "lon": 34.348722,
+      "active": false,
+      "last_reading_utc": "2026-11-22T17:06:01Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": 12.7,
+          "temp_min": 18.0,
+          "temp_max": 26.6,
+          "humidity_mean": 77.0,
+          "readings_received": 6
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": 46.7,
+          "temp_min": 18.0,
+          "temp_max": 30.2,
+          "humidity_mean": 77.0,
+          "readings_received": 10
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": 20.6,
+          "temp_min": 18.5,
+          "temp_max": 29.1,
+          "humidity_mean": 73.0,
+          "readings_received": 8
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": 0.0,
+          "temp_min": 19.5,
+          "temp_max": 30.5,
+          "humidity_mean": 73.0,
+          "readings_received": 10
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": 4.8,
+          "temp_min": 20.2,
+          "temp_max": 23.3,
+          "humidity_mean": 88.0,
+          "readings_received": 4
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": 0.3,
+          "temp_min": 21.5,
+          "temp_max": 26.0,
+          "humidity_mean": 87.0,
+          "readings_received": 5
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": 0.0,
+          "temp_min": 20.6,
+          "temp_max": 29.1,
+          "humidity_mean": 76.0,
+          "readings_received": 6
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 7
+    },
+    {
+      "id": "342",
+      "label": "Station 342",
+      "name": "Station 342, Butula",
+      "area": "Butula",
+      "lat": 0.336528,
+      "lon": 34.373833,
+      "active": true,
+      "last_reading_utc": "2026-11-23T15:54:10Z",
+      "status": {
+        "code": "none",
+        "label": "No alerts this week",
+        "colour": "#5B7A99"
+      },
+      "what_to_do": "No rain alerts for this station this week.",
+      "latest": {
+        "time_utc": "2026-11-23T15:54:10Z",
+        "temperature_c": 22.7,
+        "humidity_pct": 77.0,
+        "rain_since_morning_mm": null,
+        "uv_index": 0.0,
+        "pressure_hpa": 870.0
+      },
+      "forecast": [
+        {
+          "date": "2026-11-25",
+          "rain_mm": 8.0,
+          "temp_min": null,
+          "temp_max": 29.0,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-26",
+          "rain_mm": 8.0,
+          "temp_min": null,
+          "temp_max": 29.0,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-27",
+          "rain_mm": 8.0,
+          "temp_min": null,
+          "temp_max": 29.0,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-28",
+          "rain_mm": 8.0,
+          "temp_min": null,
+          "temp_max": 29.0,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-29",
+          "rain_mm": 8.0,
+          "temp_min": null,
+          "temp_max": 29.0,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-30",
+          "rain_mm": 8.0,
+          "temp_min": null,
+          "temp_max": 29.0,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-12-01",
+          "rain_mm": 8.0,
+          "temp_min": null,
+          "temp_max": 29.0,
+          "alert": null,
+          "planting": false
+        }
+      ],
+      "forecast_status": "ok",
+      "insights": [],
+      "flat": true,
+      "forecast_variation_mm": 0.0,
+      "advice_note": "The forecast shows no day-to-day change, so we are not giving planting or spraying advice.",
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": 6.9,
+          "temp_min": 18.0,
+          "temp_max": 26.4,
+          "humidity_mean": 80.0,
+          "readings_received": 7
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": 21.1,
+          "temp_min": 17.4,
+          "temp_max": 28.6,
+          "humidity_mean": 78.0,
+          "readings_received": 5
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": 0.0,
+          "temp_min": 23.5,
+          "temp_max": 23.5,
+          "humidity_mean": 80.0,
+          "readings_received": 1
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": 0.0,
+          "temp_min": 23.2,
+          "temp_max": 23.2,
+          "humidity_mean": 76.0,
+          "readings_received": 1
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 4
+    },
+    {
+      "id": "348",
+      "label": "Station 348",
+      "name": "Station 348, Nambale",
+      "area": "Nambale",
+      "lat": 0.454844,
+      "lon": 34.248751,
+      "active": false,
+      "last_reading_utc": "2026-11-21T16:53:08Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": 5.3,
+          "temp_min": 18.5,
+          "temp_max": 28.1,
+          "humidity_mean": 77.0,
+          "readings_received": 7
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": 0.0,
+          "temp_min": 18.8,
+          "temp_max": 19.7,
+          "humidity_mean": 96.0,
+          "readings_received": 4
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": 9.7,
+          "temp_min": 18.2,
+          "temp_max": 30.3,
+          "humidity_mean": 88.0,
+          "readings_received": 4
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": 1.5,
+          "temp_min": 19.7,
+          "temp_max": 28.9,
+          "humidity_mean": 76.0,
+          "readings_received": 10
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": 0.0,
+          "temp_min": 20.4,
+          "temp_max": 25.3,
+          "humidity_mean": 85.0,
+          "readings_received": 6
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": 0.0,
+          "temp_min": 25.4,
+          "temp_max": 29.6,
+          "humidity_mean": 66.0,
+          "readings_received": 6
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": 0.0,
+          "temp_min": 22.0,
+          "temp_max": 22.0,
+          "humidity_mean": 96.0,
+          "readings_received": 2
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 7
+    },
+    {
+      "id": "361",
+      "label": "Station 361",
+      "name": "Station 361, Matayos",
+      "area": "Matayos",
+      "lat": 0.387437,
+      "lon": 34.244861,
+      "active": false,
+      "last_reading_utc": "2026-08-05T17:43:14Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 0
+    },
+    {
+      "id": "375",
+      "label": "Station 375",
+      "name": "Station 375, Nambale",
+      "area": "Nambale",
+      "lat": 0.531778,
+      "lon": 34.359361,
+      "active": false,
+      "last_reading_utc": "2026-11-04T17:11:49Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 0
+    },
+    {
+      "id": "389",
+      "label": "Station 389",
+      "name": "Station 389, Nambale",
+      "area": "Nambale",
+      "lat": 0.415167,
+      "lon": 34.28575,
+      "active": false,
+      "last_reading_utc": "2026-11-19T16:46:03Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": 0.0,
+          "temp_min": 18.7,
+          "temp_max": 29.6,
+          "humidity_mean": 89.0,
+          "readings_received": 5
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": 0.0,
+          "temp_min": 22.9,
+          "temp_max": 30.7,
+          "humidity_mean": 67.0,
+          "readings_received": 9
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 2
+    },
+    {
+      "id": "393",
+      "label": "Station 393",
+      "name": "Station 393, Nambale",
+      "area": "Nambale",
+      "lat": 0.463306,
+      "lon": 34.302222,
+      "active": false,
+      "last_reading_utc": "2026-11-22T16:54:57Z",
+      "status": {
+        "code": "offline",
+        "label": "Not reporting",
+        "colour": "#9E9E9E"
+      },
+      "what_to_do": "This station is not reporting, so there is no forecast for it. Check a nearby station.",
+      "latest": null,
+      "forecast": [],
+      "forecast_status": "inactive",
+      "insights": [],
+      "flat": false,
+      "forecast_variation_mm": null,
+      "advice_note": null,
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": 0.0,
+          "temp_min": 22.8,
+          "temp_max": 30.4,
+          "humidity_mean": 67.0,
+          "readings_received": 12
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": 0.0,
+          "temp_min": 22.4,
+          "temp_max": 28.8,
+          "humidity_mean": 76.0,
+          "readings_received": 7
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": 0.0,
+          "temp_min": 21.5,
+          "temp_max": 29.8,
+          "humidity_mean": 67.0,
+          "readings_received": 7
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 3
+    },
+    {
+      "id": "395",
+      "label": "Station 395",
+      "name": "Station 395, Nambale",
+      "area": "Nambale",
+      "lat": 0.501389,
+      "lon": 34.313917,
+      "active": true,
+      "last_reading_utc": "2026-11-23T17:15:32Z",
+      "status": {
+        "code": "none",
+        "label": "No alerts this week",
+        "colour": "#5B7A99"
+      },
+      "what_to_do": "No rain alerts for this station this week.",
+      "latest": {
+        "time_utc": "2026-11-23T17:15:32Z",
+        "temperature_c": 22.6,
+        "humidity_pct": 85.0,
+        "rain_since_morning_mm": null,
+        "uv_index": 0.0,
+        "pressure_hpa": 880.0
+      },
+      "forecast": [
+        {
+          "date": "2026-11-25",
+          "rain_mm": 5.9,
+          "temp_min": null,
+          "temp_max": 30.3,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-26",
+          "rain_mm": 5.9,
+          "temp_min": null,
+          "temp_max": 30.3,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-27",
+          "rain_mm": 5.9,
+          "temp_min": null,
+          "temp_max": 30.3,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-28",
+          "rain_mm": 5.9,
+          "temp_min": null,
+          "temp_max": 30.3,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-29",
+          "rain_mm": 5.9,
+          "temp_min": null,
+          "temp_max": 30.3,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-11-30",
+          "rain_mm": 5.9,
+          "temp_min": null,
+          "temp_max": 30.3,
+          "alert": null,
+          "planting": false
+        },
+        {
+          "date": "2026-12-01",
+          "rain_mm": 5.9,
+          "temp_min": null,
+          "temp_max": 30.3,
+          "alert": null,
+          "planting": false
+        }
+      ],
+      "forecast_status": "ok",
+      "insights": [],
+      "flat": true,
+      "forecast_variation_mm": 0.0,
+      "advice_note": "The forecast shows no day-to-day change, so we are not giving planting or spraying advice.",
+      "planting": null,
+      "operations": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-12",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-13",
+          "rain_mm": 4.6,
+          "temp_min": 18.5,
+          "temp_max": 19.3,
+          "humidity_mean": 96.0,
+          "readings_received": 4
+        },
+        {
+          "date": "2026-11-14",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-15",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-16",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-17",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-18",
+          "rain_mm": 2.3,
+          "temp_min": 19.2,
+          "temp_max": 30.3,
+          "humidity_mean": 72.0,
+          "readings_received": 8
+        },
+        {
+          "date": "2026-11-19",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-20",
+          "rain_mm": 0.0,
+          "temp_min": 22.1,
+          "temp_max": 32.3,
+          "humidity_mean": 68.0,
+          "readings_received": 9
+        },
+        {
+          "date": "2026-11-21",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-22",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        },
+        {
+          "date": "2026-11-23",
+          "rain_mm": 0.0,
+          "temp_min": 22.6,
+          "temp_max": 31.7,
+          "humidity_mean": 62.0,
+          "readings_received": 10
+        },
+        {
+          "date": "2026-11-24",
+          "rain_mm": null,
+          "temp_min": null,
+          "temp_max": null,
+          "humidity_mean": null,
+          "readings_received": 0
+        }
+      ],
+      "days_with_data_14d": 4
+    }
+  ]
+}

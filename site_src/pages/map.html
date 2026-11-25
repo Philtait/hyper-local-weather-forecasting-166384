@@ -1,0 +1,29 @@
+<section class="band page-top" aria-labelledby="map-title">
+  <div class="wrap">
+    <h1 id="map-title">{{t:map.title}}</h1>
+    <p class="lead" id="map-headline"></p>
+    <h2 class="label" id="areas-title">{{t:map.choose_area}}</h2>
+    <div class="area-buttons" id="area-buttons" role="group" aria-labelledby="areas-title"></div>
+    <div class="map-layout">
+      <article class="result-card" id="result" aria-live="polite">
+        <p class="muted">{{t:map.loading}}</p>
+      </article>
+      <div class="map-col">
+        <div class="map-box">
+          <div id="map" role="region" aria-label="{{t:map.map_label}}"></div>
+          <p class="map-note" id="map-note" hidden></p>
+        </div>
+        <details class="legend" id="legend" open>
+          <summary>{{t:map.legend}}</summary>
+          <ul id="legend-items"></ul>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="band band-alt" aria-labelledby="all-title">
+  <div class="wrap">
+    <h2 id="all-title">{{t:map.all_stations}}</h2>
+    <div class="station-groups" id="station-groups"></div>
+  </div>
+</section>

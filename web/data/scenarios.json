@@ -1,0 +1,205 @@
+{
+  "scenarios": [
+    {
+      "key": "dry",
+      "title": "Dry week",
+      "rain_mm": [
+        0,
+        0,
+        0,
+        0.5,
+        0,
+        0,
+        0
+      ],
+      "dates": [
+        "2026-11-25",
+        "2026-11-26",
+        "2026-11-27",
+        "2026-11-28",
+        "2026-11-29",
+        "2026-11-30",
+        "2026-12-01"
+      ],
+      "status": {
+        "code": "none",
+        "label": "No alerts this week",
+        "colour": "#5B7A99"
+      },
+      "what_to_do": "No rain alerts for this station this week.",
+      "insights": [],
+      "sms_text": null
+    },
+    {
+      "key": "normal",
+      "title": "Normal rains",
+      "rain_mm": [
+        0,
+        3,
+        0,
+        0,
+        4,
+        0,
+        2
+      ],
+      "dates": [
+        "2026-11-25",
+        "2026-11-26",
+        "2026-11-27",
+        "2026-11-28",
+        "2026-11-29",
+        "2026-11-30",
+        "2026-12-01"
+      ],
+      "status": {
+        "code": "delay",
+        "label": "Rain coming: delay spraying",
+        "colour": "#1565C0"
+      },
+      "what_to_do": "Rain expected from 26 Nov: delay spraying and harvesting on rainy days.",
+      "insights": [
+        {
+          "key": "rain_delay:advisory:2026-11-26",
+          "type": "rain_delay",
+          "severity": "advisory",
+          "status": "delay",
+          "title": "Rain coming: delay spraying",
+          "start_date": "2026-11-26",
+          "action": "Rain expected from 26 Nov: delay spraying and harvesting on rainy days.",
+          "message": "Rain expected on 2026-11-26. Delay field work such as spraying or harvesting on those days.",
+          "basis": "Rain of 1 mm or more is forecast on Thu 26 Nov, Sun 29 Nov, within the next 3 days. Spraying or harvesting just before rain is usually wasted effort. This is Imarika's own rule, not an official standard.",
+          "caveat": "Rainfall forecasts are less reliable than temperature forecasts.",
+          "sms_text": "Scenario: Rain expected from 26 Nov: delay spraying and harvesting on rainy days."
+        }
+      ],
+      "sms_text": "Scenario: Rain expected from 26 Nov: delay spraying and harvesting on rainy days."
+    },
+    {
+      "key": "planting",
+      "title": "Planting rains",
+      "rain_mm": [
+        0,
+        0,
+        0,
+        6,
+        5,
+        8,
+        4
+      ],
+      "dates": [
+        "2026-11-25",
+        "2026-11-26",
+        "2026-11-27",
+        "2026-11-28",
+        "2026-11-29",
+        "2026-11-30",
+        "2026-12-01"
+      ],
+      "status": {
+        "code": "planting",
+        "label": "Good rain for planting",
+        "colour": "#2E7D32"
+      },
+      "what_to_do": "Rain from 27 Nov may suit planting. Dry spells beyond 7 days are not checked.",
+      "insights": [
+        {
+          "key": "planting_window:advisory:2026-11-27",
+          "type": "planting_window",
+          "severity": "advisory",
+          "status": "planting",
+          "title": "Good rain for planting",
+          "start_date": "2026-11-27",
+          "action": "Rain from 27 Nov may suit planting. Dry spells beyond 7 days are not checked.",
+          "message": "Planting window: 23.0 mm of rain expected from 2026-11-27 to 2026-12-01, with 4 rain days. Dry-spell risk beyond the 7-day forecast horizon is not assessed.",
+          "basis": "About 23 mm of rain is forecast over the 5 days from Fri 27 Nov to Tue 1 Dec, with rain on 4 of them. Imarika counts at least 20 mm over 5 days, with rain on at least 3 days, as good rain for planting, following published definitions of the start of the rains. It cannot check for dry spells after the 7-day forecast.",
+          "caveat": "Rainfall forecasts are less reliable than temperature forecasts.",
+          "sms_text": "Scenario: Rain from 27 Nov may suit planting. Dry spells beyond 7 days are not checked."
+        }
+      ],
+      "sms_text": "Scenario: Rain from 27 Nov may suit planting. Dry spells beyond 7 days are not checked."
+    },
+    {
+      "key": "heavy",
+      "title": "Heavy rain",
+      "rain_mm": [
+        2,
+        8,
+        35,
+        62,
+        12,
+        4,
+        0
+      ],
+      "dates": [
+        "2026-11-25",
+        "2026-11-26",
+        "2026-11-27",
+        "2026-11-28",
+        "2026-11-29",
+        "2026-11-30",
+        "2026-12-01"
+      ],
+      "status": {
+        "code": "warning",
+        "label": "Very heavy rain expected",
+        "colour": "#C62828"
+      },
+      "what_to_do": "Flood warning 28 Nov: very heavy rain expected. If you are in a flood-prone area, move to higher ground.",
+      "insights": [
+        {
+          "key": "flood_alert:warning:2026-11-28",
+          "type": "flood_alert",
+          "severity": "warning",
+          "status": "warning",
+          "title": "Very heavy rain",
+          "start_date": "2026-11-28",
+          "action": "Flood warning 28 Nov: very heavy rain expected. If you are in a flood-prone area, move to higher ground.",
+          "message": "Flood warning: very heavy rain of 62.0 mm expected on 2026-11-28.",
+          "basis": "The forecast shows 62 mm of rain on Sat 28 Nov. Imarika raises a very heavy rain alert when one day's rain reaches 50 mm, the level the Kenya Meteorological Department describes as very heavy rainfall.",
+          "caveat": "Rainfall forecasts are less reliable than temperature forecasts.",
+          "sms_text": "Scenario: Flood warning 28 Nov: very heavy rain expected. If you are in a flood-prone area, move to higher ground."
+        },
+        {
+          "key": "flood_alert:watch:2026-11-27",
+          "type": "flood_alert",
+          "severity": "watch",
+          "status": "watch",
+          "title": "Heavy rain",
+          "start_date": "2026-11-27",
+          "action": "Flood watch 27 Nov: heavy rain expected. Clear drains and avoid low-lying fields.",
+          "message": "Flood watch: heavy rain of 35.0 mm expected on 2026-11-27.",
+          "basis": "The forecast shows 35 mm of rain on Fri 27 Nov. Imarika raises a heavy rain alert when one day's rain reaches 20 mm, the level the Kenya Meteorological Department describes as heavy rainfall.",
+          "caveat": "Rainfall forecasts are less reliable than temperature forecasts.",
+          "sms_text": "Scenario: Flood watch 27 Nov: heavy rain expected. Clear drains and avoid low-lying fields."
+        },
+        {
+          "key": "planting_window:advisory:2026-11-25",
+          "type": "planting_window",
+          "severity": "advisory",
+          "status": "planting",
+          "title": "Good rain for planting",
+          "start_date": "2026-11-25",
+          "action": "Rain from 25 Nov may suit planting. Dry spells beyond 7 days are not checked.",
+          "message": "Planting window: 119.0 mm of rain expected from 2026-11-25 to 2026-11-29, with 5 rain days. Dry-spell risk beyond the 7-day forecast horizon is not assessed.",
+          "basis": "About 119 mm of rain is forecast over the 5 days from Wed 25 Nov to Sun 29 Nov, with rain on 5 of them. Imarika counts at least 20 mm over 5 days, with rain on at least 3 days, as good rain for planting, following published definitions of the start of the rains. It cannot check for dry spells after the 7-day forecast.",
+          "caveat": "Rainfall forecasts are less reliable than temperature forecasts.",
+          "sms_text": "Scenario: Rain from 25 Nov may suit planting. Dry spells beyond 7 days are not checked."
+        },
+        {
+          "key": "rain_delay:advisory:2026-11-25",
+          "type": "rain_delay",
+          "severity": "advisory",
+          "status": "delay",
+          "title": "Rain coming: delay spraying",
+          "start_date": "2026-11-25",
+          "action": "Rain expected from 25 Nov: delay spraying and harvesting on rainy days.",
+          "message": "Rain expected on 2026-11-25, 2026-11-26, 2026-11-27. Delay field work such as spraying or harvesting on those days.",
+          "basis": "Rain of 1 mm or more is forecast on Wed 25 Nov, Thu 26 Nov, Fri 27 Nov, Sat 28 Nov, within the next 3 days. Spraying or harvesting just before rain is usually wasted effort. This is Imarika's own rule, not an official standard.",
+          "caveat": "Rainfall forecasts are less reliable than temperature forecasts.",
+          "sms_text": "Scenario: Rain expected from 25 Nov: delay spraying and harvesting on rainy days."
+        }
+      ],
+      "sms_text": "Scenario: Flood warning 28 Nov: very heavy rain expected. If you are in a flood-prone area, move to higher ground."
+    }
+  ]
+}

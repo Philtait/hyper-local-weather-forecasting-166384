@@ -1,0 +1,121 @@
+{
+  "synthetic": false,
+  "as_of": "2026-11-24",
+  "issued_line": "Imarika forecast, issued 24 November 2026",
+  "generated_at": "2026-11-25T11:28:54Z",
+  "timezone": "Africa/Nairobi",
+  "counts": {
+    "stations_total": 26,
+    "stations_reporting": 7,
+    "stations_with_forecast": 7,
+    "stations_flat_forecast": 7,
+    "stations_with_alerts": 0,
+    "stations_heavy_rain": 0,
+    "alerts_total": 0
+  },
+  "headline": "7 of 26 stations sent data in the last 2 days.",
+  "latest_reading_utc": "2026-11-24T17:26:33Z",
+  "recent_hours": 48,
+  "history_hours_per_day": 18,
+  "flat_note": "The forecast shows no day-to-day change, so we are not giving planting or spraying advice.",
+  "statuses": [
+    {
+      "code": "warning",
+      "label": "Very heavy rain expected",
+      "colour": "#C62828",
+      "order": 0
+    },
+    {
+      "code": "watch",
+      "label": "Heavy rain expected",
+      "colour": "#E65100",
+      "order": 1
+    },
+    {
+      "code": "planting",
+      "label": "Good rain for planting",
+      "colour": "#2E7D32",
+      "order": 2
+    },
+    {
+      "code": "delay",
+      "label": "Rain coming: delay spraying",
+      "colour": "#1565C0",
+      "order": 3
+    },
+    {
+      "code": "none",
+      "label": "No alerts this week",
+      "colour": "#5B7A99",
+      "order": 4
+    },
+    {
+      "code": "offline",
+      "label": "Not reporting",
+      "colour": "#9E9E9E",
+      "order": 5
+    }
+  ],
+  "thresholds": {
+    "heavy_rain_mm": 20,
+    "very_heavy_rain_mm": 50,
+    "sms_max_chars": 159
+  },
+  "reliability": [
+    "Every station's forecast is made the same way; it is not adjusted for each station.",
+    "Rain is harder to predict than temperature.",
+    "Check local advice before big decisions."
+  ],
+  "boundary_file": "data/kenya_boundaries.geojson",
+  "credits": {
+    "boundaries": {
+      "headline": "Boundaries: geoBoundaries (open licence).",
+      "layers": [
+        {
+          "level": "ADM0",
+          "name": "Republic of Kenya",
+          "source": "RCMRD GeoPortal, geoBoundaries",
+          "licence": "Public Domain"
+        },
+        {
+          "level": "ADM1",
+          "name": "Counties",
+          "source": "RCMRD GeoPortal, Africa GeoPortal",
+          "licence": "Public Domain"
+        },
+        {
+          "level": "ADM2",
+          "name": "Sub-Counties",
+          "source": "IEBC, OCHA ROSEA",
+          "licence": "CC BY 3.0 IGO"
+        }
+      ],
+      "citation": "geoBoundaries: Runfola, D. et al. (2020) geoBoundaries: A global database of political administrative boundaries. PLoS ONE 15(4): e0231866.",
+      "source": "assets/README.md"
+    },
+    "data_sources": [
+      {
+        "name": "iLabAfrica weather stations",
+        "detail": "SenseCAP S2120 stations in Busia County, Kenya"
+      },
+      {
+        "name": "Open-Meteo",
+        "detail": "Hourly weather data based on the ERA5 reanalysis"
+      },
+      {
+        "name": "ERA5",
+        "detail": "Copernicus Climate Change Service reanalysis, via Open-Meteo"
+      },
+      {
+        "name": "NASA POWER",
+        "detail": "Daily weather data, NASA Langley Research Center"
+      },
+      {
+        "name": "CHIRPS",
+        "detail": "Daily rainfall estimates, Climate Hazards Center, UC Santa Barbara"
+      }
+    ],
+    "map_tiles": "Map data from OpenStreetMap contributors"
+  },
+  "source_dir": "deploy_data"
+}
