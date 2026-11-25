@@ -1,29 +1,31 @@
-<section class="band page-top" aria-labelledby="map-title">
+<section class="band page-top map-page" aria-labelledby="map-title">
   <div class="wrap">
     <h1 id="map-title">{{t:map.title}}</h1>
-    <p class="lead" id="map-headline"></p>
-    <h2 class="label" id="areas-title">{{t:map.choose_area}}</h2>
-    <div class="area-buttons" id="area-buttons" role="group" aria-labelledby="areas-title"></div>
-    <div class="map-layout">
-      <article class="result-card" id="result" aria-live="polite">
-        <p class="muted">{{t:map.loading}}</p>
-      </article>
-      <div class="map-col">
-        <div class="map-box">
-          <div id="map" role="region" aria-label="{{t:map.map_label}}"></div>
-          <p class="map-note" id="map-note" hidden></p>
-        </div>
-        <details class="legend" id="legend" open>
-          <summary>{{t:map.legend}}</summary>
-          <ul id="legend-items"></ul>
-        </details>
+    <p class="status-line" id="map-status"></p>
+    <div class="map-controls">
+      <div class="chips" id="area-chips" role="group" aria-label="{{t:map.choose_area}}"></div>
+      <div class="view-switch" role="group" aria-label="{{t:map.view_label}}">
+        <button type="button" class="view-btn" data-view="map" aria-pressed="true">{{icon:pin}}<span>{{t:map.view_map}}</span></button>
+        <button type="button" class="view-btn" data-view="list" aria-pressed="false">{{icon:list}}<span>{{t:map.view_list}}</span></button>
       </div>
     </div>
-  </div>
-</section>
-<section class="band band-alt" aria-labelledby="all-title">
-  <div class="wrap">
-    <h2 id="all-title">{{t:map.all_stations}}</h2>
-    <div class="station-groups" id="station-groups"></div>
+    <div class="map-layout">
+      <div class="map-main">
+        <div class="map-view" id="map-view">
+          <div class="map-box">
+            <div id="map" role="region" aria-label="{{t:map.map_label}}"></div>
+            <p class="map-note" id="map-note" hidden></p>
+          </div>
+          <ul class="legend" id="legend" aria-label="{{t:map.legend}}"></ul>
+          <p class="map-help">{{t:map.help}}</p>
+        </div>
+        <div class="list-view" id="list-view" hidden>
+          <div class="station-list" id="station-list" role="list" aria-label="{{t:map.list_label}}"></div>
+        </div>
+      </div>
+      <aside class="panel" id="panel" aria-labelledby="panel-title" aria-live="polite">
+        <p class="muted">{{t:map.loading}}</p>
+      </aside>
+    </div>
   </div>
 </section>
