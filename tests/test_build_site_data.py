@@ -617,10 +617,45 @@ class PagesTests(unittest.TestCase):
         home_js = (WEB / "js" / "home.js").read_text(encoding="utf-8")
         self.assertIn("M.stateOf(", home_js)                             # the same three states as the map
 
+    def test_final_polish(self):
+        strings = json.loads((WEB / "i18n" / "en.json").read_text(encoding="utf-8"))
+        home = (WEB / "index.html").read_text(encoding="utf-8")
+        self.assertIn("Weather from stations near your farm.", home)
+        self.assertIn("Readings and outlook for farmers in Busia County.", home)
+        for key in ["stations", "areas", "recent", "today"]:                 # Imarika in numbers, from data/
+            self.assertIn(f'data-count="{key}">&nbsp;</strong>', home)
+        self.assertNotIn("forecast days", home)
+        how = strings["how"]
+        self.assertEqual(how["step1"], "Weather stations in Busia County measure rain, temperature, humidity and the sun's strength during the day.")
+        self.assertEqual(how["step3"], "A forecasting model uses past readings to estimate the coming days. Days further ahead mostly repeat the recent pattern.")
+        self.assertEqual(how["step4"], "Simple rules turn a forecast that shows a clear change into advice about rain, planting and spraying.")
+        self.assertEqual(how["step5"], "The advice reaches farmers on this website and by text message.")
+        css = (WEB / "css" / "styles.css").read_text(encoding="utf-8")
+        tabs = re.search(r"\n\.tabs \{[^}]*\}", css).group(0)
+        self.assertIn("overflow-y: hidden", tabs)                            # never a vertical scrollbar
+        self.assertIn("scrollbar-width: none", tabs)
+        self.assertIn(".tabs::-webkit-scrollbar { display: none; }", css)
+        self.assertNotIn("max-width: 960px", css)                          # tiles, strip and chart use the full width
+        station_js = (WEB / "js" / "station.js").read_text(encoding="utf-8")
+        self.assertIn('id="others-toggle" aria-expanded="false"', station_js)  # the rest of the area behind a toggle
+        self.assertEqual(strings["station"]["others_all"], "Show all stations in this area")
+        contact = (WEB / "contact.html").read_text(encoding="utf-8")
+        self.assertIn('class="btn btn-primary" type="submit" id="c-send"', contact)
+        self.assertEqual(strings["contact"]["open_email"], "Send message")
+        self.assertIn(".contact-form .field { display: block; width: 100%; max-width: none; }", css)
+        self.assertEqual(json.loads((WEB / "contact.json").read_text(encoding="utf-8"))["email"], "")  # no test address committed
+        worker = (WEB / "sw.js").read_text(encoding="utf-8")
+        self.assertIn('"js/units.js"', worker)
+        for page in ["map.html", "sms.html", "station.html"]:                # the shared rounding loads first
+            scripts = re.findall(r'<script src="([^"]+)"', (WEB / page).read_text(encoding="utf-8"))
+            self.assertIn("js/units.js", scripts, page)
+        for page in self.PAGES + ["station.html"]:
+            self.assertIn('class="band page-top', (WEB / page).read_text(encoding="utf-8"), page)  # one top padding
+
     def test_how_it_works_keeps_the_honest_limits_in_view(self):
         how = (WEB / "how-it-works.html").read_text(encoding="utf-8")
         self.assertEqual(how.count("<h1"), 1)
-        self.assertEqual(len(re.findall(r'<li><span class="step-badge"', how)), 4)
+        self.assertEqual(len(re.findall(r'<li><span class="step-badge"', how)), 5)
         for phrase in ["Stations switch off overnight.", "Rain that falls at night is not measured.",
                        "mostly repeats the recent daily pattern", "Only some stations send data."]:
             self.assertIn(phrase, how)

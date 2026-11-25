@@ -4,7 +4,7 @@
    Words such as "today" follow the visitor's own clock; otherwise the date is shown. */
 (function () {
   "use strict";
-  var I = window.Imarika, t = I.t, esc = I.esc, icon = I.icon, M = window.ImarikaMapLogic;
+  var I = window.Imarika, t = I.t, esc = I.esc, icon = I.icon, M = window.ImarikaMapLogic, U = window.ImarikaUnits;
   // OpenStreetMap, greyed and lightened in CSS, with our own area labels on top. (CARTO's label-free style was
   // tried: it now draws "API key required" over the tiles, so it is not used.) Offline: boundaries only.
   var BASEMAPS = [
@@ -23,7 +23,6 @@
   function reduceMotion() { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
   function phone() { return window.matchMedia("(max-width: 760px)").matches; }
   function sheet() { return window.matchMedia("(max-width: 1000px)").matches; }
-  function oneDecimal(n) { return Math.round(n * 10) / 10; }
 
   /* ------------------------------------------------------------ days and states */
   function today() { return I.localDay(new Date().toISOString()); }
@@ -81,11 +80,11 @@
   function readings(latest) {
     if (!latest || !latest.time_utc) return "";
     var tiles = [], readToday = I.localDay(latest.time_utc) === today();
-    if (latest.temperature_c != null) tiles.push(tile("thermometer", t("map.temperature"), I.round(latest.temperature_c) + "°C"));
+    if (latest.temperature_c != null) tiles.push(tile("thermometer", t("map.temperature"), U.temp(latest.temperature_c) + "°C"));
     if (latest.humidity_pct != null) tiles.push(tile("humidity", t("map.humidity"), I.round(latest.humidity_pct) + "%"));
     if (!readToday) tiles.push(tile("drop", t("map.rain_morning"), t("map.no_reading_today"), { text: true }));
     else if (latest.rain_since_morning_mm != null) {
-      tiles.push(tile("drop", t("map.rain_morning"), oneDecimal(latest.rain_since_morning_mm) + " " + t("rain.unit")));
+      tiles.push(tile("drop", t("map.rain_morning"), U.rainText(latest.rain_since_morning_mm) + " " + t("rain.unit")));
     }
     if (latest.uv_index != null) {
       tiles.push(tile("sun", t("map.sun"), I.round(latest.uv_index),
@@ -106,7 +105,7 @@
     var day = (s.forecast || [])[0];
     if (!day) return '<p class="panel-note">' + esc(t("map.no_forecast")) + "</p>";
     var line = t("map.outlook_line", { day: I.longDate(day.date),
-      mm: day.rain_mm != null ? oneDecimal(day.rain_mm) : t("map.no_value"), max: day.temp_max != null ? I.round(day.temp_max) : "-" });
+      mm: day.rain_mm != null ? U.rainText(day.rain_mm) : t("map.no_value"), max: day.temp_max != null ? U.temp(day.temp_max) : "-" });
     return '<h3 class="panel-label">' + esc(t("map.outlook")) + '</h3><p class="outlook-line">' + icon("drop") + "<span>" +
       esc(line) + '</span></p><p class="caption">' + esc(t("map.rain_window")) + (s.flat ? ". " + esc(t("map.outlook_note")) : ".") + "</p>";
   }
@@ -144,7 +143,7 @@
   function rainCell(s) {
     var l = s.latest;
     if (!l || l.rain_since_morning_mm == null || !l.time_utc || I.localDay(l.time_utc) !== state.dataDay) return "–";
-    return oneDecimal(l.rain_since_morning_mm) + " " + t("rain.unit");
+    return U.rainText(l.rain_since_morning_mm) + " " + t("rain.unit");
   }
 
   /* A data cell carries its column name: hidden on wide screens (the table head shows it), shown small on phones. */
@@ -163,7 +162,7 @@
       return '<th scope="col">' + esc(h) + "</th>";
     }).join("") + "</tr></thead><tbody>" + rows.map(function (s) {
       var code = stateOf(s), l = s.latest;
-      var temp = l && l.temperature_c != null && s.active ? I.round(l.temperature_c) + "°C" : "–";
+      var temp = l && l.temperature_c != null && s.active ? U.temp(l.temperature_c) + "°C" : "–";
       return '<tr data-station="' + esc(s.id) + '"' + (s.id === state.selected ? ' class="is-selected"' : "") + ">" +
         '<th scope="row"><button type="button" class="row-btn" data-station="' + esc(s.id) + '" aria-pressed="' +
         (s.id === state.selected) + '">' + esc(s.label) + '<span class="row-area">' + esc(s.area || "") + "</span></button>" +

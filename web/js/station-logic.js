@@ -2,9 +2,9 @@
    Used by js/station.js and js/charts.js in the browser (window.ImarikaStationLogic) and by the Node tests. */
 (function (root, factory) {
   "use strict";
-  if (typeof module === "object" && module.exports) module.exports = factory();
-  else root.ImarikaStationLogic = factory();
-})(typeof self !== "undefined" ? self : this, function () {
+  if (typeof module === "object" && module.exports) module.exports = factory(require("./units.js"));
+  else root.ImarikaStationLogic = factory(root.ImarikaUnits);
+})(typeof self !== "undefined" ? self : this, function (U) {
   "use strict";
 
   var TABS = ["latest", "days", "working"];
@@ -34,14 +34,16 @@
 
   function hasForecast(station) { return !!station && station.active === true && (station.forecast || []).length > 0; }
 
-  /* "Rain was measured on 2 of the last 7 days (total 0 mm)": the total covers only the measured days. */
+  /* "Rain was measured on 2 of the last 7 days (total 0 mm)": the total covers only the measured days.
+     Totals add the daily values as they are shown (js/units.js), then round by the same rule, so seven
+     days shown as "11 mm" always total "77 mm". */
   function rainSummary(station) {
     var measured = daysWith(station, "rain");
-    var total = measured.reduce(function (sum, d) { return sum + d.rain_mm; }, 0);
     var next = hasForecast(station) ? station.forecast.filter(function (d) { return known(d.rain_mm); }) : [];
+    var rain = function (d) { return d.rain_mm; };
     return {
-      measuredDays: measured.length, window: lastDays(station).length, totalMm: Math.round(total),
-      forecastDays: next.length, forecastMm: Math.round(next.reduce(function (sum, d) { return sum + d.rain_mm; }, 0))
+      measuredDays: measured.length, window: lastDays(station).length, totalMm: U.rainTotal(measured.map(rain)),
+      forecastDays: next.length, forecastMm: U.rainTotal(next.map(rain))
     };
   }
 

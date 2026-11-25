@@ -27,14 +27,14 @@ PAGES = [
      ['<link rel="preload" href="img/about-field.webp" as="image" type="image/webp">'], ["js/map-logic.js", "js/home.js"]),
     ("how", "how-it-works.html", "how.page_title", "info", [], []),
     ("map", "map.html", "map.page_title", "pin",
-     ['<link rel="stylesheet" href="vendor/leaflet/leaflet.css">'], ["vendor/leaflet/leaflet.js", "js/map-logic.js", "js/map.js"]),
-    ("sms", "sms.html", "sms.page_title", "message", [], ["js/sms-message.js", "js/sms.js"]),
+     ['<link rel="stylesheet" href="vendor/leaflet/leaflet.css">'], ["vendor/leaflet/leaflet.js", "js/units.js", "js/map-logic.js", "js/map.js"]),
+    ("sms", "sms.html", "sms.page_title", "message", [], ["js/units.js", "js/sms-message.js", "js/sms.js"]),
     ("contact", "contact.html", "contact.page_title", "mail", [], ["js/contact.js"]),
 ]
 # Pages that are not in the main navigation: key, output file, title string, nav item kept highlighted, head, scripts
 EXTRA_PAGES = [
     ("station", "station.html", "station.page_title", "map", [],
-     ["js/map-logic.js", "js/station-logic.js", "js/charts.js", "js/station.js"]),
+     ["js/units.js", "js/map-logic.js", "js/station-logic.js", "js/charts.js", "js/station.js"]),
 ]
 PLACEHOLDER = re.compile(r"\{\{(t|icon):([\w.]+)\}\}")
 

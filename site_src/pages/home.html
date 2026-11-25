@@ -4,7 +4,6 @@
       <div class="page-hero-text">
         <h1 id="hero-title">{{t:home.hero_title}}</h1>
         <p class="lead">{{t:home.hero_text}}</p>
-        <p class="hero-who">{{t:home.hero_who}}</p>
         <div class="actions">
           <a class="btn btn-primary" href="map.html">{{icon:pin}}<span>{{t:home.hero_map}}</span></a>
           <a class="btn btn-secondary" href="sms.html">{{icon:message}}<span>{{t:home.hero_sms}}</span></a>
@@ -18,7 +17,19 @@
   </div>
 </section>
 
-<section class="band band-alt" aria-labelledby="helps-title">
+<section class="band band-tight band-alt" aria-labelledby="numbers-title">
+  <div class="wrap">
+    <h2 id="numbers-title" class="h-small">{{t:home.numbers_title}}</h2>
+    <ul class="numbers" id="numbers">
+      <li><span class="icon-circle">{{icon:station}}</span><span><strong data-count="stations">&nbsp;</strong><span>{{t:home.num_stations}}</span></span></li>
+      <li><span class="icon-circle">{{icon:pin}}</span><span><strong data-count="areas">&nbsp;</strong><span>{{t:home.num_areas}}</span></span></li>
+      <li><span class="icon-circle">{{icon:check}}</span><span><strong data-count="recent">&nbsp;</strong><span>{{t:home.num_recent}}</span></span></li>
+      <li><span class="icon-circle">{{icon:calendar}}</span><span><strong data-count="today">&nbsp;</strong><span>{{t:home.num_today}}</span></span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="helps-title">
   <div class="wrap">
     <h2 id="helps-title">{{t:home.helps_title}}</h2>
     <ul class="helps">
@@ -30,7 +41,7 @@
   </div>
 </section>
 
-<section class="band" aria-labelledby="stations-title">
+<section class="band band-alt" aria-labelledby="stations-title">
   <div class="wrap stations-grid">
     <div>
       <h2 id="stations-title">{{t:home.stations_title}}</h2>
