@@ -32,10 +32,45 @@
 <main id="main" tabindex="-1">
 <p class="offline-note wrap" id="offline-note" role="status" hidden></p>
 <section class="band page-top" aria-labelledby="page-title">
-  <div class="wrap placeholder">
-    <span class="icon-circle"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#message"></use></svg></span>
-    <h1 id="page-title">SMS demo</h1>
-    <p class="lead">This page will let you see the text message a farmer receives about the coming week.</p>
+  <div class="wrap">
+    <div class="media-intro media-small">
+      <div>
+        <h1 id="page-title">See the SMS a farmer receives</h1>
+        <p class="lead">Pick an area and a message, then send it to a test phone number.</p>
+      </div>
+      <img src="img/farmer.webp" width="960" height="720" loading="lazy" alt="Illustration of a farmer checking a message on a phone at the edge of a maize field">
+    </div>
+    <div class="sms-layout">
+      <form class="sms-form" id="sms-form" novalidate>
+        <fieldset>
+          <legend><span class="step-num">1</span>Choose an area</legend>
+          <div class="area-buttons" id="sms-areas" role="group" aria-label="Choose an area"></div>
+        </fieldset>
+        <fieldset>
+          <legend><span class="step-num">2</span>Choose a message</legend>
+          <div class="choice-list" id="sms-messages"></div>
+        </fieldset>
+        <fieldset>
+          <legend><span class="step-num">3</span>Enter a phone number</legend>
+          <label class="field-label" for="sms-phone">Phone number</label>
+          <p class="field-hint" id="sms-phone-hint">Start with +254, for example +254712345678.</p>
+          <input class="field" id="sms-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" value="+254"
+                 aria-describedby="sms-phone-hint sms-phone-error">
+          <p class="field-error" id="sms-phone-error" role="alert"></p>
+        </fieldset>
+        <button class="btn btn-solid" type="submit" id="sms-send"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#message"></use></svg><span>Send the message</span></button>
+        <p class="helper">Test mode: the message goes to a simulator, not a real phone.</p>
+        <p class="sms-result" id="sms-result" role="status"></p>
+      </form>
+      <div class="phone-col">
+        <h2 class="label">What the phone shows</h2>
+        <div class="phone" aria-live="polite">
+          <div class="phone-top"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#message"></use></svg><span>Imarika</span></div>
+          <div class="phone-screen"><p class="bubble" id="sms-text"></p></div>
+          <p class="phone-count" id="sms-count"></p>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 </main>
@@ -57,5 +92,6 @@
   </ul>
 </nav>
 <script src="js/common.js"></script>
+<script src="js/sms.js"></script>
 </body>
 </html>

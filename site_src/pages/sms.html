@@ -1,7 +1,42 @@
 <section class="band page-top" aria-labelledby="page-title">
-  <div class="wrap placeholder">
-    <span class="icon-circle">{{icon:message}}</span>
-    <h1 id="page-title">{{t:sms.title}}</h1>
-    <p class="lead">{{t:sms.lead}}</p>
+  <div class="wrap">
+    <div class="media-intro media-small">
+      <div>
+        <h1 id="page-title">{{t:sms.title}}</h1>
+        <p class="lead">{{t:sms.lead}}</p>
+      </div>
+      <img src="img/farmer.webp" width="960" height="720" loading="lazy" alt="{{t:images.farmer_alt}}">
+    </div>
+    <div class="sms-layout">
+      <form class="sms-form" id="sms-form" novalidate>
+        <fieldset>
+          <legend><span class="step-num">1</span>{{t:sms.step1}}</legend>
+          <div class="area-buttons" id="sms-areas" role="group" aria-label="{{t:sms.step1}}"></div>
+        </fieldset>
+        <fieldset>
+          <legend><span class="step-num">2</span>{{t:sms.step2}}</legend>
+          <div class="choice-list" id="sms-messages"></div>
+        </fieldset>
+        <fieldset>
+          <legend><span class="step-num">3</span>{{t:sms.step3}}</legend>
+          <label class="field-label" for="sms-phone">{{t:sms.phone_label}}</label>
+          <p class="field-hint" id="sms-phone-hint">{{t:sms.phone_hint}}</p>
+          <input class="field" id="sms-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" value="+254"
+                 aria-describedby="sms-phone-hint sms-phone-error">
+          <p class="field-error" id="sms-phone-error" role="alert"></p>
+        </fieldset>
+        <button class="btn btn-solid" type="submit" id="sms-send">{{icon:message}}<span>{{t:sms.send}}</span></button>
+        <p class="helper">{{t:sms.test_mode}}</p>
+        <p class="sms-result" id="sms-result" role="status"></p>
+      </form>
+      <div class="phone-col">
+        <h2 class="label">{{t:sms.preview}}</h2>
+        <div class="phone" aria-live="polite">
+          <div class="phone-top">{{icon:message}}<span>{{t:sms.from}}</span></div>
+          <div class="phone-screen"><p class="bubble" id="sms-text"></p></div>
+          <p class="phone-count" id="sms-count"></p>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
