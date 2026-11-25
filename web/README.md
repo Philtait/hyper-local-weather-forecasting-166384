@@ -27,9 +27,18 @@ python scripts/build_site_data.py --synthetic --out web/data      # fake preview
 ```
 
 If the export has `history_daily.csv` (device_id, date, rain_mm, temp_min, temp_max, humidity_mean,
-readings_received) and a `coverage_14d` column in `station_status.csv`, the station charts show the last
-14 days; a day without readings is shown as "No reading", never as zero. Without them the charts show
-the forecast only. Synthetic mode makes up history with gaps.
+readings_received), the station charts show the last 14 days; a day without a rain reading is shown as
+"No reading", never as zero. Without it the charts show the forecast only. Synthetic mode makes up
+history with gaps.
+
+Rules applied by the builder:
+
+- Times are UTC in the data; the pages show them in Kenya time with "EAT".
+- A forecast whose daily rain changes by less than 1 mm over days 1 to 5 (`forecast_variation_mm` in
+  `insights_latest.csv`) gets no planting or rain-delay advice anywhere; flood alerts still apply.
+- Latest readings show only values with a documented unit. Wind speed, gust and light level are left
+  out until their units are verified.
+- Forecast days have no overnight low, so the pages show "up to" the day's maximum.
 
 `--reports-dir` (default `reports/`) is read for the accuracy and data-quality numbers. The
 synthetic flag lives only in `meta.json` and is never shown on a page. Do not commit `web/data` while it
