@@ -388,6 +388,39 @@ class NeverShowTests(unittest.TestCase):
             if kind == "latest":  # the reading's date and time are always there
                 self.assertRegex(text, r"(Last reading|Kipimo cha mwisho) \w+ \d{1,2} \w+, \d{2}:\d{2}")
 
+    def test_footer_is_one_quiet_line_and_credits_live_on_contact_only(self):
+        """The footer never carries the AI images note or the map and boundary credits again;
+        those sit in "Data and credits" on the Contact page and in the map's own attribution control."""
+        footer_banned = ["generated with ai", "images are illustrative", "illustrative", "openstreetmap",
+                         "geoboundaries", "cc by", "map data"]
+        layout = (SRC / "layout.html").read_text(encoding="utf-8")
+        footers = [re.search(r"<footer.*?</footer>", layout, re.S).group(0)]
+        for path in sorted(WEB.glob("*.html")):
+            footers.append(re.search(r"<footer.*?</footer>", path.read_text(encoding="utf-8"), re.S).group(0))
+        strings = json.loads((WEB / "i18n" / "en.json").read_text(encoding="utf-8"))
+        footers.append(" ".join(string_values(strings["footer"])))
+        for footer in footers:
+            for phrase in footer_banned:
+                self.assertNotIn(phrase, footer.lower(), footer[:120])
+            self.assertLessEqual(len(re.findall(r"<p\b", footer)), 1)  # one line
+        self.assertEqual(strings["footer"]["owner"], "Philip Tait Lemaron")  # one string, order editable
+        credit = "Illustrative images were generated with AI."
+        for path in sorted(WEB.glob("*.html")):
+            text = path.read_text(encoding="utf-8")
+            if path.name == "contact.html":
+                self.assertIn('id="credits-title"', text)
+                for phrase in ["iLabAfrica Anga Weather Network", "© OpenStreetMap contributors",
+                               "CC BY 3.0 IGO; IEBC and OCHA ROSEA", credit]:
+                    self.assertIn(phrase, text)
+            else:
+                self.assertNotIn(credit, text, path.name)
+                self.assertNotIn("credits-title", text, path.name)
+        map_js = (WEB / "js" / "map.js").read_text(encoding="utf-8")
+        self.assertIn("OpenStreetMap</a> contributors", map_js)        # the map keeps its own attribution
+        self.assertIn('addAttribution("Boundaries: geoBoundaries")', map_js)
+        self.assertNotRegex((WEB / "css" / "styles.css").read_text(encoding="utf-8"),
+                            r"leaflet-control-attribution \{[^}]*display: none")
+
     def test_sms_page_shows_no_now_live_or_test_scenario(self):
         """Visible words only: i18n strings and page text (tags, attributes and scripts removed)."""
         strings = json.loads((WEB / "i18n" / "en.json").read_text(encoding="utf-8"))
@@ -447,7 +480,12 @@ class PagesTests(unittest.TestCase):
         css = (WEB / "css" / "styles.css").read_text(encoding="utf-8")
         self.assertIn("scroll-margin-top", css)                      # sticky header never covers an anchor
         self.assertRegex(css, r"\.tiles-osm \.leaflet-tile-pane \{ filter: grayscale\(1\)")  # quiet basemap
-        self.assertRegex(css, r"\.area-btn \{[^}]*border-radius: 10px")
+        for token in ["--space-1: 8px", "--space-2: 16px", "--space-3: 24px", "--space-4: 40px", "--tap: 44px"]:
+            self.assertIn(token, css)                                # one spacing scale, 44 px targets
+        for rule in [".btn-primary {", ".btn-secondary {", ".btn:disabled", ".chip {", ".card {", ":focus-visible {"]:
+            self.assertIn(rule, css)                                 # one shared set of components
+        for dead in [".area-btn", ".btn-solid", ".btn-outline {", ".stale-note", ".footer-small"]:
+            self.assertNotIn(dead, css)
         for state in ["today", "recent", "off"]:                    # three marker states, one per class
             self.assertRegex(css, rf"\.mk-{state}::before \{{")
             self.assertRegex(css, rf"\.dot-{state} \{{")
@@ -524,9 +562,8 @@ class PagesTests(unittest.TestCase):
             self.assertIn('class="site-header"', text, name)
             self.assertIn('class="bottom-nav"', text, name)
             self.assertEqual(text.count('aria-current="page"'), 2, name)  # top nav and bottom nav
-            self.assertIn("Final-year project, Strathmore University. Philip Tait Lemaron.", text, name)
-            self.assertIn("Images are illustrative and generated with AI.", text, name)
-            self.assertIn("CC BY 3.0 IGO; IEBC and OCHA ROSEA", text, name)
+            footer = re.search(r'<footer class="site-footer">.*?</footer>', text, re.S).group(0)
+            self.assertIn("© 2026 Philip Tait Lemaron · Strathmore University final year project", footer, name)
             for target in self.PAGES:
                 self.assertIn(f'href="{target}"', text, f"{name} does not link to {target}")
 

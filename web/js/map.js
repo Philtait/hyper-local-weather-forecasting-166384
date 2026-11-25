@@ -123,7 +123,7 @@
       '<div class="panel-body" id="panel-body">' +
       (hasAlert(s) ? '<div class="panel-alert">' + I.badge(s.status.code) + "<p>" + esc(s.what_to_do) + "</p></div>" : "") +
       (s.active ? readings(s.latest) : "") + outlook(s) +
-      '<a class="btn btn-solid details-btn" href="station.html?id=' + encodeURIComponent(s.id) + '">' + icon("arrow") +
+      '<a class="btn btn-primary details-btn" href="station.html?id=' + encodeURIComponent(s.id) + '">' + icon("arrow") +
       "<span>" + esc(t("map.details")) + "</span></a></div>";
     var panel = $("panel");
     panel.innerHTML = html;
