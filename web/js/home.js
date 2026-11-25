@@ -67,7 +67,8 @@
         document.getElementById("updated").textContent =
           I.t("home.updated", { time: I.clock(meta.generated_at) + ", " + I.longDate(I.localDay(meta.generated_at)) });
         if (meta.headline_week) {
-          document.getElementById("hero-week-text").textContent = meta.headline_week;
+          // The label already says "This week:", so drop the sentence's own closing "this week".
+          document.getElementById("hero-week-text").textContent = meta.headline_week.replace(/\s+this week(\.?)\s*$/i, "$1");
           document.getElementById("hero-week").hidden = false;
         }
         document.getElementById("status-counts").innerHTML = Object.keys(I.ORDER).filter(function (code) { return counts[code]; })
