@@ -15,10 +15,9 @@
     "contact": "Contact"
   },
   "footer": {
-    "credit": "Final-year project, Strathmore University. Philip Tait Lemaron.",
-    "images": "Images are illustrative and generated with AI.",
-    "map_data": "Map data from OpenStreetMap contributors.",
-    "boundaries": "Boundaries from geoBoundaries (CC BY 3.0 IGO; IEBC and OCHA ROSEA)."
+    "year": "© 2026",
+    "owner": "Philip Tait Lemaron",
+    "project": "Strathmore University final year project"
   },
   "status": {
     "warning": "Very heavy rain",
@@ -273,7 +272,12 @@
     "report_body": "Area or station:\nDay:\nWhat the forecast said:\nWhat the weather really did:",
     "privacy": "We do not store the details you type here.",
     "other": "Other ways to reach us",
-    "form_error": "Please write a message first."
+    "form_error": "Please write a message first.",
+    "credits_title": "Data and credits",
+    "credits_stations": "Weather station data from the iLabAfrica Anga Weather Network.",
+    "credits_map": "Map data © OpenStreetMap contributors.",
+    "credits_boundaries": "Boundaries from geoBoundaries (CC BY 3.0 IGO; IEBC and OCHA ROSEA).",
+    "credits_images": "Illustrative images were generated with AI."
   },
   "station": {
     "page_title": "Station details: Imarika",

@@ -3,8 +3,8 @@
     <h1 id="page-title">{{t:contact.title}}</h1>
     <p class="lead">{{t:contact.lead}}</p>
     <div class="contact-actions">
-      <a class="btn btn-solid" id="email-button" href="#" hidden>{{icon:mail}}<span>{{t:contact.email_button}}</span></a>
-      <a class="btn btn-outline" id="report-button" href="#" hidden>{{icon:warning}}<span>{{t:contact.report}}</span></a>
+      <a class="btn btn-primary" id="email-button" href="#" hidden>{{icon:mail}}<span>{{t:contact.email_button}}</span></a>
+      <a class="btn btn-secondary" id="report-button" href="#" hidden>{{icon:warning}}<span>{{t:contact.report}}</span></a>
       <p class="muted" id="no-email" hidden>{{t:contact.no_email}}</p>
     </div>
     <ul class="contact-details" id="contact-details"></ul>
@@ -20,8 +20,19 @@
       <label class="field-label" for="c-message">{{t:contact.message}}</label>
       <textarea class="field" id="c-message" name="message" rows="6" aria-describedby="c-error"></textarea>
       <p class="field-error" id="c-error" role="alert"></p>
-      <button class="btn btn-solid" type="submit" id="c-send">{{icon:mail}}<span>{{t:contact.open_email}}</span></button>
+      <button class="btn btn-primary" type="submit" id="c-send">{{icon:mail}}<span>{{t:contact.open_email}}</span></button>
     </form>
     <p class="helper">{{t:contact.privacy}}</p>
+  </div>
+</section>
+<section class="band band-tight" aria-labelledby="credits-title">
+  <div class="wrap credits">
+    <h2 id="credits-title" class="h-small">{{t:contact.credits_title}}</h2>
+    <ul class="credits-list">
+      <li>{{t:contact.credits_stations}}</li>
+      <li>{{t:contact.credits_map}}</li>
+      <li>{{t:contact.credits_boundaries}}</li>
+      <li>{{t:contact.credits_images}}</li>
+    </ul>
   </div>
 </section>
