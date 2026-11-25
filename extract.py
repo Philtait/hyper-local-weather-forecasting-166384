@@ -19,6 +19,9 @@ parser.add_argument("--raw-dir", default="data/raw",
                     help="folder for one raw JSON file per device (default: data/raw)")
 parser.add_argument("--csv-path", default="data/all_readings.csv",
                     help="combined CSV output (default: data/all_readings.csv)")
+parser.add_argument("--update", action="store_true",
+                    help="for devices already on disk, fetch only new readings (pages are newest "
+                         "first; stop at the first page with readings already saved) and merge them")
 args = parser.parse_args()
 
 RAW_DIR  = args.raw_dir        # one JSON file per device
@@ -89,6 +92,34 @@ def fetch_all_pages(device_id):
 
     return all_records
 
+def fetch_new_pages(device_id, known_ids):
+    """Newest pages first, until a page contains a reading already saved.
+
+    Returns (new records, complete). If a page is not in newest-first order the
+    stop rule is not safe, so paging continues to the last page instead.
+    """
+    new, page, limit, total_pages = [], 1, 500, None
+    while True:
+        resp = get(f"/api/v1/readings/device/{device_id}",
+                   params={"limit": limit, "page": page}, timeout=60)
+        if not resp or not resp.get("success"):
+            print(f"  Bad response on page {page}: {resp}")
+            return new, False
+        records = resp.get("data", [])
+        if total_pages is None:
+            total_pages = resp.get("pagination", {}).get("totalPages", 1)
+        times = [r.get("receivedAt") or "" for r in records]
+        ordered = all(a >= b for a, b in zip(times, times[1:]))
+        fresh = [r for r in records if r.get("_id") not in known_ids]
+        new.extend(fresh)
+        print(f"  Page {page}/{total_pages} — {len(fresh)} new of {len(records)}"
+              + ("" if ordered else " (page not newest first: reading on)"))
+        if not records or page >= total_pages or (ordered and len(fresh) < len(records)):
+            return new, True
+        page += 1
+        time.sleep(0.3)
+
+
 def flatten_record(r, device_meta):
     """Extract only the fields we need into a flat dict."""
     s = r.get("sensorData", {})
@@ -150,6 +181,7 @@ device_meta = {
 # Step 2: Extract per device
 print(f"\n[2/3] Extracting readings ({len(devices)} devices)...")
 total_extracted = 0
+total_new       = 0
 failed_devices  = []
 
 for i, device in enumerate(devices, 1):
@@ -158,11 +190,28 @@ for i, device in enumerate(devices, 1):
 
     print(f"\n  [{i}/{len(devices)}] Device {did}")
 
-    # Skip if already extracted (resumable)
+    # Skip if already extracted (resumable), or with --update fetch only new readings
     if os.path.exists(save_path):
         existing = json.load(open(save_path))
-        print(f"  Already extracted — {len(existing):,} records on disk. Skipping.")
+        if not args.update:
+            print(f"  Already extracted — {len(existing):,} records on disk. Skipping.")
+            total_extracted += len(existing)
+            continue
+        fresh, complete = fetch_new_pages(did, {r.get("_id") for r in existing})
+        if not complete:
+            failed_devices.append(did)
+        if fresh:
+            merged = fresh + existing
+            tmp_path = save_path + ".tmp"
+            with open(tmp_path, "w") as f:
+                json.dump(merged, f)
+            os.replace(tmp_path, save_path)   # never leave a half-written file
+            existing = merged
+        newest = max((r.get("receivedAt") or "" for r in existing), default="")
+        print(f"  {len(fresh):,} new readings; {len(existing):,} on disk; newest {newest}")
+        total_new += len(fresh)
         total_extracted += len(existing)
+        time.sleep(0.5)
         continue
 
     records = fetch_all_pages(did)
@@ -210,6 +259,8 @@ with open(CSV_PATH, "w", newline="", encoding="utf-8") as csvfile:
 print(f"\n{'='*60}")
 print(f"DONE — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 print(f"Total records extracted: {total_extracted:,}")
+if args.update:
+    print(f"New readings this run:   {total_new:,}")
 print(f"Total rows in CSV:       {row_count:,}")
 print(f"CSV saved to:            {CSV_PATH}")
 if failed_devices:
