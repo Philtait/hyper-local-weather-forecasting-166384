@@ -32,10 +32,59 @@
 <main id="main" tabindex="-1">
 <p class="offline-note wrap" id="offline-note" role="status" hidden></p>
 <section class="band page-top" aria-labelledby="page-title">
-  <div class="wrap placeholder">
-    <span class="icon-circle"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#info"></use></svg></span>
+  <div class="wrap">
     <h1 id="page-title">How it works</h1>
-    <p class="lead">This page will explain, step by step, how Imarika turns weather readings into advice.</p>
+    <p class="lead">Imarika turns readings from weather stations near your farm into simple advice for the week.</p>
+    <h2 class="sub-title">From weather station to your phone</h2>
+    <ol class="steps steps-five">
+      <li><span class="icon-circle"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#station"></use></svg></span><p>Weather stations in Busia County measure rain, temperature, humidity and wind all day.</p></li>
+      <li><span class="icon-circle"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#check"></use></svg></span><p>We clean the readings and check them, so faulty values are not used.</p></li>
+      <li><span class="icon-circle"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar"></use></svg></span><p>A forecasting model uses past readings to predict the next 7 days.</p></li>
+      <li><span class="icon-circle"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#sprout"></use></svg></span><p>Simple rules turn the forecast into advice about rain, planting and spraying.</p></li>
+      <li><span class="icon-circle"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#phone"></use></svg></span><p>The advice reaches farmers on this website and by text message.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="band band-alt" aria-labelledby="words-title">
+  <div class="wrap">
+    <div class="media-intro">
+      <div>
+        <h2 id="words-title">What the colours and words mean</h2>
+        <p>Every station gets one word for the coming week. The colour and the icon always match the word.</p>
+      </div>
+      <img src="img/station.webp" width="960" height="720" loading="lazy" alt="Illustration of a weather station standing in a maize field">
+    </div>
+    <table class="status-table">
+      <thead><tr><th scope="col">Word</th><th scope="col">What to do</th></tr></thead>
+      <tbody>
+        <tr><th scope="row"><span class="badge st-warning"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#warning"></use></svg><span>Very heavy rain</span></span></th><td>If you are in a flood-prone area, move to higher ground.</td></tr>
+        <tr><th scope="row"><span class="badge st-watch"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#drop"></use></svg><span>Heavy rain</span></span></th><td>Clear drains and avoid low-lying fields.</td></tr>
+        <tr><th scope="row"><span class="badge st-planting"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#sprout"></use></svg><span>Good rain for planting</span></span></th><td>Rain may suit planting. Dry spells after the next 7 days are not checked.</td></tr>
+        <tr><th scope="row"><span class="badge st-delay"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#spray"></use></svg><span>Rain coming, wait before spraying</span></span></th><td>Delay spraying and harvesting on the rainy days.</td></tr>
+        <tr><th scope="row"><span class="badge st-none"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#check"></use></svg><span>Quiet week</span></span></th><td>No rain alerts for this station this week.</td></tr>
+        <tr><th scope="row"><span class="badge st-offline"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#offline"></use></svg><span>Not reporting</span></span></th><td>This station sends no data, so there is no forecast. Check a nearby station.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="sure-title">
+  <div class="wrap">
+    <h2 id="sure-title">How sure are we?</h2>
+    <ul class="check-list">
+      <li><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar"></use></svg><span>Forecasts for the next few days are more certain than forecasts for later in the week.</span></li>
+      <li><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#drop"></use></svg><span>Rain is harder to predict than temperature, so treat rain amounts as a guide.</span></li>
+      <li><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#offline"></use></svg><span>A station that stops sending data shows as Not reporting and gets no forecast.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="band band-mint" aria-labelledby="about-title">
+  <div class="wrap">
+    <h2 id="about-title">About the project</h2>
+    <p>Imarika is a final-year project at Strathmore University by Philip Tait Lemaron.</p>
+    <p>Weather station data comes from the iLabAfrica Anga Weather Network.</p>
   </div>
 </section>
 </main>
