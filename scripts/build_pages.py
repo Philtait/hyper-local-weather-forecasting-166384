@@ -31,6 +31,11 @@ PAGES = [
     ("sms", "sms.html", "sms.page_title", "message", [], ["js/sms-message.js", "js/sms.js"]),
     ("contact", "contact.html", "contact.page_title", "mail", [], ["js/contact.js"]),
 ]
+# Pages that are not in the main navigation: key, output file, title string, nav item kept highlighted, head, scripts
+EXTRA_PAGES = [
+    ("station", "station.html", "station.page_title", "map", [],
+     ["js/map-logic.js", "js/station-logic.js", "js/charts.js", "js/station.js"]),
+]
 PLACEHOLDER = re.compile(r"\{\{(t|icon):([\w.]+)\}\}")
 
 
@@ -65,14 +70,14 @@ def nav_items(current, strings, bottom):
     return "\n".join(items)
 
 
-def render(page, strings):
+def render(page, strings, nav_current=None):
     key, _, title, _, head, scripts = page
     layout = (SRC / "layout.html").read_text(encoding="utf-8")
     body = (SRC / "pages" / f"{key}.html").read_text(encoding="utf-8").strip()
     parts = {
         "lang": strings["lang"], "page": key, "page_title": html.escape(lookup(strings, title)),
         "head": "".join(line + "\n" for line in head), "body": body,
-        "nav": nav_items(key, strings, False), "bottom_nav": nav_items(key, strings, True),
+        "nav": nav_items(nav_current or key, strings, False), "bottom_nav": nav_items(nav_current or key, strings, True),
         "scripts": "".join(f'<script src="{src}"></script>\n' for src in scripts),
     }
     text = re.sub(r"\{\{(\w+)\}\}", lambda m: parts[m.group(1)], layout)
@@ -85,9 +90,9 @@ def main(argv=None):
     args = parser.parse_args(argv)
     strings = json.loads(STRINGS.read_text(encoding="utf-8"))
     stale = []
-    for page in PAGES:
+    for page, nav_current in [(page, None) for page in PAGES] + [(page, page[3]) for page in EXTRA_PAGES]:
         target = WEB / page[1]
-        text = render(page, strings)
+        text = render(page, strings, nav_current)
         if args.check:
             if not target.is_file() or target.read_text(encoding="utf-8") != text:
                 stale.append(page[1])
