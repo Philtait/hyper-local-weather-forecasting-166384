@@ -3,9 +3,9 @@
 Real station data and SARIMA forecasts for the Imarika dashboard and website.
 Built by `scripts/forecast_export.py` from `data/all_readings_refresh.csv`.
 
-- AS-OF (newest reading in the network): 2026-11-24T17:26:33Z (2026-11-24 20:26 EAT)
-- Stations: 26; active (last reading within 48 h of AS-OF): 7; forecasts produced: 7
-- Generated: 2026-11-25T11:16:15Z (2026-11-25 14:16 EAT); used for `reported_today`
+- AS-OF (newest reading in the network): 2026-11-25T13:35:58Z (2026-11-25 16:35 EAT)
+- Stations: 26; active (last reading within 48 h of AS-OF): 13; forecasts produced: 10
+- Generated: 2026-11-25T13:46:31Z (2026-11-25 16:46 EAT); used for `reported_today`
 - Packages: python 3.12.10, pandas 2.3.3, numpy 2.5.3, statsmodels 0.14.5, scikit-learn 1.9.1
 
 ## Times
@@ -43,7 +43,7 @@ UTC); the LoRaWAN frame counter restarts each morning, so the stations switch of
   forecast. Fitted per station on the last 120 days of complete hours before AS-OF
   (gaps left as missing), lbfgs, at most 200 iterations. The 95% upper bounds come
   from one Kalman filter pass with the fitted parameters (no re-estimation).
-- Horizon: 173 hourly steps from the last complete hour before AS-OF, to the end of
+- Horizon: 177 hourly steps from the last complete hour before AS-OF, to the end of
   01:00 EAT after day 7 (21:59 UTC on day 7). Day 1 is the Nairobi date after the AS-OF
   date. Only 08:00-00:00 EAT (05:00-20:59 UTC) is published.
 - Rainfall and wind forecasts are clipped at 0. No LSTM output is used anywhere.
@@ -114,4 +114,6 @@ maxiter 1000, same order); package versions and AS-OF.
 
 ## Station notes
 
-- 101990961244800061: partial; wind forecast failed to converge
+- 101990961244800270: error; forecast not available
+- 101990961244800317: error; forecast not available
+- 101990961244800395: error; forecast not available
