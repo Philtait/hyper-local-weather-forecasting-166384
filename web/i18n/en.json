@@ -218,7 +218,21 @@
     "demo": "The send service is not running here, so the message is only shown on the phone above.",
     "nothing": "There is no message to send for this choice.",
     "from": "Imarika",
-    "no_reason": "no reason was given"
+    "no_reason": "no reason was given",
+    "counter_parts": "{n} characters, {parts} messages",
+    "check_simulator": "Check the Africa's Talking simulator.",
+    "crop_group": "Crop guide",
+    "crop_none": "{station} has no forecast this week, so there is no crop guide to send.",
+    "crop_unavailable": "The crop guide could not be loaded.",
+    "lang_label": "Language of the crop guide",
+    "lang_en": "English",
+    "lang_sw": "Kiswahili",
+    "crops": {
+      "en": { "maize": "Maize", "beans": "Beans", "sorghum": "Sorghum", "cassava": "Cassava",
+              "cowpeas": "Cowpeas", "sweet potatoes": "Sweet potatoes" },
+      "sw": { "maize": "Mahindi", "beans": "Maharagwe", "sorghum": "Mtama", "cassava": "Muhogo",
+              "cowpeas": "Kunde", "sweet potatoes": "Viazi vitamu" }
+    }
   },
   "contact": {
     "title": "Contact us",

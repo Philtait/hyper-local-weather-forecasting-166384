@@ -1,11 +1,11 @@
 {
- "generated_utc": "2026-11-25T12:58:45Z",
+ "generated_utc": "2026-11-25T13:12:04Z",
  "model": "models/gemini-3.5-flash-lite",
  "models_used": [
   "models/gemini-3.5-flash-lite"
  ],
  "stations": {
-  "101990961244800001": {
+  "001": {
    "area": "Butula",
    "bucket": {
     "rain_mm": 8,
@@ -316,7 +316,7 @@
     }
    }
   },
-  "101990961244800061": {
+  "061": {
    "area": "Butula",
    "bucket": {
     "rain_mm": 6,
@@ -627,7 +627,7 @@
     }
    }
   },
-  "101990961244800113": {
+  "113": {
    "area": "Butula",
    "bucket": {
     "rain_mm": 6,
@@ -938,7 +938,7 @@
     }
    }
   },
-  "101990961244800184": {
+  "184": {
    "area": "Butula",
    "bucket": {
     "rain_mm": 6,
@@ -1249,7 +1249,7 @@
     }
    }
   },
-  "101990961244800270": {
+  "270": {
    "area": "Nambale",
    "bucket": {
     "rain_mm": 7,
@@ -1560,7 +1560,7 @@
     }
    }
   },
-  "101990961244800342": {
+  "342": {
    "area": "Butula",
    "bucket": {
     "rain_mm": 8,
@@ -1871,7 +1871,7 @@
     }
    }
   },
-  "101990961244800395": {
+  "395": {
    "area": "Nambale",
    "bucket": {
     "rain_mm": 6,

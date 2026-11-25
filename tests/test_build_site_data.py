@@ -6,6 +6,7 @@ No network is used. Run: python -m pytest -q tests/test_build_site_data.py
 import csv
 import json
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -359,6 +360,33 @@ class NeverShowTests(unittest.TestCase):
                 allowed = 1 if path.name == "model_results.json" and word in {"SARIMA", "LSTM"} else 0
                 self.assertLessEqual(count, allowed, f"{path.name} names {word} {count} times")
             self.assertIsNone(EIGHTEEN_DIGITS.search(joined), path.name)
+
+
+    def test_crop_guide_sms_text_never_shows_banned_words(self):
+        """Every crop guide SMS, built by the shared JS builder exactly as it is sent, is scanned too."""
+        guide = WEB / "data" / "crop_guide.json"
+        node = shutil.which("node")
+        if not guide.is_file() or not node:
+            self.skipTest("crop_guide.json or node is missing")
+        script = (
+            "const b = require(process.argv[1]); const g = require(process.argv[2]); const out = [];"
+            "for (const s of b.stations(g)) for (const c of b.CROPS) for (const l of b.LANGS) {"
+            " const m = b.buildCropMessage(g, s, c, l); if (m) out.push(m.text); }"
+            "process.stdout.write(JSON.stringify(out));"
+        )
+        result = subprocess.run([node, "-e", script, str(WEB / "js" / "sms-message.js"), str(guide)],
+                                capture_output=True, text=True, encoding="utf-8", check=True)
+        messages = json.loads(result.stdout)
+        self.assertGreater(len(messages), 0)
+        for text in messages:
+            lower = text.lower()
+            for phrase in NEVER_SHOW + PAGE_ONLY:
+                self.assertNotIn(phrase, lower, f"crop guide SMS contains {phrase!r}: {text}")
+            for word in JARGON + ["AI"]:
+                self.assertIsNone(re.search(rf"\b{word}\b", text), f"crop guide SMS contains {word}: {text}")
+            self.assertIsNone(re.search(r"\{(RAIN|TEMP)\}|\bF0\d\b", text), text)
+            self.assertIsNone(EIGHTEEN_DIGITS.search(text), text)
+            self.assertLessEqual(len(text), 306)
 
 
 class RealDataTests(unittest.TestCase):

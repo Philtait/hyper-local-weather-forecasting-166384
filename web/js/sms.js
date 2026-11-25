@@ -1,11 +1,13 @@
 /* SMS demo: choose an area and a message, preview the exact text, send it to the sandbox simulator.
-   The server looks the text up again from data/; the browser only sends which message was chosen. */
+   The server looks the text up again from data/; the browser only sends which message was chosen.
+   Crop guide messages are built by js/sms-message.js, the same builder the send function uses. */
 (function () {
   "use strict";
-  var I = window.Imarika, t = I.t, esc = I.esc;
+  var I = window.Imarika, t = I.t, esc = I.esc, B = window.ImarikaSmsMessage;
   var PHONE = /^\+254[17]\d{8}$/;
   var LIMIT = 160;
-  var state = { stations: [], scenarios: [], area: null, choice: null };
+  var CROP = "crop:";
+  var state = { stations: [], scenarios: [], guide: null, area: null, choice: null, lang: "en" };
 
   function $(id) { return document.getElementById(id); }
   function stationFor(area) {
@@ -36,25 +38,71 @@
     }).join("");
   }
 
+  /* The crop guide uses the same station as "this week's advice"; only a station with a forecast has one. */
+  function cropStation() {
+    var s = stationFor(state.area);
+    if (!s || !state.guide || B.stations(state.guide).indexOf(s.id) < 0 || !(s.forecast || []).length) return { station: s, ok: false };
+    return { station: s, ok: true };
+  }
+
+  function cropChoice(crop) {
+    var cs = cropStation();
+    if (!cs.ok) return null;
+    var built = B.buildCropMessage(state.guide, cs.station.id, crop, state.lang);
+    return { id: CROP + crop, label: t("sms.crops." + state.lang + "." + crop), text: built && built.text,
+             parts: built && built.parts,
+             body: built ? { scenario: "crop_guide", station: cs.station.id, crop: crop, lang: state.lang } : null };
+  }
+
   function renderChoices() {
     var list = choices();
-    if (!list.some(function (c) { return c.id === state.choice; })) state.choice = (list.filter(function (c) { return c.text; })[0] || list[0]).id;
+    var cropActive = state.choice && state.choice.indexOf(CROP) === 0 && cropStation().ok;
+    if (!cropActive && !list.some(function (c) { return c.id === state.choice; })) {
+      state.choice = (list.filter(function (c) { return c.text; })[0] || list[0]).id;
+    }
     $("sms-messages").innerHTML = list.map(function (c, i) {
       var heading = i === 1 ? '<p class="choice-group">' + esc(t("sms.examples")) + "</p>" : "";
       return heading + '<label class="choice"><input type="radio" name="message" value="' + esc(c.id) + '"' +
         (c.id === state.choice ? " checked" : "") + "><span>" + esc(c.label) + "</span></label>";
     }).join("");
+    renderCrops();
     preview();
   }
 
-  function current() { return choices().filter(function (c) { return c.id === state.choice; })[0]; }
+  function renderCrops() {
+    var cs = cropStation();
+    var html = '<p class="choice-group" id="crop-group-title">' + esc(t("sms.crop_group")) + "</p>";
+    if (!cs.ok) {
+      html += '<p class="crop-note">' + esc(cs.station && state.guide
+        ? t("sms.crop_none", { station: cs.station.name }) : t("sms.crop_unavailable")) + "</p>";
+      $("sms-crops").innerHTML = html;
+      return;
+    }
+    html += '<div class="lang-switch" role="group" aria-label="' + esc(t("sms.lang_label")) + '">' +
+      B.LANGS.map(function (lang) {
+        return '<button type="button" class="lang-btn" data-lang="' + lang + '" aria-pressed="' + (lang === state.lang) + '">' +
+          esc(t("sms.lang_" + lang)) + "</button>";
+      }).join("") + "</div>";
+    html += '<div class="crop-grid" role="group" aria-labelledby="crop-group-title">' + B.CROPS.map(function (crop) {
+      return '<button type="button" class="crop-btn" data-crop="' + esc(crop) + '" aria-pressed="' +
+        (state.choice === CROP + crop) + '">' + esc(t("sms.crops." + state.lang + "." + crop)) + "</button>";
+    }).join("") + "</div>";
+    $("sms-crops").innerHTML = html;
+  }
+
+  function current() {
+    if (state.choice && state.choice.indexOf(CROP) === 0) return cropChoice(state.choice.slice(CROP.length));
+    return choices().filter(function (c) { return c.id === state.choice; })[0];
+  }
 
   function preview() {
     var c = current(), box = $("sms-text");
     if (c && c.text) {
       box.textContent = c.text;
       box.classList.remove("empty");
-      $("sms-count").textContent = t("sms.counter", { n: c.text.length });
+      // Short messages keep "x of 160 characters"; longer ones show the real count and number of messages.
+      $("sms-count").textContent = c.text.length <= LIMIT ? t("sms.counter", { n: c.text.length })
+        : t("sms.counter_parts", { n: c.text.length, parts: B.smsParts(c.text.length) });
     } else {
       box.textContent = c && c.dry ? t("sms.dry_none") : t("sms.nothing");
       box.classList.add("empty");
@@ -63,10 +111,16 @@
     $("sms-send").disabled = !(c && c.body);
   }
 
-  function result(kind, text) {
+  function result(kind, text, extra) {
     var el = $("sms-result");
     el.className = "sms-result " + kind;
     el.textContent = text;
+    if (extra) {
+      var line = document.createElement("span");
+      line.className = "sms-result-line";
+      line.textContent = extra;
+      el.appendChild(line);
+    }
   }
 
   function send(event) {
@@ -94,7 +148,7 @@
         return r.json();
       })
       .then(function (j) {
-        if (j && j.ok) result("ok", t("sms.sent"));
+        if (j && j.ok) result("ok", t("sms.sent"), t("sms.check_simulator"));
         else result("fail", t("sms.failed", { reason: (j && j.error) || t("sms.no_reason") }));
       })
       .catch(function () { result("", t("sms.demo")); })
@@ -102,10 +156,12 @@
   }
 
   I.ready.then(function () {
-    return Promise.all([I.getJSON("data/stations.json"), I.getJSON("data/scenarios.json")]);
+    return Promise.all([I.getJSON("data/stations.json"), I.getJSON("data/scenarios.json"),
+                        I.getJSON("data/crop_guide.json").catch(function () { return null; })]);
   }).then(function (res) {
     state.stations = res[0].stations;
     state.scenarios = res[1].scenarios;
+    state.guide = res[2];
     var first = state.stations.filter(function (s) { return s.active && s.insights.length; }).sort(I.bySeverity)[0] || state.stations[0];
     state.area = first ? first.area : null;
     renderAreas();
@@ -120,7 +176,16 @@
       result("", "");
     });
     $("sms-messages").addEventListener("change", function (e) {
-      if (e.target.name === "message") { state.choice = e.target.value; preview(); result("", ""); }
+      // A test scenario replaces any selected crop: only one message is active at a time.
+      if (e.target.name === "message") { state.choice = e.target.value; renderCrops(); preview(); result("", ""); }
+    });
+    $("sms-crops").addEventListener("click", function (e) {
+      var lang = e.target.closest(".lang-btn"), crop = e.target.closest(".crop-btn");
+      if (lang) state.lang = lang.getAttribute("data-lang");
+      else if (crop) state.choice = CROP + crop.getAttribute("data-crop");
+      else return;
+      renderChoices();
+      result("", "");
     });
     $("sms-phone").addEventListener("input", function () { $("sms-phone-error").textContent = ""; });
     $("sms-form").addEventListener("submit", send);
