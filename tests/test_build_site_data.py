@@ -490,7 +490,8 @@ class PagesTests(unittest.TestCase):
             self.assertRegex(css, rf"\.mk-{state}::before \{{")
             self.assertRegex(css, rf"\.dot-{state} \{{")
         self.assertNotIn(".mk-count", css)                           # no clustering
-        self.assertRegex(css, r"\.panel \{[^}]*border-radius: 16px")
+        self.assertRegex(css, r"\.panel \{[^}]*border-radius: var\(--radius-card\)")
+        self.assertIn("--radius-card: 16px", css)
         map_js = (WEB / "js" / "map.js").read_text(encoding="utf-8")
         self.assertNotIn("days-small", map_js)
         self.assertIn('"#station=" + id', map_js)                   # map.html#station=113
@@ -587,6 +588,14 @@ class PagesTests(unittest.TestCase):
         sms = (WEB / "sms.html").read_text(encoding="utf-8")
         self.assertIn("See the SMS a farmer receives", sms)
         self.assertIn("Test mode: the message goes to a simulator, not a real phone.", sms)
+        # Step 1: area chips, then stations that sent data; the rest behind a toggle, collapsed by default.
+        self.assertIn('id="sms-areas"', sms)
+        self.assertIn('id="sms-off-toggle" aria-expanded="false" aria-controls="sms-off" hidden', sms)
+        self.assertIn('id="sms-off" hidden', sms)
+        self.assertNotIn('loading="lazy"', sms)                       # the hero image is above the fold
+        self.assertIn('class="page-hero-media"', sms)
+        sms_js = (WEB / "js" / "sms.js").read_text(encoding="utf-8")
+        self.assertIn('box.lang = ', sms_js)                          # Kiswahili text is marked lang="sw"
         how = (WEB / "how-it-works.html").read_text(encoding="utf-8")
         for code in ["warning", "watch", "planting", "delay", "none", "offline"]:
             self.assertIn(f"badge st-{code}", how)

@@ -6,27 +6,44 @@
   "use strict";
   var I = window.Imarika, t = I.t, esc = I.esc, B = window.ImarikaSmsMessage;
   var PHONE = /^\+254[17]\d{8}$/;
-  var state = { stations: [], guide: null, station: null, scenario: "latest", crop: B.CROPS[0], lang: "en" };
+  var state = { stations: [], guide: null, station: null, scenario: "latest", crop: B.CROPS[0], lang: "en", area: null, showOff: false };
 
   function $(id) { return document.getElementById(id); }
   function data() { return { stations: state.stations, guide: state.guide }; }
-  function byId(id) { return B.findStation(state.stations, id); }
+  function areaOf(s) { return s.area || "Busia"; }
+  function areas() {
+    var seen = {};
+    state.stations.forEach(function (s) { seen[areaOf(s)] = true; });
+    return Object.keys(seen).sort();
+  }
 
+  function stationButton(s) {
+    var ok = B.selectable(s);
+    var meta = ok ? t("sms.last_reading", { time: B.readingTime(s.last_reading_utc, "en") }) : t("sms.not_sending");
+    return '<button type="button" class="station-btn" data-station="' + esc(s.id) + '" aria-pressed="' +
+      (s.id === state.station) + '"' + (ok ? "" : " disabled") + ' aria-label="' +
+      esc(t("sms.station_label", { area: areaOf(s), id: s.id }) + ". " + meta) + '"><span class="station-name">' +
+      esc(t("sms.station_short", { id: s.id })) + '</span><span class="station-meta">' + esc(meta) + "</span></button>";
+  }
+
+  /* Step 1 in two small choices (Hick's law): an area, then only the stations there that sent data.
+     Stations not sending data wait behind a toggle, collapsed by default. */
   function renderStations() {
-    var areas = {};
-    state.stations.forEach(function (s) { (areas[s.area || "Busia"] = areas[s.area || "Busia"] || []).push(s); });
-    $("sms-stations").innerHTML = Object.keys(areas).sort().map(function (area) {
-      var list = areas[area].slice().sort(function (a, b) { return a.id < b.id ? -1 : 1; });
-      return '<div class="station-group"><p class="choice-group">' + esc(area) + '</p><div class="station-buttons">' +
-        list.map(function (s) {
-          var ok = B.selectable(s);
-          var meta = ok ? t("sms.last_reading", { time: B.readingTime(s.last_reading_utc, "en") }) : t("sms.not_sending");
-          return '<button type="button" class="station-btn" data-station="' + esc(s.id) + '" aria-pressed="' +
-            (s.id === state.station) + '"' + (ok ? "" : " disabled") + '><span class="station-name">' +
-            esc(t("sms.station_label", { area: s.area || "Busia", id: s.id })) + '</span><span class="station-meta">' +
-            esc(meta) + "</span></button>";
-        }).join("") + "</div></div>";
+    $("sms-areas").innerHTML = areas().map(function (area) {
+      return '<button type="button" class="chip" data-area="' + esc(area) + '" aria-pressed="' + (area === state.area) + '">' +
+        esc(area) + "</button>";
     }).join("");
+    var list = state.stations.filter(function (s) { return areaOf(s) === state.area; })
+      .sort(function (a, b) { return a.id < b.id ? -1 : 1; });
+    var on = list.filter(B.selectable), off = list.filter(function (s) { return !B.selectable(s); });
+    $("sms-stations").innerHTML = on.length ? '<div class="station-buttons">' + on.map(stationButton).join("") + "</div>"
+      : '<p class="muted">' + esc(t("sms.none_in_area")) + "</p>";
+    var toggle = $("sms-off-toggle");
+    toggle.hidden = !off.length;
+    toggle.setAttribute("aria-expanded", String(state.showOff));
+    toggle.textContent = state.showOff ? t("sms.hide_off") : t("sms.show_off", { n: off.length });
+    $("sms-off").innerHTML = '<div class="station-buttons">' + off.map(stationButton).join("") + "</div>";
+    $("sms-off").hidden = !state.showOff || !off.length;
   }
 
   function option(id, label, enabled, note, extra) {
@@ -40,12 +57,12 @@
     if (!can[state.scenario]) state.scenario = "latest";
     var langs = '<div class="lang-switch" role="group" aria-label="' + esc(t("sms.lang_label")) + '">' +
       B.LANGS.map(function (lang) {
-        return '<button type="button" class="lang-btn" data-lang="' + lang + '" aria-pressed="' + (lang === state.lang) + '">' +
+        return '<button type="button" class="lang-btn" data-lang="' + lang + '" lang="' + lang + '" aria-pressed="' + (lang === state.lang) + '">' +
           esc(t("sms.lang_" + lang)) + "</button>";
       }).join("") + "</div>";
     var crops = can.crop_guide ? '<div class="crop-grid" role="group" aria-label="' + esc(t("sms.msg_crop")) + '">' +
       B.CROPS.map(function (crop) {
-        return '<button type="button" class="crop-btn" data-crop="' + esc(crop) + '" aria-pressed="' +
+        return '<button type="button" class="crop-btn" data-crop="' + esc(crop) + '" lang="' + state.lang + '" aria-pressed="' +
           (state.scenario === "crop_guide" && state.crop === crop) + '">' + esc(t("sms.crops." + state.lang + "." + crop)) + "</button>";
       }).join("") + "</div>" : "";
     $("sms-messages").innerHTML = langs +
@@ -64,6 +81,8 @@
 
   function preview() {
     var built = state.station ? B.buildMessage(data(), request()) : null, box = $("sms-text");
+    // Kiswahili text is marked lang="sw" so screen readers read it right; the alert is always English.
+    box.lang = built && state.lang === "sw" && state.scenario !== "alert" ? "sw" : "en";
     if (built) {
       box.textContent = built.text;
       box.classList.remove("empty");
@@ -129,9 +148,10 @@
       return (a.area || "") < (b.area || "") ? -1 : (a.area || "") > (b.area || "") ? 1 : a.id < b.id ? -1 : 1;
     })[0];
     state.station = first ? first.id : null;
+    state.area = first ? areaOf(first) : areas()[0];
     renderStations();
     renderMessages();
-    $("sms-stations").addEventListener("click", function (e) {
+    function pickStation(e) {
       var b = e.target.closest(".station-btn");
       if (!b || b.disabled) return;
       state.station = b.getAttribute("data-station");
@@ -139,6 +159,26 @@
       renderStations();
       renderMessages();
       result("", "");
+    }
+    $("sms-stations").addEventListener("click", pickStation);
+    $("sms-off").addEventListener("click", pickStation);
+    $("sms-areas").addEventListener("click", function (e) {
+      var b = e.target.closest("[data-area]");
+      if (!b || b.getAttribute("data-area") === state.area) return;
+      state.area = b.getAttribute("data-area");
+      state.showOff = false;
+      // The preview follows the area: its first station that sent data, or nothing to send.
+      var next = state.stations.filter(function (s) { return areaOf(s) === state.area && B.selectable(s); })
+        .sort(function (a, c) { return a.id < c.id ? -1 : 1; })[0];
+      state.station = next ? next.id : null;
+      state.scenario = "latest";
+      renderStations();
+      renderMessages();
+      result("", "");
+    });
+    $("sms-off-toggle").addEventListener("click", function () {
+      state.showOff = !state.showOff;
+      renderStations();
     });
     $("sms-messages").addEventListener("change", function (e) {
       if (e.target.name === "message") { state.scenario = e.target.value; renderMessages(); result("", ""); }

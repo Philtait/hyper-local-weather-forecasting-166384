@@ -42,7 +42,7 @@
   function tile(name, labelText, value, opts) {
     opts = opts || {};
     return '<li class="tile">' + icon(name) + '<span class="tile-label">' + esc(labelText) + '</span><strong class="tile-value' +
-      (opts.text ? " tile-value-text" : "") + '">' + esc(value) + "</strong>" +
+      (opts.text ? " tile-value-text" : "") + '">' + esc(value) + (opts.sub ? ' <span class="tile-sub">' + esc(opts.sub) + "</span>" : "") + "</strong>" +
       (opts.note ? '<span class="tile-note">' + esc(opts.note) + "</span>" : "") + "</li>";
   }
 
@@ -55,7 +55,7 @@
     if (l.humidity_pct != null) tiles.push(tile("humidity", t("map.humidity"), Math.round(l.humidity_pct) + "%"));
     if (!readToday) tiles.push(tile("drop", t("map.rain_morning"), t("map.no_reading_today"), { text: true }));
     else if (l.rain_since_morning_mm != null) tiles.push(tile("drop", t("map.rain_morning"), oneDecimal(l.rain_since_morning_mm) + " " + t("rain.unit")));
-    if (l.uv_index != null) tiles.push(tile("sun", t("map.sun"), Math.round(l.uv_index) + " (" + uvWord(l.uv_index) + ")", { note: afterDark(l) ? t("map.after_dark") : "" }));
+    if (l.uv_index != null) tiles.push(tile("sun", t("map.sun"), Math.round(l.uv_index), { sub: uvWord(l.uv_index), note: afterDark(l) ? t("map.after_dark") : "" }));
     if (l.pressure_hpa != null) tiles.push(tile("info", t("map.pressure"), Math.round(l.pressure_hpa) + " " + t("map.hpa")));
     if (!tiles.length) return "";
     var day = I.localDay(l.time_utc), time = I.clock(l.time_utc);
