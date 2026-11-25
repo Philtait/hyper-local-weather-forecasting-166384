@@ -294,6 +294,23 @@ class PagesTests(unittest.TestCase):
 
     PAGES = ["index.html", "how-it-works.html", "map.html", "sms.html", "contact.html"]
 
+    def test_map_and_hero_polish(self):
+        css = (WEB / "css" / "styles.css").read_text(encoding="utf-8")
+        self.assertIn("scroll-margin-top", css)                      # sticky header never covers an anchor
+        self.assertRegex(css, r"\.leaflet-tile-pane \{ filter: grayscale\(0\.7\)")
+        self.assertRegex(css, r"\.area-btn \{[^}]*border-radius: 10px")
+        self.assertNotRegex(css, r"\.mk-count \{[^}]*background")    # cluster colour comes from its status class
+        map_js = (WEB / "js" / "map.js").read_text(encoding="utf-8")
+        self.assertNotIn("days-small", map_js)                       # one row per day, no narrow tiles
+        self.assertIn("mk-count mk-' + code", map_js)
+        self.assertIn("zoomArea: true", map_js)                      # choosing an area zooms to it
+        # A day's status checks codes in the same order as the engine's precedence.
+        order = re.search(r"function dayStatus\(day\) \{(.*?)\n  \}", map_js, re.S).group(1)
+        positions = [order.index('"' + code + '"') for code in ["warning", "watch", "planting", "delay", "none"]]
+        self.assertEqual(positions, sorted(positions))
+        home_js = (WEB / "js" / "home.js").read_text(encoding="utf-8")
+        self.assertIn(r'replace(/\s+this week(\.?)\s*$/i, "$1")', home_js)
+
     def test_pages_are_up_to_date_with_their_sources(self):
         import build_pages
         self.assertEqual(build_pages.main(["--check"]), 0, "run python scripts/build_pages.py")
