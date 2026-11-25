@@ -65,6 +65,16 @@
       .then(function (res) {
         var stations = res[0].stations, geo = res[1], day = M.dataDay(meta, stations), counts = {};
         stations.forEach(function (s) { var code = M.stateOf(s, day); counts[code] = (counts[code] || 0) + 1; });
+        // Imarika in numbers, all from the data. "Today" is the visitor's own day in Kenya time: if the newest
+        // reading is from an earlier day, no station sent data today.
+        var areas = {};
+        stations.forEach(function (s) { if (s.area) areas[s.area] = true; });
+        var values = { stations: stations.length, areas: Object.keys(areas).length,
+          recent: stations.filter(function (s) { return s.active; }).length,
+          today: day === I.localDay(new Date().toISOString()) ? (counts.today || 0) : 0 };
+        Array.prototype.forEach.call(document.querySelectorAll("[data-count]"), function (el) {
+          el.textContent = values[el.getAttribute("data-count")];
+        });
         if (meta.latest_reading_utc) {
           // Plain counts from the data: stations that sent data recently and the newest reading, in Kenya time.
           document.getElementById("hero-week-text").textContent = I.t("home.hero_data", {

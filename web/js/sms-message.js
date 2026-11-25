@@ -11,9 +11,9 @@
    Every message: at most 306 characters (two SMS), whole sentences only, plain GSM characters. */
 (function (root, factory) {
   "use strict";
-  if (typeof module === "object" && module.exports) module.exports = factory();
-  else root.ImarikaSmsMessage = factory();
-})(typeof self !== "undefined" ? self : this, function () {
+  if (typeof module === "object" && module.exports) module.exports = factory(require("./units.js"));
+  else root.ImarikaSmsMessage = factory(root.ImarikaUnits);
+})(typeof self !== "undefined" ? self : this, function (U) {
   "use strict";
 
   var MAX_CHARS = 306;
@@ -83,7 +83,7 @@
     return WEEKDAYS[lang][d.getUTCDay()] + " " + d.getUTCDate() + " " + MONTHS[lang][d.getUTCMonth()];
   }
 
-  function rainAmount(mm) { return mm > 0 && mm < 1 ? mm.toFixed(1) : String(Math.round(mm)); }
+  function rainAmount(mm) { return U.rainText(mm); }   // the shared rule in js/units.js
 
   /* A station can be chosen only while it is sending data (active in the forecast export). */
   function selectable(station) { return !!station && station.active === true; }
@@ -101,8 +101,8 @@
     if (!when) return null;
     var sw = lang === "sw";
     var values = [];
-    if (isNumber(latest.temperature_c)) values.push(sw ? "joto nyuzi joto " + Math.round(latest.temperature_c)
-                                                       : "temp " + Math.round(latest.temperature_c) + "C");
+    if (isNumber(latest.temperature_c)) values.push(sw ? "joto nyuzi joto " + U.temp(latest.temperature_c)
+                                                       : "temp " + U.temp(latest.temperature_c) + "C");
     if (isNumber(latest.humidity_pct)) values.push((sw ? "unyevu wa hewa " : "humidity ") + Math.round(latest.humidity_pct) + "%");
     if (isNumber(latest.rain_since_morning_mm)) values.push(sw ? "mvua tangu 08:00: milimita " + rainAmount(latest.rain_since_morning_mm)
                                                                : "rain since 08:00: " + rainAmount(latest.rain_since_morning_mm) + " mm");
@@ -112,7 +112,7 @@
 
     var day = (station.forecast || [])[0];
     if (day && isNumber(day.rain_mm) && isNumber(day.temp_max)) {
-      var rain = rainAmount(day.rain_mm), temp = Math.round(day.temp_max);
+      var rain = rainAmount(day.rain_mm), temp = U.temp(day.temp_max);
       var flat = isNumber(station.forecast_variation_mm) && station.forecast_variation_mm < 1.0;
       var label = dayLabel(day.date, lang);
       var outlook;

@@ -18,6 +18,8 @@ const GSM_BASIC = new Set("@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆ
 function browserBuilder() {
   const context = { self: {} };
   vm.createContext(context);
+  // The page loads js/units.js before js/sms-message.js, exactly as sms.html does.
+  vm.runInContext(fs.readFileSync(path.join(path.dirname(SOURCE), "units.js"), "utf8"), context);
   vm.runInContext(fs.readFileSync(SOURCE, "utf8"), context);
   return context.self.ImarikaSmsMessage;
 }

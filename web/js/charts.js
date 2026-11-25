@@ -3,7 +3,7 @@
    sentence and a small table. Colours: rain blue, temperature brown, humidity teal. Labels sit on the chart. */
 (function () {
   "use strict";
-  var I = window.Imarika, t = I.t, esc = I.esc, S = window.ImarikaStationLogic;
+  var I = window.Imarika, t = I.t, esc = I.esc, S = window.ImarikaStationLogic, U = window.ImarikaUnits;
   var NS = "http://www.w3.org/2000/svg";
   var C = { rain: "#2f6fb0", rainLight: "#cfe0f3", temp: "#8a5a3c", humid: "#0e7490", grid: "#d5e2da", text: "#33433b",
             missing: "#9aa3ad", full: "#1f7a4d", part: "#a7d7b9", none: "#ffffff", noneLine: "#6b7280", forest: "#0f3d2e" };
@@ -19,7 +19,7 @@
     svg.appendChild(el("text", Object.assign({ x: x, y: y, "font-size": FONT, fill: C.text, "text-anchor": "middle",
       "font-family": "Lexend, sans-serif" }, extra || {}), text));
   }
-  function mm(v) { return v >= 1 || v === 0 ? String(Math.round(v)) : "<1"; }
+  function mm(v) { return U.rainText(v); }   // the shared rule in js/units.js
   function dayNum(iso) { return String(Number(iso.slice(8, 10))); }
   function known(v) { return typeof v === "number" && isFinite(v); }
 
@@ -110,13 +110,13 @@
   function temperature(slot, s) {
     var past = S.lastDays(s), measured = S.daysWith(s, "temperature");
     var rows = past.map(function (d) {
-      return [day(d), known(d.temp_min) && known(d.temp_max) ? t("station.range", { min: Math.round(d.temp_min), max: Math.round(d.temp_max) }) : t("station.no_reading")];
+      return [day(d), known(d.temp_min) && known(d.temp_max) ? t("station.range", { min: U.temp(d.temp_min), max: U.temp(d.temp_max) }) : t("station.no_reading")];
     });
     var headers = [t("station.day"), t("station.temp_col")];
     if (measured.length < S.MIN_DAYS) { sparse(slot, "", measured.length, headers, rows); return; }
     var lo = Math.min.apply(null, measured.map(function (d) { return d.temp_min; }));
     var hi = Math.max.apply(null, measured.map(function (d) { return d.temp_max; }));
-    var box = host(slot, esc(t("station.temp_summary", { min: Math.round(lo), max: Math.round(hi) })));
+    var box = host(slot, esc(t("station.temp_summary", { min: U.temp(lo), max: U.temp(hi) })));
     var f = frame(box, 250, past.length), top = 30, bottom = f.H - 56;
     var y = function (v) { return bottom - (bottom - top) * (v - (lo - 1)) / Math.max(2, hi - lo + 2); };
     var bw = Math.min(18, f.slot * 0.4);
@@ -128,8 +128,8 @@
       }
       var y1 = y(d.temp_max), y2 = y(d.temp_min);
       f.svg.appendChild(el("rect", { x: x - bw / 2, y: y1, width: bw, height: Math.max(3, y2 - y1), rx: 4, fill: C.temp }));
-      label(f.svg, x, y1 - 7, Math.round(d.temp_max), { fill: C.temp, "font-weight": 600 });
-      label(f.svg, x, y2 + 19, Math.round(d.temp_min));
+      label(f.svg, x, y1 - 7, U.temp(d.temp_max), { fill: C.temp, "font-weight": 600 });
+      label(f.svg, x, y2 + 19, U.temp(d.temp_min));
     });
     axisDays(f, past);
     box.appendChild(f.svg);

@@ -135,6 +135,15 @@ main:focus { outline: none; }
 .summary-line { display: flex; gap: var(--space-1); align-items: flex-start; font-size: var(--fs-small); color: var(--text-2);
   padding-top: var(--space-2); border-top: 1px solid var(--border); }
 .summary-line .icon { color: var(--leaf); margin-top: 1px; }
+.numbers { list-style: none; padding: 0; margin: var(--space-2) 0 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3); }
+.numbers li { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1); }
+.numbers li > span:last-child { display: flex; flex-direction: column; }
+.numbers .icon-circle { width: 48px; height: 48px; }
+.numbers .icon-circle .icon { width: 24px; height: 24px; }
+.numbers strong { font-size: 32px; line-height: 1.1; color: var(--forest); }
+.numbers strong + span { font-size: var(--fs-small); color: var(--text-2); text-wrap: balance; }
+.band-alt .icon-circle { background: var(--white); }
 .helps, .steps { list-style: none; padding: 0; margin: var(--space-3) 0; display: grid; gap: var(--space-3); }
 .helps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .helps li, .steps li { display: flex; flex-direction: column; gap: var(--space-1); }
@@ -151,7 +160,7 @@ main:focus { outline: none; }
 .closing p { margin: 0; }
 
 /* ---------------------------------------------------------------- How it works */
-.steps { grid-template-columns: repeat(4, minmax(0, 1fr)); counter-reset: none; }
+.steps { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .steps li { position: relative; }
 .step-badge { position: absolute; left: 44px; top: -4px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
   background: var(--forest); color: var(--white); font-size: 15px; font-weight: 700; }
@@ -161,7 +170,7 @@ main:focus { outline: none; }
 /* ---------------------------------------------------------------- Contact */
 .contact-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: var(--space-4); align-items: start;
   margin-top: var(--space-3); }
-.contact-grid .field { max-width: none; }
+.contact-form .field { display: block; width: 100%; max-width: none; }   /* name and message: one width, the full form column */
 
 /* ---------------------------------------------------------------- status badges */
 .badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: var(--radius);
@@ -268,7 +277,8 @@ main:focus { outline: none; }
 /* ---------------------------------------------------------------- smaller screens */
 @media (max-width: 1000px) {
   .stations-grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
-  .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .numbers { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-2); }
+  .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .contact-grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
 }
 @media (max-width: 760px) {
@@ -389,13 +399,13 @@ textarea.field { max-width: 640px; resize: vertical; }
 }
 
 /* Contact */
-.contact-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin: 8px 0 20px; }
+.contact-actions { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-2); max-width: 340px; margin: var(--space-1) 0 var(--space-3); }
 .contact-actions p { margin: 0; }
 .contact-details { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
 .contact-details li { display: flex; gap: 12px; align-items: center; }
 .contact-details .icon { color: var(--leaf); }
-.contact-form { margin-top: 8px; }
-.contact-form .btn { margin-top: 8px; }
+.contact-form { margin-top: var(--space-1); }
+.contact-form .btn { margin-top: var(--space-1); width: 100%; }
 
 /* Station page: header, three tabs, tiles, outlook strip, one chart at a time */
 .station-page { font-size: 18px; }
@@ -405,23 +415,29 @@ textarea.field { max-width: 640px; resize: vertical; }
 .station-status { display: flex; align-items: flex-start; gap: var(--space-1); }
 .station-status .dot { margin-top: 5px; }
 .tile-sub { font-size: var(--fs-body); font-weight: 600; color: var(--text-2); white-space: nowrap; }
-.tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); margin: 8px 0 24px; overflow-x: auto; }
+/* The tab row never shows a scroll control: it scrolls sideways only if it must, with the scrollbar hidden,
+   and never vertically (the 3 px selected line used to overflow by 1 px and add a vertical scrollbar). */
+.tabs { display: flex; gap: var(--space-1); border-bottom: 1px solid var(--border); margin: var(--space-1) 0 var(--space-3);
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: none; -ms-overflow-style: none; }
+.tabs::-webkit-scrollbar { display: none; }
 .tab { font: inherit; font-size: 18px; min-height: 44px; padding: 8px 16px; border: 0; border-bottom: 3px solid transparent;
-  background: none; color: var(--text-2); cursor: pointer; white-space: nowrap; margin-bottom: -1px; }
+  background: none; color: var(--text-2); cursor: pointer; white-space: nowrap; }
 .tab:hover { color: var(--forest); }
 .tab[aria-selected="true"] { color: var(--forest); font-weight: 700; border-bottom-color: var(--leaf); }
 .tab-panel:focus-visible { outline-offset: 8px; }
-.tiles-wide { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); max-width: 960px; }
+/* Tiles, outlook strip and chart card all span the full content width, the same as the tab row. */
+.tiles-wide { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
 .section-label { font-size: 20px; color: var(--text); margin: 40px 0 8px; }
 .day-strip { list-style: none; padding: 0 0 8px; margin: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(112px, 1fr);
-  gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; max-width: 960px; }
+  gap: var(--space-1); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; }
 .day-tile { scroll-snap-align: start; border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; display: flex;
   flex-direction: column; gap: 4px; background: var(--white); }
 .day-tile-name { font-weight: 700; color: var(--forest); }
 .day-tile-rain { display: flex; align-items: center; gap: 4px; color: var(--rain); font-weight: 600; }
 .day-tile-rain .icon { width: 20px; height: 20px; }
 .day-tile-temp { color: var(--text-2); font-size: 16px; }
-.others-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.others-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.others-off { margin-top: var(--space-1); }
 .other-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 16px; border: 1px solid var(--border);
   border-radius: 999px; text-decoration: none; color: var(--text); }
 .other-link:hover { border-color: var(--leaf); color: var(--forest); }
@@ -429,7 +445,7 @@ textarea.field { max-width: 640px; resize: vertical; }
 .chart-btn { font: inherit; font-size: 18px; min-height: 44px; padding: 8px 20px; border: 0; background: var(--white); color: var(--text); cursor: pointer; }
 .chart-btn + .chart-btn { border-left: 1px solid var(--border); }
 .chart-btn[aria-pressed="true"] { background: var(--mint); color: var(--forest); font-weight: 600; }
-.chart { max-width: 960px; border: 1px solid var(--border); border-radius: var(--radius-card); padding: 24px; background: var(--white); }
+.chart { border: 1px solid var(--border); border-radius: var(--radius-card); padding: 24px; background: var(--white); }
 .chart-summary { margin: 0 0 16px; }
 .chart-box { width: 100%; overflow: hidden; }
 .chart-svg { display: block; }
@@ -443,7 +459,6 @@ textarea.field { max-width: 640px; resize: vertical; }
   .station-page { padding-bottom: 24px; }
   .chart { padding: 16px; }
   .tiles-wide { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .tabs { overflow: visible; }
   .tab { flex: 1 1 0; white-space: normal; padding: 8px; text-align: center; line-height: 1.2; }
 }
 

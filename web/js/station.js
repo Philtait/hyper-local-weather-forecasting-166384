@@ -2,7 +2,7 @@
    accessible and kept in the URL hash (#latest, #days, #working). Reads only data/*.json. */
 (function () {
   "use strict";
-  var I = window.Imarika, t = I.t, esc = I.esc, icon = I.icon, M = window.ImarikaMapLogic, S = window.ImarikaStationLogic;
+  var I = window.Imarika, t = I.t, esc = I.esc, icon = I.icon, M = window.ImarikaMapLogic, S = window.ImarikaStationLogic, U = window.ImarikaUnits;
   var CHARTS = ["rain", "temperature", "humidity"];
   var state = { meta: null, stations: [], station: null, dataDay: null, tab: "latest", chart: "rain", drawn: {} };
 
@@ -17,7 +17,6 @@
     if (iso === shiftDay(today(), -1)) return t("time.yesterday");
     return I.longDate(iso);
   }
-  function oneDecimal(n) { return Math.round(n * 10) / 10; }
 
   /* ------------------------------------------------------------ header */
   function header(s) {
@@ -51,10 +50,10 @@
     var l = s.latest;
     if (!s.active || !l || !l.time_utc) return "";
     var tiles = [], readToday = I.localDay(l.time_utc) === today();
-    if (l.temperature_c != null) tiles.push(tile("thermometer", t("map.temperature"), Math.round(l.temperature_c) + "°C"));
+    if (l.temperature_c != null) tiles.push(tile("thermometer", t("map.temperature"), U.temp(l.temperature_c) + "°C"));
     if (l.humidity_pct != null) tiles.push(tile("humidity", t("map.humidity"), Math.round(l.humidity_pct) + "%"));
     if (!readToday) tiles.push(tile("drop", t("map.rain_morning"), t("map.no_reading_today"), { text: true }));
-    else if (l.rain_since_morning_mm != null) tiles.push(tile("drop", t("map.rain_morning"), oneDecimal(l.rain_since_morning_mm) + " " + t("rain.unit")));
+    else if (l.rain_since_morning_mm != null) tiles.push(tile("drop", t("map.rain_morning"), U.rainText(l.rain_since_morning_mm) + " " + t("rain.unit")));
     if (l.uv_index != null) tiles.push(tile("sun", t("map.sun"), Math.round(l.uv_index), { sub: uvWord(l.uv_index), note: afterDark(l) ? t("map.after_dark") : "" }));
     if (l.pressure_hpa != null) tiles.push(tile("info", t("map.pressure"), Math.round(l.pressure_hpa) + " " + t("map.hpa")));
     if (!tiles.length) return "";
@@ -72,25 +71,33 @@
     var strip = s.forecast.map(function (d) {
       var name = I.weekday(d.date).slice(0, 3), num = Number(d.date.slice(8, 10));
       return '<li class="day-tile"><span class="day-tile-name">' + esc(name + " " + num) + '</span><span class="day-tile-rain">' +
-        icon("drop") + "<span>" + esc(d.rain_mm != null ? (d.rain_mm >= 1 ? Math.round(d.rain_mm) : oneDecimal(d.rain_mm)) + " " +
+        icon("drop") + "<span>" + esc(d.rain_mm != null ? U.rainText(d.rain_mm) + " " +
         t("rain.unit") : t("map.no_value")) + "</span></span>" +
-        '<span class="day-tile-temp">' + esc(d.temp_max != null ? t("station.up_to", { max: Math.round(d.temp_max) }) : t("map.no_value")) + "</span></li>";
+        '<span class="day-tile-temp">' + esc(d.temp_max != null ? t("station.up_to", { max: U.temp(d.temp_max) }) : t("map.no_value")) + "</span></li>";
     }).join("");
     return '<h2 class="section-label">' + esc(t("station.outlook")) + '</h2><ul class="day-strip" tabindex="0" aria-label="' +
       esc(t("station.outlook")) + '">' + strip + '</ul><p class="caption">' + esc(t("map.rain_window")) + "." +
       (s.flat ? " " + esc(t("map.outlook_note")) : "") + "</p>";
   }
 
+  /* Other stations in the area: those that sent data in the last 2 days, the rest behind a small toggle. */
   function others(s) {
     var list = state.stations.filter(function (o) { return o.area === s.area && o.id !== s.id; })
       .sort(function (a, b) { return a.id.localeCompare(b.id, "en", { numeric: true }); });
     if (!list.length) return "";
-    return '<div class="others"><h2 class="section-label">' + esc(t("map.other_stations")) + '</h2><ul class="others-list">' +
-      list.map(function (o) {
+    var on = list.filter(function (o) { return o.active; }), off = list.filter(function (o) { return !o.active; });
+    function links(items) {
+      return items.map(function (o) {
         var code = M.stateOf(o, state.dataDay);
         return '<li><a class="other-link" href="station.html?id=' + encodeURIComponent(o.id) + '"><span class="dot dot-' + code +
           '" aria-hidden="true"></span>' + esc(o.label) + "</a></li>";
-      }).join("") + "</ul></div>";
+      }).join("");
+    }
+    return '<div class="others"><h2 class="section-label">' + esc(t("map.other_stations")) + "</h2>" +
+      (on.length ? '<ul class="others-list">' + links(on) + "</ul>" : '<p class="muted">' + esc(t("station.others_none")) + "</p>") +
+      (off.length ? '<button type="button" class="toggle-link" id="others-toggle" aria-expanded="false" aria-controls="others-off">' +
+        esc(t("station.others_all")) + '</button><ul class="others-list others-off" id="others-off" hidden>' + links(off) + "</ul>" : "") +
+      "</div>";
   }
 
   /* ------------------------------------------------------------ tabs */
@@ -137,6 +144,14 @@
       else if (e.key === "Home") next = S.TABS[0];
       else if (e.key === "End") next = S.TABS[S.TABS.length - 1];
       if (next) { e.preventDefault(); show(next, true); }
+    });
+    $("panel-latest").addEventListener("click", function (e) {
+      var b = e.target.closest("#others-toggle");
+      if (!b) return;
+      var open = b.getAttribute("aria-expanded") !== "true";
+      b.setAttribute("aria-expanded", String(open));
+      b.textContent = t(open ? "station.others_hide" : "station.others_all");
+      $("others-off").hidden = !open;
     });
     $("panel-days").addEventListener("click", function (e) {
       var b = e.target.closest(".chart-btn");

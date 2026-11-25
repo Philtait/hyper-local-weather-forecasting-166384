@@ -36,9 +36,8 @@
   <div class="wrap">
     <div class="page-hero">
       <div class="page-hero-text">
-        <h1 id="hero-title">Know when the rain is coming.</h1>
-        <p class="lead">Imarika gives weather forecasts for Busia County, from weather stations in your own area.</p>
-        <p class="hero-who">It is made for smallholder farmers and the people who advise them.</p>
+        <h1 id="hero-title">Weather from stations near your farm.</h1>
+        <p class="lead">Readings and outlook for farmers in Busia County.</p>
         <div class="actions">
           <a class="btn btn-primary" href="map.html"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#pin"></use></svg><span>See the weather map</span></a>
           <a class="btn btn-secondary" href="sms.html"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#message"></use></svg><span>Try the SMS demo</span></a>
@@ -52,7 +51,19 @@
   </div>
 </section>
 
-<section class="band band-alt" aria-labelledby="helps-title">
+<section class="band band-tight band-alt" aria-labelledby="numbers-title">
+  <div class="wrap">
+    <h2 id="numbers-title" class="h-small">Imarika in numbers</h2>
+    <ul class="numbers" id="numbers">
+      <li><span class="icon-circle"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#station"></use></svg></span><span><strong data-count="stations">&nbsp;</strong><span>weather stations</span></span></li>
+      <li><span class="icon-circle"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#pin"></use></svg></span><span><strong data-count="areas">&nbsp;</strong><span>areas</span></span></li>
+      <li><span class="icon-circle"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#check"></use></svg></span><span><strong data-count="recent">&nbsp;</strong><span>stations sent data recently</span></span></li>
+      <li><span class="icon-circle"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar"></use></svg></span><span><strong data-count="today">&nbsp;</strong><span>stations sent data today</span></span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="helps-title">
   <div class="wrap">
     <h2 id="helps-title">How it helps a farmer</h2>
     <ul class="helps">
@@ -64,7 +75,7 @@
   </div>
 </section>
 
-<section class="band" aria-labelledby="stations-title">
+<section class="band band-alt" aria-labelledby="stations-title">
   <div class="wrap stations-grid">
     <div>
       <h2 id="stations-title">Our weather stations</h2>
