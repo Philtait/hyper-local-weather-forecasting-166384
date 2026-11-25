@@ -1,0 +1,124 @@
+{
+  "lang": "en",
+  "site": {
+    "name": "Imarika",
+    "description": "Weather forecasts for farmers in Busia County, from weather stations in your own area.",
+    "skip": "Skip to main content",
+    "nav_label": "Main menu",
+    "home_link": "Imarika home page"
+  },
+  "nav": {
+    "home": "Home",
+    "how": "How it works",
+    "map": "Weather map",
+    "sms": "SMS demo",
+    "contact": "Contact"
+  },
+  "footer": {
+    "credit": "Final-year project, Strathmore University. Philip Tait Lemaron.",
+    "images": "Images are illustrative and generated with AI.",
+    "map_data": "Map data from OpenStreetMap contributors.",
+    "boundaries": "Boundaries from geoBoundaries (CC BY 3.0 IGO; IEBC and OCHA ROSEA)."
+  },
+  "status": {
+    "warning": "Very heavy rain",
+    "watch": "Heavy rain",
+    "planting": "Good rain for planting",
+    "delay": "Rain coming, wait before spraying",
+    "none": "Quiet week",
+    "offline": "Not reporting"
+  },
+  "rain": {
+    "dry": "Dry",
+    "some": "Some rain",
+    "heavy": "Heavy rain",
+    "very_heavy": "Very heavy rain",
+    "unit": "mm"
+  },
+  "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September",
+             "October", "November", "December"],
+  "time": {
+    "today": "today",
+    "yesterday": "yesterday",
+    "temp_range": "{min} to {max}°C"
+  },
+  "images": {
+    "field_alt": "Illustration of a maize field after rain in western Kenya",
+    "station_alt": "Illustration of a weather station standing in a maize field",
+    "farmer_alt": "Illustration of a farmer checking a message on a phone at the edge of a maize field"
+  },
+  "offline": {
+    "saved": "You appear to be offline. Showing the saved forecast from {date}."
+  },
+  "home": {
+    "title": "Imarika: weather forecasts for farmers in Busia County",
+    "hero_title": "Know when the rain is coming.",
+    "hero_text": "Weather forecasts for farmers in Busia County, from weather stations in your own area.",
+    "hero_map": "See the weather map",
+    "hero_sms": "Try the SMS demo",
+    "this_week": "This week:",
+    "numbers_title": "Imarika in numbers",
+    "num_stations": "weather stations",
+    "num_areas": "areas covered",
+    "num_reporting": "stations reporting now",
+    "num_days": "forecast days",
+    "updated": "Last updated {time}",
+    "how_title": "How it works",
+    "step1_title": "Stations measure the weather",
+    "step1_text": "Weather stations in your area measure rain, temperature, humidity and wind every few minutes.",
+    "step2_title": "We forecast the next 7 days",
+    "step2_text": "Imarika uses these readings to forecast rain and temperature for each of the next seven days.",
+    "step3_title": "Advice reaches you by web and SMS",
+    "step3_text": "You get plain advice about rain, planting and spraying on this website or by text message.",
+    "read_more": "Read more about how it works",
+    "stations_title": "Our weather stations",
+    "stations_text": "Each dot is one weather station. The colour shows what the coming week looks like there.",
+    "stations_map_label": "Map of Busia County with its weather stations",
+    "open_map": "Open the map",
+    "station_word": "station",
+    "stations_word": "stations",
+    "contact_title": "Questions or feedback?",
+    "contact_text": "We would like to hear from farmers, extension officers and anyone else who uses Imarika.",
+    "contact_button": "Contact us"
+  },
+  "map": {
+    "title": "Weather stations in Busia County",
+    "page_title": "Weather map: Imarika",
+    "choose_area": "Choose your area",
+    "map_label": "Map of weather stations in Busia County",
+    "station_updated": "{station}, updated {time}",
+    "next_days": "Next 3 days",
+    "later": "Later in the week (less certain)",
+    "right_now": "Right now",
+    "temperature": "Temperature",
+    "humidity": "Humidity",
+    "wind": "Wind",
+    "rain_today": "Rain so far today",
+    "kmh": "km/h",
+    "planting": "Planting",
+    "spraying": "Spraying",
+    "not_reporting": "This station stopped sending data on {date}. Choose a nearby station.",
+    "other_stations": "Other stations in this area",
+    "legend": "What the colours mean",
+    "all_stations": "All weather stations",
+    "cluster": "{count} stations here. Tap to zoom in.",
+    "tiles_offline": "The background map is not available, so only the area outlines are shown.",
+    "loading": "Loading the forecast."
+  },
+  "how": {
+    "title": "How it works",
+    "page_title": "How it works: Imarika",
+    "lead": "This page will explain, step by step, how Imarika turns weather readings into advice."
+  },
+  "sms": {
+    "title": "SMS demo",
+    "page_title": "SMS demo: Imarika",
+    "lead": "This page will let you see the text message a farmer receives about the coming week."
+  },
+  "contact": {
+    "title": "Contact",
+    "page_title": "Contact: Imarika",
+    "lead": "This page will show how to reach the Imarika project with questions or feedback."
+  }
+}

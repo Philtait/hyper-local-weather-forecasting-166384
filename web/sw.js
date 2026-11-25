@@ -2,12 +2,14 @@
    Bump VERSION when shell files change so old caches are removed. */
 "use strict";
 
-var VERSION = "imarika-v1";
+var VERSION = "imarika-v2";
 var SHELL = [
-  "./", "index.html", "css/styles.css", "js/app.js", "manifest.webmanifest",
+  "./", "index.html", "how-it-works.html", "map.html", "sms.html", "contact.html",
+  "css/styles.css", "js/common.js", "js/home.js", "js/map.js", "i18n/en.json", "manifest.webmanifest",
   "vendor/leaflet/leaflet.js", "vendor/leaflet/leaflet.css",
   "fonts/lexend-latin-400-normal.woff2", "fonts/lexend-latin-500-normal.woff2", "fonts/lexend-latin-600-normal.woff2",
-  "fonts/lexend-latin-700-normal.woff2", "fonts/lexend-latin-800-normal.woff2",
+  "fonts/lexend-latin-700-normal.woff2",
+  "img/icons.svg", "img/about-field.webp", "img/station.webp", "img/farmer.webp",
   "icons/icon-192.png", "icons/icon-512.png"
 ];
 var DATA = ["data/meta.json", "data/stations.json", "data/scenarios.json", "data/model_results.json",
@@ -38,11 +40,12 @@ self.addEventListener("fetch", function (event) {
   var request = event.request;
   if (request.method !== "GET") return;               // the SMS function is never cached
   var url = new URL(request.url);
-  if (url.origin !== self.location.origin) return;    // map tiles go straight to the network
+  if (url.origin !== self.location.origin) return;    // map tiles are never cached
   if (url.pathname.indexOf("/api/") >= 0) return;
 
   event.respondWith(caches.open(VERSION).then(function (cache) {
-    var key = request.mode === "navigate" ? "index.html" : request;
+    // Pages are cached under their own path; "/" is the Home page.
+    var key = request.mode === "navigate" && /\/$/.test(url.pathname) ? "index.html" : request;
     return cache.match(key, { ignoreSearch: true }).then(function (cached) {
       var network = fetch(request).then(function (response) {
         if (response && response.ok) cache.put(key, response.clone());
