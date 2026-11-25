@@ -33,18 +33,23 @@
 <p class="offline-note wrap" id="offline-note" role="status" hidden></p>
 <section class="band page-top" aria-labelledby="page-title">
   <div class="wrap">
-    <div class="media-intro media-small">
-      <div>
+    <div class="page-hero">
+      <div class="page-hero-text">
         <h1 id="page-title">See the SMS a farmer receives</h1>
         <p class="lead">Pick a station and a message built from its own data, then send it to a test phone number.</p>
       </div>
-      <img src="img/farmer.webp" width="960" height="720" loading="lazy" alt="Illustration of a farmer checking a message on a phone at the edge of a maize field">
+      <div class="page-hero-media">
+        <img src="img/farmer.webp" width="960" height="720" fetchpriority="high" alt="Illustration of a farmer checking a message on a phone at the edge of a maize field">
+      </div>
     </div>
     <div class="sms-layout">
       <form class="sms-form" id="sms-form" novalidate>
         <fieldset>
           <legend><span class="step-num">1</span>Choose a station</legend>
+          <div class="chips area-chips" id="sms-areas" role="group" aria-label="Choose an area"></div>
           <div class="station-picker" id="sms-stations" role="group" aria-label="Choose a station"></div>
+          <button type="button" class="toggle-link" id="sms-off-toggle" aria-expanded="false" aria-controls="sms-off" hidden></button>
+          <div class="station-picker station-picker-off" id="sms-off" hidden></div>
         </fieldset>
         <fieldset>
           <legend><span class="step-num">2</span>Choose a message</legend>

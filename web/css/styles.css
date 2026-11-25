@@ -187,9 +187,9 @@ main:focus { outline: none; }
 .map-layout { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 24px; align-items: start; }
 .map-main { min-width: 0; }
 .map-box { position: relative; }
-#map { height: 600px; border-radius: 16px; border: 1px solid var(--border); background: #f3f6f4; }
+#map { height: 600px; border-radius: var(--radius-card); border: 1px solid var(--border); background: #f3f6f4; }
 .map-note { position: absolute; left: 16px; right: 16px; bottom: 16px; z-index: 500; margin: 0; max-width: none;
-  background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 8px 16px; font-size: 16px; color: var(--text-2); }
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 8px 16px; font-size: 16px; color: var(--text-2); }
 .legend { list-style: none; padding: 0; margin: 16px 0 8px; display: flex; flex-wrap: wrap; gap: 8px 24px; }
 .legend li { display: flex; align-items: center; gap: 8px; }
 .map-help { color: var(--text-2); margin: 0; }
@@ -215,10 +215,11 @@ main:focus { outline: none; }
 .leaflet-container .leaflet-control-attribution { font-size: 13px; line-height: 1.4; color: var(--text); padding: 2px var(--space-1);
   background: rgba(255, 255, 255, .92); border-top-left-radius: 6px; }
 .leaflet-container .leaflet-control-attribution a { color: var(--leaf-dark); }
+.leaflet-container .leaflet-bar a { width: var(--tap); height: var(--tap); line-height: var(--tap); font-size: 22px; color: var(--forest); }
 .leaflet-marker-icon:focus-visible { outline: 3px solid var(--focus); border-radius: 50%; }
 
 /* Selected-station panel: right side on desktop, bottom sheet on smaller screens. */
-.panel { min-width: 0; border: 1px solid var(--border); border-radius: 16px; background: var(--white); padding: 24px; position: sticky; top: 88px; }
+.panel { min-width: 0; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--white); padding: 24px; position: sticky; top: calc(var(--header) + var(--space-2)); }
 .panel-head { display: flex; align-items: flex-start; gap: 16px; }
 .panel-head .dot { width: 20px; height: 20px; margin-top: 8px; }
 .panel-title { flex: 1; min-width: 0; }
@@ -227,7 +228,7 @@ main:focus { outline: none; }
 .sheet-toggle { display: none; }
 .panel-label { font-size: 18px; color: var(--text); margin: 24px 0 8px; }
 .tiles { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.tile { border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: grid; grid-template-columns: 24px minmax(0, 1fr);
+.tile { border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; display: grid; grid-template-columns: 24px minmax(0, 1fr);
   gap: 4px 8px; align-items: center; }
 .tile .icon { width: 24px; height: 24px; color: var(--leaf); }
 .tile-label { font-size: 16px; color: var(--text-2); line-height: 1.25; }
@@ -303,9 +304,17 @@ main:focus { outline: none; }
 .sub-title { font-size: 24px; margin-top: 32px; }
 .steps-five { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 24px; }
 .steps-five p { color: var(--text); }
-.media-intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: 40px; align-items: center; margin-bottom: 32px; }
-.media-intro img { width: 100%; height: auto; border-radius: var(--radius); }
-.media-small { grid-template-columns: minmax(0, 1fr) 240px; }
+.media-intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: var(--space-4); align-items: center; margin-bottom: var(--space-4); }
+.media-intro img { width: 100%; height: auto; border-radius: var(--radius-card); }
+
+/* Page hero shared by Home and the SMS demo: text left, the image right at the same height as the text,
+   one crop and a 16 px radius. On phones the image becomes a slim wide strip under the intro. */
+.page-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px); gap: var(--space-4); align-items: stretch;
+  margin-bottom: var(--space-4); }
+.page-hero-text { align-self: center; }
+.page-hero-text > :last-child { margin-bottom: 0; }
+.page-hero-media { position: relative; min-height: 180px; border-radius: var(--radius-card); overflow: hidden; background: var(--mint); }
+.page-hero-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
 .status-table { width: 100%; border-collapse: collapse; background: var(--white); border: 1px solid var(--border); }
 .status-table th, .status-table td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 .status-table thead th { background: var(--mint); color: var(--forest); font-size: 16px; }
@@ -315,26 +324,34 @@ main:focus { outline: none; }
 .check-list .icon { color: var(--leaf); margin-top: 2px; }
 
 /* forms */
-fieldset { border: 0; margin: 0 0 28px; padding: 0; min-width: 0; }
-legend { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 700; color: var(--forest); margin-bottom: 14px; padding: 0; }
-.step-num { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--mint); color: var(--forest); font-size: 18px; }
-.field-label { display: block; font-weight: 600; margin: 16px 0 4px; }
-.field-hint { color: var(--text-2); font-size: 16px; margin: 0 0 8px; }
-.field { width: 100%; max-width: 480px; font: inherit; padding: 12px 14px; border: 2px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--text); }
+fieldset { border: 0; margin: 0 0 var(--space-4); padding: 0; min-width: 0; }
+legend { display: flex; align-items: center; gap: var(--space-2); font-size: var(--fs-h3); font-weight: 700; color: var(--forest);
+  margin-bottom: var(--space-2); padding: 0; }
+.step-num { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--forest);
+  color: var(--white); font-size: var(--fs-body); }
+.field-label { display: block; font-weight: 600; margin: var(--space-2) 0 4px; }
+.field-hint { color: var(--text-2); font-size: var(--fs-small); margin: 0 0 var(--space-1); }
+.field { width: 100%; max-width: 480px; min-height: 48px; font: inherit; padding: 10px var(--space-2); border: 2px solid var(--border);
+  border-radius: var(--radius); background: var(--white); color: var(--text); }
 .field:focus-visible { border-color: var(--leaf); }
 .field[aria-invalid="true"] { border-color: var(--st-warning-fg); }
 textarea.field { max-width: 640px; resize: vertical; }
-.field-error { color: var(--st-warning-fg); font-weight: 500; margin: 6px 0 0; min-height: 1.5em; }
-.helper { color: var(--text-2); font-size: 16px; margin: 12px 0 0; }
-.choice-list { display: flex; flex-direction: column; gap: 8px; }
-.choice { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; background: var(--white); }
+.field-error { color: var(--st-warning-fg); font-weight: 500; margin: var(--space-1) 0 0; min-height: 1.5em; }
+.helper { color: var(--text-2); font-size: var(--fs-small); margin: 12px 0 0; }
+.choice-list { display: flex; flex-direction: column; gap: var(--space-1); }
+.choice { display: flex; gap: 12px; align-items: flex-start; min-height: 48px; padding: 12px var(--space-2); border: 2px solid var(--border);
+  border-radius: var(--radius); cursor: pointer; background: var(--white); }
 .choice:has(input:checked) { border-color: var(--leaf); background: var(--mint); }
 .choice input { width: 20px; height: 20px; margin: 3px 0 0; accent-color: var(--leaf); flex: none; }
-.choice-group { font-weight: 600; color: var(--text-2); margin: 10px 0 0; font-size: 16px; }
 
 /* SMS demo */
-.sms-layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 48px; align-items: start; }
-.phone-col { position: sticky; top: 90px; }
+.sms-layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: var(--space-4); align-items: start; }
+.phone-col { position: sticky; top: calc(var(--header) + var(--space-3)); }
+.area-chips { margin-bottom: var(--space-2); }
+.toggle-link { font: inherit; font-size: var(--fs-small); font-weight: 600; color: var(--leaf-dark); background: none; border: 0;
+  padding: 0; min-height: var(--tap); margin-top: var(--space-1); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.toggle-link:hover { color: var(--forest); }
+.station-picker-off { margin-top: var(--space-1); }
 .phone { border: 2px solid var(--forest); border-radius: 28px; padding: 18px 14px 16px; background: var(--white); max-width: 340px; }
 .phone-top { display: flex; align-items: center; gap: 8px; justify-content: center; font-weight: 700; color: var(--forest);
   padding-bottom: 12px; border-bottom: 1px solid var(--border); }
@@ -346,11 +363,9 @@ textarea.field { max-width: 640px; resize: vertical; }
 .sms-result.ok { color: var(--st-planting-fg); }
 .sms-result.fail { color: var(--st-warning-fg); }
 .sms-result-line { display: block; margin-top: 4px; }
-.station-group + .station-group { margin-top: 14px; }
-.station-group .choice-group { margin: 0 0 8px; }
-.station-buttons { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.station-buttons { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-1); }
 .station-btn { font: inherit; display: flex; flex-direction: column; gap: 2px; text-align: left; min-height: 56px;
-  padding: 10px 14px; border-radius: 10px; border: 2px solid var(--border); background: var(--white); color: var(--text); cursor: pointer; }
+  padding: 10px var(--space-2); border-radius: var(--radius); border: 2px solid var(--border); background: var(--white); color: var(--text); cursor: pointer; }
 .station-btn:hover:not(:disabled) { border-color: var(--leaf); }
 .station-btn[aria-pressed="true"] { background: var(--leaf); border-color: var(--leaf); color: var(--white); }
 .station-btn:disabled { cursor: not-allowed; background: var(--soft); color: var(--text-2); border-style: dashed; }
@@ -391,7 +406,9 @@ textarea.field { max-width: 640px; resize: vertical; }
 .back-link { margin: 0 0 16px; }
 .back-link a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 600; text-decoration: none; }
 .back-link .icon { width: 24px; height: 24px; transform: rotate(180deg); }
-.station-status { display: flex; align-items: center; gap: 8px; }
+.station-status { display: flex; align-items: flex-start; gap: var(--space-1); }
+.station-status .dot { margin-top: 5px; }
+.tile-sub { font-size: var(--fs-body); font-weight: 600; color: var(--text-2); white-space: nowrap; }
 .tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); margin: 8px 0 24px; overflow-x: auto; }
 .tab { font: inherit; font-size: 18px; min-height: 44px; padding: 8px 16px; border: 0; border-bottom: 3px solid transparent;
   background: none; color: var(--text-2); cursor: pointer; white-space: nowrap; margin-bottom: -1px; }
@@ -402,7 +419,7 @@ textarea.field { max-width: 640px; resize: vertical; }
 .section-label { font-size: 20px; color: var(--text); margin: 40px 0 8px; }
 .day-strip { list-style: none; padding: 0 0 8px; margin: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(112px, 1fr);
   gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; max-width: 960px; }
-.day-tile { scroll-snap-align: start; border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: flex;
+.day-tile { scroll-snap-align: start; border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; display: flex;
   flex-direction: column; gap: 4px; background: var(--white); }
 .day-tile-name { font-weight: 700; color: var(--forest); }
 .day-tile-rain { display: flex; align-items: center; gap: 4px; color: var(--rain); font-weight: 600; }
@@ -416,7 +433,7 @@ textarea.field { max-width: 640px; resize: vertical; }
 .chart-btn { font: inherit; font-size: 18px; min-height: 44px; padding: 8px 20px; border: 0; background: var(--white); color: var(--text); cursor: pointer; }
 .chart-btn + .chart-btn { border-left: 1px solid var(--border); }
 .chart-btn[aria-pressed="true"] { background: var(--mint); color: var(--forest); font-weight: 600; }
-.chart { max-width: 960px; border: 1px solid var(--border); border-radius: 16px; padding: 24px; background: var(--white); }
+.chart { max-width: 960px; border: 1px solid var(--border); border-radius: var(--radius-card); padding: 24px; background: var(--white); }
 .chart-summary { margin: 0 0 16px; }
 .chart-box { width: 100%; overflow: hidden; }
 .chart-svg { display: block; }
@@ -438,8 +455,8 @@ textarea.field { max-width: 640px; resize: vertical; }
   .steps-five { grid-template-columns: minmax(0, 1fr); }
   .steps-five li { flex-direction: row; align-items: center; gap: 16px; }
   .steps-five p { margin: 0; }
-  .media-intro, .media-small { grid-template-columns: minmax(0, 1fr); gap: 20px; }
-  .media-small img { max-width: 260px; }
+  .media-intro { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
+  .page-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 280px); gap: var(--space-3); }
   .sms-layout { grid-template-columns: minmax(0, 1fr); gap: 32px; }
   .phone-col { position: static; }
 }
@@ -449,7 +466,10 @@ textarea.field { max-width: 640px; resize: vertical; }
   .status-table th, .status-table td { display: block; border: 0; padding: 4px 14px; width: auto !important; }
   .phone { max-width: none; }
 }
-@media (max-width: 760px) { .media-small img { max-width: 180px; } }
+@media (max-width: 760px) {
+  .page-hero { grid-template-columns: minmax(0, 1fr); gap: var(--space-2); margin-bottom: var(--space-3); }
+  .page-hero-media { min-height: 0; aspect-ratio: 16 / 5; }
+}
 
 /* ---------------------------------------------------------------- polish */
 [id] { scroll-margin-top: calc(var(--header) + var(--space-2)); }
@@ -461,7 +481,7 @@ textarea.field { max-width: 640px; resize: vertical; }
   #map { height: 460px; }
   .map-page { padding-bottom: 120px; }
   /* Bottom sheet: the header row is always visible; the readings open with the arrow button or a tap. */
-  .panel { position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 900; border-radius: 16px 16px 0 0;
+  .panel { position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 900; border-radius: var(--radius-card) var(--radius-card) 0 0;
     border-bottom: 0; padding: 16px; max-height: 75vh; overflow-y: auto; box-shadow: 0 -4px 16px rgba(15, 61, 46, .14); }
   .panel-title h2 { font-size: 22px; }
   .panel-body { display: none; }
@@ -480,13 +500,18 @@ textarea.field { max-width: 640px; resize: vertical; }
   /* List rows stack: station and status on top, then the last reading, temperature and rain. */
   .station-table thead { display: none; }
   .station-table, .station-table tbody { display: block; }
-  .station-table tr { display: grid; grid-template-columns: repeat(3, auto); justify-content: space-between; gap: 0 16px;
-    padding: 8px 0; border-bottom: 1px solid var(--border); }
+  /* Three equal columns so the values line up from row to row; each value carries a small label. */
+  .station-table tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 var(--space-2);
+    padding: var(--space-1) 0 12px; border-bottom: 1px solid var(--border); }
   .station-table th, .station-table td { display: block; border: 0; padding: 0; }
   .station-table th { grid-column: 1 / 3; grid-row: 1; }
-  .station-table .row-area { display: inline; font-weight: 400; color: var(--text-2); margin-left: 8px; }
-  .station-table .cell-status { grid-column: 3; grid-row: 1; align-self: center; justify-self: end; }
+  .station-table .row-area { display: inline; font-weight: 400; color: var(--text-2); margin-left: var(--space-1); }
+  .station-table .cell-status { grid-column: 3; grid-row: 1; align-self: center; justify-self: end; font-size: var(--fs-small); }
   .station-table .cell-area { display: none; }
-  .station-table td.cell-data { grid-row: 2; color: var(--text-2); font-size: 16px; }
+  .station-table td.cell-data { grid-row: 2; color: var(--text); font-size: var(--fs-small); }
+  .station-table .cell-label { position: static; display: block; width: auto; height: auto; overflow: visible; clip: auto;
+    white-space: normal; font-size: 14px; color: var(--text-2); line-height: 1.3; }
+  .chip { padding: 0 var(--space-2); }
 }
 .row-area { display: none; }
+.cell-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }

@@ -65,7 +65,7 @@
   function tile(name, label, value, opts) {
     opts = opts || {};
     return '<li class="tile">' + icon(name) + '<span class="tile-label">' + esc(label) + '</span><strong class="tile-value' +
-      (opts.text ? " tile-value-text" : "") + '">' + esc(value) + "</strong>" +
+      (opts.text ? " tile-value-text" : "") + '">' + esc(value) + (opts.sub ? ' <span class="tile-sub">' + esc(opts.sub) + "</span>" : "") + "</strong>" +
       (opts.note ? '<span class="tile-note">' + esc(opts.note) + "</span>" : "") + "</li>";
   }
 
@@ -88,8 +88,8 @@
       tiles.push(tile("drop", t("map.rain_morning"), oneDecimal(latest.rain_since_morning_mm) + " " + t("rain.unit")));
     }
     if (latest.uv_index != null) {
-      tiles.push(tile("sun", t("map.sun"), I.round(latest.uv_index) + " (" + uvWord(latest.uv_index) + ")",
-                      { note: afterDark(latest) ? t("map.after_dark") : "" }));
+      tiles.push(tile("sun", t("map.sun"), I.round(latest.uv_index),
+                      { sub: uvWord(latest.uv_index), note: afterDark(latest) ? t("map.after_dark") : "" }));
     }
     if (!tiles.length) return "";
     var day = I.localDay(latest.time_utc), time = I.clock(latest.time_utc);
@@ -147,6 +147,12 @@
     return oneDecimal(l.rain_since_morning_mm) + " " + t("rain.unit");
   }
 
+  /* A data cell carries its column name: hidden on wide screens (the table head shows it), shown small on phones. */
+  function cell(head, value) {
+    return '<td class="cell-data"><span class="cell-label">' + esc(head) + '<span class="visually-hidden">: </span></span>' +
+      "<span>" + esc(value) + "</span></td>";
+  }
+
   function renderList() {
     var rows = visible().slice().sort(function (a, b) {
       return (a.area || "").localeCompare(b.area || "") || a.id.localeCompare(b.id, "en", { numeric: true });
@@ -164,9 +170,7 @@
         (hasAlert(s) ? I.badge(s.status.code) : "") + "</th>" +
         '<td class="cell-area">' + esc(s.area || "") + "</td>" +
         '<td class="cell-status">' + dot(code) + "<span>" + esc(shortState(code)) + "</span></td>" +
-        '<td class="cell-data"><span class="visually-hidden">' + esc(heads[3]) + ": </span>" + esc(lastCell(s)) + "</td>" +
-        '<td class="cell-data"><span class="visually-hidden">' + esc(heads[4]) + ": </span>" + esc(temp) + "</td>" +
-        '<td class="cell-data"><span class="visually-hidden">' + esc(heads[5]) + ": </span>" + esc(rainCell(s)) + "</td></tr>";
+        cell(heads[3], lastCell(s)) + cell(heads[4], temp) + cell(heads[5], rainCell(s)) + "</tr>";
     }).join("") + "</tbody></table>";
   }
 
