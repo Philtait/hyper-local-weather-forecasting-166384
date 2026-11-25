@@ -41,13 +41,20 @@
     var left = 6, right = 6, slot = (W - left - right) / n;
     return { svg: svg, W: W, H: height, slot: slot, x: function (i) { return left + slot * i + slot / 2; } };
   }
-  function divider(f, split, top, bottom, today) {
-    if (split < 0) return;
-    var x = f.x(split) - f.slot / 2;
-    f.svg.appendChild(el("line", { x1: x, x2: x, y1: top - 4, y2: bottom + 4, stroke: "#0f3d2e", "stroke-width": 1.5, "stroke-dasharray": "4 3" }));
-    label(f.svg, x - 6, top - 8, t("charts.measured"), { "text-anchor": "end", "font-weight": 600 });
-    label(f.svg, x + 6, top - 8, t("charts.forecast"), { "text-anchor": "start", "font-weight": 600 });
-    if (today) label(f.svg, f.x(split - 1), f.H - 4, t("charts.today"), { "font-weight": 700, fill: "#0f3d2e" });
+  /* "Today" goes under the visitor's own date in Kenya time, and is left out when that date is not on the chart. */
+  function todayIndex(days) {
+    var today = I.localDay(new Date().toISOString());
+    return days.map(function (d) { return d.date; }).indexOf(today);
+  }
+  function divider(f, split, top, bottom, days) {
+    if (split >= 0) {
+      var x = f.x(split) - f.slot / 2;
+      f.svg.appendChild(el("line", { x1: x, x2: x, y1: top - 4, y2: bottom + 4, stroke: "#0f3d2e", "stroke-width": 1.5, "stroke-dasharray": "4 3" }));
+      label(f.svg, x - 6, top - 8, t("charts.measured"), { "text-anchor": "end", "font-weight": 600 });
+      label(f.svg, x + 6, top - 8, t("charts.forecast"), { "text-anchor": "start", "font-weight": 600 });
+    }
+    var i = days ? todayIndex(days) : -1;
+    if (i >= 0) label(f.svg, f.x(i), f.H - 4, t("charts.today"), { "font-weight": 700, fill: "#0f3d2e" });
   }
   /* Day-of-month numbers under each column; charts with a Today marker leave a row below for it. */
   function axisDays(f, days, withToday) {
@@ -92,6 +99,7 @@
     if (past.length) parts.push(t("charts.rain_past", { mm: sum(past) }));
     if (next.length) parts.push(t("charts.rain_next", { mm: sum(next) }));
     if (missing) parts.push(t(missing === 1 ? "charts.no_reading_one" : "charts.no_reading_many", { n: missing }));
+    parts.push(t("charts.rain_window"));
     var wrap = block(t("charts.rain_title"), parts.join(" "));
     host.appendChild(wrap);
     var f = frame(wrap.querySelector(".chart-box"), 250, days.length);
@@ -143,8 +151,8 @@
     spot = spot || [f.W - width + 4, yh - 5];
     label(f.svg, spot[0], spot[1], text, { "text-anchor": "start", fill: C.heavy, "font-weight": 600,
       stroke: "#ffffff", "stroke-width": 4, "paint-order": "stroke" });
-    divider(f, data.split, top - 10, bottom, true);
-    axisDays(f, days, data.split > 0);
+    divider(f, data.split, top - 10, bottom, days);
+    axisDays(f, days, todayIndex(days) >= 0);
     var readout = wrap.querySelector(".chart-readout");
     hits(f, days, readout, function (d) {
       return fullDay(d.date) + ": " + (d.rain == null ? t("charts.no_reading") : kindWord(d) + ", " + t("rain." + I.rainClass(d.rain)) + ", " + mm(d.rain) + " " + t("rain.unit"));
@@ -156,37 +164,59 @@
   }
 
   /* ------------------------------------------------------------ 2. temperature */
+  /* Measured days have a range (lowest and highest while the station was on); forecast days only a maximum. */
+  function tempValue(d) {
+    if (d.kind === "forecast") return d.tmax == null ? null : t("time.up_to", { max: Math.round(d.tmax) });
+    return d.tmin == null || d.tmax == null ? null : t("charts.range", { min: Math.round(d.tmin), max: Math.round(d.tmax) });
+  }
   function tempChart(host, s) {
     var data = series(s), days = data.days;
-    var known = days.filter(function (d) { return d.tmin != null && d.tmax != null; });
-    if (!known.length) return;
-    var lo = Math.min.apply(null, known.map(function (d) { return d.tmin; }));
-    var hi = Math.max.apply(null, known.map(function (d) { return d.tmax; }));
-    var wrap = block(t("charts.temp_title"), t("charts.temp_summary", { min: Math.round(lo), max: Math.round(hi) }));
+    var measured = days.filter(function (d) { return d.kind === "measured" && d.tmin != null && d.tmax != null; });
+    var forecast = days.filter(function (d) { return d.kind === "forecast" && d.tmax != null; });
+    if (!measured.length && !forecast.length) return;
+    var values = [];
+    measured.forEach(function (d) { values.push(d.tmin, d.tmax); });
+    forecast.forEach(function (d) { values.push(d.tmax); });
+    var lo = Math.min.apply(null, values), hi = Math.max.apply(null, values);
+    var parts = [];
+    if (measured.length) {
+      parts.push(t("charts.temp_measured", { min: Math.round(Math.min.apply(null, measured.map(function (d) { return d.tmin; }))),
+                                             max: Math.round(Math.max.apply(null, measured.map(function (d) { return d.tmax; }))) }));
+    }
+    if (forecast.length) parts.push(t("charts.temp_forecast", { max: Math.round(Math.max.apply(null, forecast.map(function (d) { return d.tmax; }))) }));
+    var wrap = block(t("charts.temp_title"), parts.join(" "));
     host.appendChild(wrap);
     var f = frame(wrap.querySelector(".chart-box"), 260, days.length);
     var top = 50, bottom = f.H - 68;
-    var y = function (v) { return bottom - (bottom - top) * (v - (lo - 1)) / ((hi + 1) - (lo - 1)); };
+    var y = function (v) { return bottom - (bottom - top) * (v - (lo - 1)) / Math.max(2, (hi + 1) - (lo - 1)); };
     var bw = Math.min(16, f.slot * 0.4);
     days.forEach(function (d, i) {
+      if (d.kind === "forecast") {
+        if (d.tmax == null) { label(f.svg, f.x(i), (top + bottom) / 2, "–"); return; }
+        var ym = y(d.tmax);
+        f.svg.appendChild(el("line", { x1: f.x(i) - bw / 2 - 2, x2: f.x(i) + bw / 2 + 2, y1: ym, y2: ym, stroke: C.temp, "stroke-width": 4, "stroke-linecap": "round" }));
+        label(f.svg, f.x(i), ym - 9, Math.round(d.tmax));
+        return;
+      }
       if (d.tmin == null || d.tmax == null) {
         label(f.svg, f.x(i), (top + bottom) / 2, "–");
         return;
       }
       var y1 = y(d.tmax), y2 = y(d.tmin);
-      f.svg.appendChild(el("rect", { x: f.x(i) - bw / 2, y: y1, width: bw, height: Math.max(2, y2 - y1), rx: 3,
-        fill: C.temp, "fill-opacity": d.kind === "forecast" ? 0.5 : 1, stroke: C.temp, "stroke-width": 1 }));
+      f.svg.appendChild(el("rect", { x: f.x(i) - bw / 2, y: y1, width: bw, height: Math.max(2, y2 - y1), rx: 3, fill: C.temp }));
       label(f.svg, f.x(i), y1 - 6, Math.round(d.tmax));
       label(f.svg, f.x(i), y2 + 17, Math.round(d.tmin));
     });
-    divider(f, data.split, top - 18, bottom + 18, true);
-    axisDays(f, days, data.split > 0);
+    divider(f, data.split, top - 18, bottom + 18, days);
+    axisDays(f, days, todayIndex(days) >= 0);
     hits(f, days, wrap.querySelector(".chart-readout"), function (d) {
-      return fullDay(d.date) + ": " + (d.tmin == null ? t("charts.no_reading") : kindWord(d) + ", " + t("time.temp_range", { min: Math.round(d.tmin), max: Math.round(d.tmax) }));
+      var v = tempValue(d);
+      return fullDay(d.date) + ": " + (v == null ? t("charts.no_reading") : kindWord(d) + ", " + v);
     });
     wrap.querySelector(".chart-box").appendChild(f.svg);
     wrap.insertAdjacentHTML("beforeend", table([t("charts.day"), t("charts.type"), t("charts.temp_col")], days.map(function (d) {
-      return [fullDay(d.date), kindWord(d), d.tmin == null ? t("charts.no_reading") : t("time.temp_range", { min: Math.round(d.tmin), max: Math.round(d.tmax) })];
+      var v = tempValue(d);
+      return [fullDay(d.date), kindWord(d), v == null ? t("charts.no_reading") : v];
     })));
   }
 
@@ -230,19 +260,14 @@
   }
 
   /* ------------------------------------------------------------ 4. is this station working? */
-  function ago(isoUtc) {
-    var minutes = Math.max(0, Math.round((Date.now() - new Date(isoUtc).getTime()) / 60000));
-    if (minutes < 60) return t(minutes === 1 ? "charts.minute_ago" : "charts.minutes_ago", { n: minutes });
-    var hours = Math.round(minutes / 60);
-    if (hours < 48) return t(hours === 1 ? "charts.hour_ago" : "charts.hours_ago", { n: hours });
-    return t("charts.days_ago", { n: Math.round(hours / 24) });
-  }
-  function workingChart(host, s) {
+  function workingChart(host, s, fullHours) {
     var days = s.history || [];
     if (!days.length) return;
     var parts = [];
-    if (s.last_reading_utc) parts.push(t("charts.last_reading", { ago: ago(s.last_reading_utc) }));
-    if (s.coverage_14d != null) parts.push(t("charts.coverage", { n: s.coverage_14d, total: days.length }));
+    if (s.last_reading_utc) {
+      parts.push(t("charts.last_reading", { date: I.longDate(I.localDay(s.last_reading_utc)), time: I.clock(s.last_reading_utc), ago: I.ago(s.last_reading_utc) }));
+    }
+    if (s.days_with_data_14d != null) parts.push(t("charts.coverage", { n: s.days_with_data_14d, total: days.length }));
     var wrap = block(t("charts.working_title"), parts.join(" "));
     host.appendChild(wrap);
     var f = frame(wrap.querySelector(".chart-box"), 64, days.length);
@@ -250,15 +275,16 @@
     days.forEach(function (d, i) {
       var n = d.readings_received || 0;
       f.svg.appendChild(el("rect", { x: f.x(i) - size / 2 + 0.75, y: 8, width: size - 1.5, height: size - 1.5, rx: 3,
-        fill: n >= 24 ? C.full : n > 0 ? C.part : C.none, stroke: n > 0 ? "none" : C.noneLine,
+        fill: n >= fullHours ? C.full : n > 0 ? C.part : C.none, stroke: n > 0 ? "none" : C.noneLine,
         "stroke-dasharray": n > 0 ? "" : "3 2", "stroke-width": 1.2 }));
     });
     axisDays(f, days, false);
-    var key = '<p class="chart-key"><span class="key-sq key-full"></span>' + esc(t("charts.key_full")) +
-      '<span class="key-sq key-part"></span>' + esc(t("charts.key_part")) + '<span class="key-sq key-none"></span>' + esc(t("charts.key_none")) + "</p>";
+    var key = '<p class="chart-key">' + [["full", "charts.key_full"], ["part", "charts.key_part"], ["none", "charts.key_none"]].map(function (k) {
+      return '<span class="key-item"><span class="key-sq key-' + k[0] + '"></span>' + esc(t(k[1])) + "</span>";
+    }).join("") + "</p>";
     hits(f, days, wrap.querySelector(".chart-readout"), function (d) {
       var n = d.readings_received || 0;
-      return fullDay(d.date) + ": " + t(n >= 24 ? "charts.key_full" : n > 0 ? "charts.key_part" : "charts.key_none");
+      return fullDay(d.date) + ": " + t(n >= fullHours ? "charts.key_full" : n > 0 ? "charts.key_part" : "charts.key_none");
     });
     wrap.querySelector(".chart-box").appendChild(f.svg);
     wrap.querySelector(".chart-box").insertAdjacentHTML("afterend", key);
@@ -275,13 +301,14 @@
     host.innerHTML = "<h3>" + esc(t("charts.title")) + "</h3>";
     slot.appendChild(host);
     var heavy = meta.thresholds.heavy_rain_mm, veryHeavy = meta.thresholds.very_heavy_rain_mm;
+    var fullHours = meta.history_hours_per_day || 18;
     if (station.active) {
       rainChart(host, station, heavy, veryHeavy);
       tempChart(host, station);
       humidityChart(host, station);
-      workingChart(host, station);
+      workingChart(host, station, fullHours);
     } else {
-      workingChart(host, station);
+      workingChart(host, station, fullHours);
       var past = (station.history || []).some(function (d) { return d.readings_received > 0; });
       if (past) { rainChart(host, station, heavy, veryHeavy); tempChart(host, station); humidityChart(host, station); }
     }

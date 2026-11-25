@@ -38,7 +38,7 @@
       out.push('<text x="' + x(cx).toFixed(1) + '" y="' + y(cy).toFixed(1) + '" text-anchor="middle" font-size="15" font-weight="600" fill="#4a5a52">' +
         I.esc(f.properties.name) + "</text>");
     });
-    var fg = { warning: "#b3261e", watch: "#b45309", planting: "#166534", delay: "#1d4ed8", none: "#475569", offline: "#6b7280" };
+    var fg = { warning: "#b3261e", watch: "#b45309", planting: "#166534", delay: "#1d4ed8", none: "#3d6b55", offline: "#6b7280" };
     stations.slice().sort(function (a, b) { return I.ORDER[b.status.code] - I.ORDER[a.status.code]; }).forEach(function (s) {
       if (s.lat == null) return;
       var off = s.status.code === "offline";
@@ -64,11 +64,12 @@
         Array.prototype.forEach.call(document.querySelectorAll("[data-count]"), function (el) {
           el.textContent = values[el.getAttribute("data-count")];
         });
-        document.getElementById("updated").textContent =
-          I.t("home.updated", { time: I.clock(meta.generated_at) + ", " + I.longDate(I.localDay(meta.generated_at)) });
-        if (meta.headline_week) {
-          // The label already says "This week:", so drop the sentence's own closing "this week".
-          document.getElementById("hero-week-text").textContent = meta.headline_week.replace(/\s+this week(\.?)\s*$/i, "$1");
+        document.getElementById("updated").textContent = I.t("home.updated", { time: I.dateTime(meta.generated_at) });
+        if (meta.latest_reading_utc) {
+          // Plain counts from the data: stations that sent data recently and the newest reading, in Kenya time.
+          document.getElementById("hero-week-text").textContent = I.t("home.hero_data", {
+            n: values.reporting, total: values.stations,
+            date: I.longDate(I.localDay(meta.latest_reading_utc)), time: I.clock(meta.latest_reading_utc) });
           document.getElementById("hero-week").hidden = false;
         }
         document.getElementById("status-counts").innerHTML = Object.keys(I.ORDER).filter(function (code) { return counts[code]; })

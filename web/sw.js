@@ -2,7 +2,7 @@
    Bump VERSION when shell files change so old caches are removed. */
 "use strict";
 
-var VERSION = "imarika-v4";
+var VERSION = "imarika-v5";
 var SHELL = [
   "./", "index.html", "how-it-works.html", "map.html", "sms.html", "contact.html",
   "css/styles.css", "js/common.js", "js/home.js", "js/map.js", "js/charts.js", "js/sms.js", "js/contact.js", "i18n/en.json", "manifest.webmanifest",

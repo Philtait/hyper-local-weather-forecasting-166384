@@ -15,7 +15,8 @@
   function reduceMotion() { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
 
   /* ------------------------------------------------------------ result card */
-  /* A day's status follows the engine's order: flood warning, flood watch, planting window, rain delay, quiet. */
+  /* A day's status follows the engine's order: flood warning, flood watch, planting window, rain delay.
+     Otherwise the row says the rain in words (Dry, Some rain, ...). Flat forecasts carry no planting or delay days. */
   function dayStatus(day) {
     if (day.alert === "warning" || day.alert === "watch") return day.alert;
     if (day.planting) return "planting";
@@ -24,31 +25,53 @@
   }
 
   function dayRow(day) {
-    var code = dayStatus(day);
-    var word = code === "none" ? t("map.day_quiet") : t("status." + code);
+    var code = dayStatus(day), kind = I.rainClass(day.rain_mm);
+    var word = code === "none" ? (day.rain_mm != null ? t("rain." + kind) : t("map.no_value")) : t("status." + code);
+    var mark = code === "none" ? "drop" : I.STATUS_ICON[code];
     var mm = day.rain_mm != null ? I.round(day.rain_mm) + " " + t("rain.unit") : t("map.no_value");
-    var temp = day.temp_min != null && day.temp_max != null
-      ? t("time.temp_range", { min: I.round(day.temp_min), max: I.round(day.temp_max) }) : t("map.no_value");
+    // The forecast has no overnight low, so only the day's maximum is shown.
+    var temp = day.temp_max != null ? t("time.up_to", { max: I.round(day.temp_max) }) : t("map.no_value");
     return '<li class="day day-' + code + '"><span class="day-name">' + esc(I.weekday(day.date)) + "</span>" +
-      '<span class="day-status">' + icon(I.STATUS_ICON[code]) + "<span>" + esc(word) + "</span></span>" +
+      '<span class="day-status">' + icon(mark) + "<span>" + esc(word) + "</span></span>" +
       '<span class="day-mm">' + icon("drop") + "<span>" + esc(mm) + "</span></span>" +
       '<span class="day-temp">' + icon("thermometer") + "<span>" + esc(temp) + "</span></span></li>";
   }
 
-  function nowList(latest) {
-    if (!latest) return "";
+  function forecastBlock(days) {
+    if (!days.length) return "";
+    var html = "<h3>" + esc(t("map.forecast")) + '</h3><p class="day-note">' + esc(t("map.rain_window")) + "</p>" +
+      '<ul class="day-rows" role="list">' + dayRow(days[0]) + "</ul>";
+    if (days.length > 1) {
+      html += "<h3>" + esc(t("map.outlook")) + '</h3><p class="day-note">' + esc(t("map.outlook_note")) + "</p>" +
+        '<ul class="day-rows day-rows-later" role="list">' + days.slice(1).map(dayRow).join("") + "</ul>";
+    }
+    return html;
+  }
+
+  /* Standard UV index categories (WHO): 0-2 Low, 3-5 Moderate, 6-7 High, 8-10 Very high, 11+ Extreme. */
+  function uvWord(uv) {
+    var r = Math.round(uv);
+    return t("map." + (r <= 2 ? "uv_low" : r <= 5 ? "uv_moderate" : r <= 7 ? "uv_high" : r <= 10 ? "uv_very_high" : "uv_extreme"));
+  }
+
+  /* Only readings with a value and a verified unit. Wind and the light sensor are left out: their units are not verified. */
+  function latestBlock(latest) {
+    if (!latest || !latest.time_utc) return "";
     var rows = [];
     if (latest.temperature_c != null) rows.push(["thermometer", t("map.temperature"), I.round(latest.temperature_c) + "°C"]);
     if (latest.humidity_pct != null) rows.push(["humidity", t("map.humidity"), I.round(latest.humidity_pct) + "%"]);
-    if (latest.wind_ms != null) rows.push(["wind", t("map.wind"), I.round(latest.wind_ms * 3.6) + " " + t("map.kmh")]);
-    if (latest.rain_today_mm != null) {
-      var mm = latest.rain_today_mm;
-      rows.push(["drop", t("map.rain_today"), t("rain." + I.rainClass(mm)) + " (" + (Math.round(mm * 10) / 10) + " " + t("rain.unit") + ")"]);
+    if (latest.rain_since_morning_mm != null) {
+      rows.push(["drop", t("map.rain_morning"), (Math.round(latest.rain_since_morning_mm * 10) / 10) + " " + t("rain.unit")]);
     }
+    if (latest.uv_index != null) rows.push(["info", t("map.uv"), I.round(latest.uv_index) + " (" + uvWord(latest.uv_index) + ")"]);
+    if (latest.pressure_hpa != null) rows.push(["info", t("map.pressure"), I.round(latest.pressure_hpa) + " " + t("map.hpa")]);
     if (!rows.length) return "";
-    return "<h3>" + esc(t("map.right_now")) + '</h3><ul class="now-list">' + rows.map(function (r) {
-      return "<li>" + icon(r[0]) + "<span>" + esc(r[1]) + "</span><strong>" + esc(r[2]) + "</strong></li>";
-    }).join("") + "</ul>";
+    var when = I.measured(latest.time_utc);
+    return "<h3>" + esc(t("map.latest")) + '</h3><p class="measured">' + esc(when.line) + "</p>" +
+      (when.note ? '<p class="stale-note">' + icon("info") + "<span>" + esc(when.note) + "</span></p>" : "") +
+      '<ul class="now-list">' + rows.map(function (r) {
+        return "<li>" + icon(r[0]) + "<span>" + esc(r[1]) + "</span><strong>" + esc(r[2]) + "</strong></li>";
+      }).join("") + "</ul>";
   }
 
   function opsList(operations) {
@@ -65,18 +88,17 @@
     var others = inArea(s.area).filter(function (o) { return o.id !== s.id; });
     var html = "<h2>" + esc(s.area || s.label) + "</h2>";
     if (!s.active) {
-      var stopped = I.longDate(I.localDay(s.last_reading_utc));
       html += '<p class="station-line">' + esc(s.label) + "</p>" + I.badge("offline") +
-        '<p class="action">' + esc(t("map.not_reporting", { date: stopped })) + "</p>" +
+        '<p class="action">' + esc(t("map.stopped")) + "</p>" +
+        (s.last_reading_utc ? '<p class="measured">' + esc(t("time.last_reading", { date: I.longDate(I.localDay(s.last_reading_utc)), time: I.clock(s.last_reading_utc) })) + "</p>" : "") +
         '<div class="chart-slot" id="chart-slot"></div>';
     } else {
-      html += '<p class="station-line">' + esc(t("map.station_updated", { station: s.label, time: I.whenSeen(s.last_reading_utc, state.meta.as_of) })) + "</p>" +
+      html += '<p class="station-line">' + esc(s.label) + "</p>" +
         I.badge(s.status.code) + '<p class="action">' + esc(s.what_to_do) + "</p>" +
-        "<h3>" + esc(t("map.next_days")) + '</h3><ul class="day-rows" role="list">' + s.forecast.slice(0, 3).map(dayRow).join("") + "</ul>" +
-        (s.forecast.length > 3 ? "<h3>" + esc(t("map.later")) + '</h3><ul class="day-rows day-rows-later" role="list">' + s.forecast.slice(3).map(dayRow).join("") + "</ul>" : "") +
-        nowList(s.latest) +
-        '<div class="chart-slot" id="chart-slot"></div>' +
-        opsList(s.operations);
+        latestBlock(s.latest) +
+        forecastBlock(s.forecast) +
+        (s.advice_note ? '<p class="flat-note">' + icon("info") + "<span>" + esc(s.advice_note) + "</span></p>" : opsList(s.operations)) +
+        '<div class="chart-slot" id="chart-slot"></div>';
     }
     if (others.length) {
       html += '<p class="other-stations"><span>' + esc(t("map.other_stations")) + ":</span>" + others.map(function (o) {
@@ -121,7 +143,10 @@
   function renderGroups() {
     document.getElementById("station-groups").innerHTML = state.areas.map(function (area) {
       return "<section><h3>" + esc(area) + "</h3><ul>" + inArea(area).map(function (s) {
-        return '<li><button type="button" class="station-row" data-station="' + esc(s.id) + '"><span>' + esc(s.label) + "</span>" + I.badge(s.status.code) + "</button></li>";
+        var seen = s.last_reading_utc ? t("map.last_seen_short", { date: I.longDate(I.localDay(s.last_reading_utc)), time: I.clock(s.last_reading_utc) }) : "";
+        return '<li><button type="button" class="station-row" data-station="' + esc(s.id) + '"><span class="row-name">' + esc(s.label) +
+          ' <span class="muted">' + esc(s.area || "") + "</span></span>" + I.badge(s.status.code) +
+          (seen ? '<span class="row-seen">' + esc(seen) + "</span>" : "") + "</button></li>";
       }).join("") + "</ul></section>";
     }).join("");
   }
@@ -181,7 +206,11 @@
           .setLatLng(layer.getBounds().getCenter()).setContent(esc(f.properties.name)).addTo(map);
       }
     });
-    if (bounds) map.fitBounds(bounds, { padding: [12, 12] }); else map.setView([0.45, 34.2], 10);
+    var placed = state.stations.filter(function (s) { return s.lat != null && s.lon != null; });
+    if (placed.length) {
+      bounds = L.latLngBounds(placed.map(function (s) { return [s.lat, s.lon]; }));
+      map.fitBounds(bounds.pad(0.15), { padding: [24, 24], maxZoom: 13 });
+    } else if (bounds) map.fitBounds(bounds, { padding: [12, 12] }); else map.setView([0.45, 34.2], 10);
     addTiles(map);
     state.layer = L.layerGroup().addTo(map);
     map.on("zoomend", drawMarkers);

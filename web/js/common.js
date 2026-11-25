@@ -45,13 +45,31 @@
   }
   function localDay(isoUtc) { var p = parts(isoUtc); return p.year + "-" + p.month.padStart(2, "0") + "-" + p.day.padStart(2, "0"); }
   function clock(isoUtc) { var p = parts(isoUtc); return p.hour + ":" + p.minute; }
-  /* "06:40 today", "06:40 yesterday" or "06:40, Monday 23 November" relative to the forecast issue day. */
-  function whenSeen(isoUtc, today) {
-    var day = localDay(isoUtc), time = clock(isoUtc);
-    if (day === today) return time + " " + t("time.today");
-    var prev = new Date(dayOfDate(today).getTime() - 86400000).toISOString().slice(0, 10);
-    if (day === prev) return time + " " + t("time.yesterday");
-    return time + ", " + longDate(day);
+  /* Reading times are UTC in the data; every one is shown in Kenya time (EAT) and labelled so. */
+  function dateTime(isoUtc) { return t("time.date_time", { date: longDate(localDay(isoUtc)), time: clock(isoUtc) }); }
+  function ago(isoUtc) {
+    var minutes = Math.max(0, Math.round((Date.now() - new Date(isoUtc).getTime()) / 60000));
+    if (minutes < 60) return t(minutes === 1 ? "time.minute_ago" : "time.minutes_ago", { n: minutes });
+    var hours = Math.round(minutes / 60);
+    if (hours < 48) return t(hours === 1 ? "time.hour_ago" : "time.hours_ago", { n: hours });
+    return t("time.days_ago", { n: Math.round(hours / 24) });
+  }
+  function partOfDay(isoUtc) {
+    var h = Number(parts(isoUtc).hour);
+    return t("time.parts." + (h >= 5 && h < 12 ? "morning" : h >= 12 && h < 17 ? "afternoon" : h >= 17 && h < 21 ? "evening" : "night"));
+  }
+  /* "Measured at 16:55 EAT today (3 hours ago)" or "Measured Tuesday 24 November, 20:26 EAT (yesterday evening)",
+     plus a plain note when the reading is more than 6 hours old. Relative to the visitor's own clock. */
+  function measured(isoUtc) {
+    var today = localDay(new Date().toISOString()), day = localDay(isoUtc), time = clock(isoUtc);
+    var days = Math.round((dayOfDate(today) - dayOfDate(day)) / 86400000);
+    var hours = (Date.now() - new Date(isoUtc).getTime()) / 3600000, when;
+    if (days <= 0) {
+      when = partOfDay(isoUtc) === t("time.parts.night") ? ago(isoUtc) : t("time.this_part", { part: partOfDay(isoUtc) });
+      return { line: t("time.measured_today", { time: time, ago: ago(isoUtc) }), note: hours > 6 ? t("time.stale_note", { when: when }) : "" };
+    }
+    when = days === 1 ? t("time.yesterday_part", { part: partOfDay(isoUtc) }) : t("time.days_ago", { n: days });
+    return { line: t("time.measured_on", { date: longDate(day), time: time, when: when }), note: hours > 6 ? t("time.stale_note", { when: when }) : "" };
   }
   function rainClass(mm) {
     if (mm >= 50) return "very_heavy";
@@ -95,7 +113,7 @@
 
   window.Imarika = {
     ready: ready, t: t, esc: esc, icon: icon, badge: badge, ORDER: ORDER, STATUS_ICON: STATUS_ICON,
-    weekday: weekday, longDate: longDate, clock: clock, localDay: localDay, whenSeen: whenSeen,
+    weekday: weekday, longDate: longDate, clock: clock, localDay: localDay, dateTime: dateTime, ago: ago, measured: measured,
     rainClass: rainClass, round: round, getJSON: getJSON,
     bySeverity: function (a, b) {
       return (ORDER[a.status.code] - ORDER[b.status.code]) || a.id.localeCompare(b.id, "en", { numeric: true });

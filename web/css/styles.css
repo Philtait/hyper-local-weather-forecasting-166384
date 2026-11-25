@@ -23,7 +23,7 @@
   --st-watch-fg: #b45309;    --st-watch-bg: #fff0dc;
   --st-planting-fg: #166534; --st-planting-bg: #dcf5e4;
   --st-delay-fg: #1d4ed8;    --st-delay-bg: #e3ecff;
-  --st-none-fg: #475569;     --st-none-bg: #eef1f4;
+  --st-none-fg: #3d6b55;     --st-none-bg: #e5f0ea;
   --st-offline-fg: #6b7280;  --st-offline-bg: #f3f4f6;
 }
 
@@ -371,3 +371,16 @@ textarea.field { max-width: 640px; resize: vertical; }
 /* ---------------------------------------------------------------- polish */
 [id] { scroll-margin-top: 88px; }
 @media (max-width: 760px) { [id] { scroll-margin-top: 72px; } }
+
+/* ---------------------------------------------------------------- real data: times, notes, station list */
+.measured { color: var(--text-2); font-size: 16px; margin: 0 0 8px; }
+.stale-note, .flat-note { display: flex; gap: 10px; align-items: flex-start; font-size: 16px; padding: 10px 12px;
+  border: 1px solid var(--border); border-radius: var(--radius); background: var(--soft); margin: 0 0 12px; }
+.stale-note .icon, .flat-note .icon { color: var(--leaf); flex: none; margin-top: 2px; }
+.flat-note { margin-top: 20px; }
+.day-note { color: var(--text-2); font-size: 16px; margin: -4px 0 10px; }
+.station-row .row-name { font-weight: 600; }
+.station-row .row-name .muted { font-weight: 400; }
+.station-row .row-seen { color: var(--text-2); font-size: 15px; }
+.chart-key { gap: 6px 16px; }
+.key-item { display: inline-flex; align-items: center; gap: 6px; }
