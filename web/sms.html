@@ -36,20 +36,19 @@
     <div class="media-intro media-small">
       <div>
         <h1 id="page-title">See the SMS a farmer receives</h1>
-        <p class="lead">Pick an area and a message, then send it to a test phone number.</p>
+        <p class="lead">Pick a station and a message built from its own data, then send it to a test phone number.</p>
       </div>
       <img src="img/farmer.webp" width="960" height="720" loading="lazy" alt="Illustration of a farmer checking a message on a phone at the edge of a maize field">
     </div>
     <div class="sms-layout">
       <form class="sms-form" id="sms-form" novalidate>
         <fieldset>
-          <legend><span class="step-num">1</span>Choose an area</legend>
-          <div class="area-buttons" id="sms-areas" role="group" aria-label="Choose an area"></div>
+          <legend><span class="step-num">1</span>Choose a station</legend>
+          <div class="station-picker" id="sms-stations" role="group" aria-label="Choose a station"></div>
         </fieldset>
         <fieldset>
           <legend><span class="step-num">2</span>Choose a message</legend>
           <div class="choice-list" id="sms-messages"></div>
-          <div class="crop-guide" id="sms-crops"></div>
         </fieldset>
         <fieldset>
           <legend><span class="step-num">3</span>Enter a phone number</legend>

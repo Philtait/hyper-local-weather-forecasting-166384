@@ -1,15 +1,13 @@
 /*
  * POST /api/send-sms  (Vercel-style Node serverless function)
  *
- * Sends one Imarika advisory to the Africa's Talking SANDBOX only.
- * Request JSON: {"phone": "+2547XXXXXXXX", "station": "<id>", "advisory": "<key>"}
- *           or: {"phone": "+2547XXXXXXXX", "scenario": "<key>"}
- *           or: {"phone": "+2547XXXXXXXX", "scenario": "crop_guide", "station": "<id>",
- *                "crop": "<crop>", "lang": "en" | "sw"}
- * The message text is looked up or built here from the deployed data files
- * (data/ is bundled with the function by vercel.json); text sent by the
- * browser is never used. Crop guide messages are built by js/sms-message.js,
- * the same module the page uses for its preview.
+ * Sends one Imarika message to the Africa's Talking SANDBOX only.
+ * Request JSON: {"phone": "+2547XXXXXXXX", "scenario": "latest" | "crop_guide" | "alert",
+ *                "station": "<id>", "lang": "en" | "sw", "crop": "<crop>" (crop_guide only)}
+ * Scenario, station, crop and language are checked against the deployed data
+ * files (data/stations.json and data/crop_guide.json, bundled with the function
+ * by vercel.json), and the text is built here by js/sms-message.js, the same
+ * module the page uses for its preview. Text sent by the browser is never used.
  *
  * Environment: AT_USERNAME (must be exactly "sandbox") and AT_API_KEY.
  * The key is never logged or returned.
@@ -27,9 +25,7 @@ const builder = require("../js/sms-message.js");
 
 const SANDBOX_URL = "https://api.sandbox.africastalking.com/version1/messaging";
 const PHONE = /^\+254[17]\d{8}$/;
-const ALLOWED_FIELDS = new Set(["phone", "station", "advisory", "scenario", "crop", "lang"]);
-const CROP_GUIDE = "crop_guide";
-const MAX_CHARS = 160;
+const ALLOWED_FIELDS = new Set(["phone", "scenario", "station", "crop", "lang"]);
 const RATE_LIMIT = { max: 5, windowMs: 10 * 60 * 1000 };
 
 class HttpError extends Error {
@@ -48,6 +44,7 @@ function checkConfig(env) {
   return { username: env.AT_USERNAME, apiKey: env.AT_API_KEY };
 }
 
+/* Whitelist the request shape; the values are checked against the data in buildText. */
 function parseRequest(body) {
   if (!body || typeof body !== "object" || Array.isArray(body)) throw new HttpError(400, "Send a JSON object");
   const extra = Object.keys(body).filter((key) => !ALLOWED_FIELDS.has(key));
@@ -56,58 +53,45 @@ function parseRequest(body) {
     if (typeof body[key] !== "string" || body[key].length > 80) throw new HttpError(400, "Invalid value for " + key);
   }
   const phone = validatePhone(body.phone);
-  if (body.scenario === CROP_GUIDE) {
-    if (body.advisory !== undefined) throw new HttpError(400, "Unexpected field: advisory");
-    if (!body.station) throw new HttpError(400, "Choose a station");
+  if (!builder.SCENARIOS.includes(body.scenario)) throw new HttpError(400, "Unknown message type");
+  if (!builder.LANGS.includes(body.lang)) throw new HttpError(400, "Unknown language");
+  if (!body.station) throw new HttpError(400, "Choose a station");
+  if (body.scenario === "crop_guide") {
     if (!builder.CROPS.includes(body.crop)) throw new HttpError(400, "Unknown crop");
-    if (!builder.LANGS.includes(body.lang)) throw new HttpError(400, "Unknown language");
-    return { phone, scenario: CROP_GUIDE, station: body.station, crop: body.crop, lang: body.lang };
+  } else if (body.crop !== undefined) {
+    throw new HttpError(400, "A crop is only used with the crop guide");
   }
-  if (body.crop !== undefined || body.lang !== undefined) throw new HttpError(400, "Crop and language are only used with the crop guide");
-  if (body.scenario && (body.station || body.advisory)) throw new HttpError(400, "Send either a scenario or a station advisory, not both");
-  if (body.scenario) return { phone, scenario: body.scenario };
-  if (body.station && body.advisory) return { phone, station: body.station, advisory: body.advisory };
-  throw new HttpError(400, "Choose a station advisory or a scenario");
+  const request = { phone, scenario: body.scenario, station: body.station, lang: body.lang };
+  if (body.scenario === "crop_guide") request.crop = body.crop;
+  return request;
 }
 
 function readJson(file) { return JSON.parse(fs.readFileSync(file, "utf8")); }
 
-function loadData(dataDir) {
-  return { stations: readJson(path.join(dataDir, "stations.json")).stations || [],
-           scenarios: readJson(path.join(dataDir, "scenarios.json")).scenarios || [] };
+function loadData(dataDir, scenario) {
+  let stations;
+  try { stations = readJson(path.join(dataDir, "stations.json")).stations || []; }
+  catch (error) { throw new HttpError(500, "Station data is not available"); }
+  let guide = null;
+  if (scenario === "crop_guide") {
+    try { guide = readJson(path.join(dataDir, "crop_guide.json")); }
+    catch (error) { throw new HttpError(500, "The crop guide is not available"); }
+  }
+  return { stations, guide };
 }
 
-function loadCropGuide(dataDir) {
-  try { return readJson(path.join(dataDir, "crop_guide.json")); }
-  catch (error) { throw new HttpError(500, "The crop guide is not available"); }
-}
-
-/* Crop guide: station, crop and language must exist in crop_guide.json; the text is built here. */
-function cropGuideMessage(guide, request) {
-  if (!builder.stations(guide).includes(request.station)) throw new HttpError(404, "Unknown station");
-  const built = builder.buildCropMessage(guide, request.station, request.crop, request.lang);
-  if (!built) throw new HttpError(409, "There is no crop guide message for this choice");
+/* The station must exist and be sending data; the shared builder makes the exact text. */
+function buildText(data, request) {
+  const station = builder.findStation(data.stations, request.station);
+  if (!station) throw new HttpError(404, "Unknown station");
+  if (!builder.selectable(station)) throw new HttpError(409, "This station is not sending data");
+  if (request.scenario === "crop_guide" && !builder.stations(data.guide).includes(request.station)) {
+    throw new HttpError(409, "There is no crop guide for this station");
+  }
+  const built = builder.buildMessage(data, request);
+  if (!built) throw new HttpError(409, "There is no message to send for this choice");
   if (built.chars > builder.MAX_CHARS) throw new HttpError(500, "Message is longer than two SMS");
   return built.text;
-}
-
-function lookupMessage(data, request) {
-  let text = null;
-  if (request.scenario === CROP_GUIDE) return cropGuideMessage(data.cropGuide, request);
-  if (request.scenario) {
-    const scenario = data.scenarios.find((item) => item.key === request.scenario);
-    if (!scenario) throw new HttpError(404, "Unknown scenario");
-    text = scenario.sms_text;
-  } else {
-    const station = data.stations.find((item) => item.id === request.station);
-    if (!station) throw new HttpError(404, "Unknown station");
-    const insight = (station.insights || []).find((item) => item.key === request.advisory);
-    if (!insight) throw new HttpError(404, "Unknown advisory for this station");
-    text = insight.sms_text;
-  }
-  if (!text) throw new HttpError(409, "There is no message to send for this choice");
-  if (text.length > MAX_CHARS) throw new HttpError(500, "Message is longer than one SMS");
-  return text;
 }
 
 function createRateLimiter({ max, windowMs }, now = () => Date.now()) {
@@ -187,12 +171,7 @@ function createHandler({ env = process.env, fetchImpl = globalThis.fetch, dataDi
       try { body = await readBody(req); } catch (error) { throw error instanceof HttpError ? error : new HttpError(400, "Send valid JSON"); }
       const request = parseRequest(body);
       const config = checkConfig(env);
-      let data;
-      if (request.scenario === CROP_GUIDE) data = { cropGuide: loadCropGuide(dataDir) };
-      else {
-        try { data = loadData(dataDir); } catch (error) { throw new HttpError(500, "Forecast data is not available"); }
-      }
-      const text = lookupMessage(data, request);
+      const text = buildText(loadData(dataDir, request.scenario), request);
       await sendToSandbox(fetchImpl, config, request.phone, text);
       reply(200, { ok: true, mode: "sandbox", detail: "accepted by the sandbox for " + maskPhone(request.phone),
                    chars: text.length, parts: builder.smsParts(text.length) });
@@ -209,7 +188,7 @@ module.exports.createHandler = createHandler;
 module.exports.validatePhone = validatePhone;
 module.exports.checkConfig = checkConfig;
 module.exports.parseRequest = parseRequest;
-module.exports.lookupMessage = lookupMessage;
+module.exports.buildText = buildText;
 module.exports.createRateLimiter = createRateLimiter;
 module.exports.RATE_LIMIT = RATE_LIMIT;
 module.exports.DATA_DIR = path.join(__dirname, "..", "data");

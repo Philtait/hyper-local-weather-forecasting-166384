@@ -2,7 +2,7 @@
    Bump VERSION when shell files change so old caches are removed. */
 "use strict";
 
-var VERSION = "imarika-v6";
+var VERSION = "imarika-v7";
 var SHELL = [
   "./", "index.html", "how-it-works.html", "map.html", "sms.html", "contact.html",
   "css/styles.css", "js/common.js", "js/home.js", "js/map.js", "js/charts.js", "js/sms-message.js", "js/sms.js", "js/contact.js", "i18n/en.json", "manifest.webmanifest",
@@ -12,7 +12,7 @@ var SHELL = [
   "img/icons.svg", "img/about-field.webp", "img/station.webp", "img/farmer.webp",
   "icons/icon-192.png", "icons/icon-512.png"
 ];
-var DATA = ["data/meta.json", "data/stations.json", "data/scenarios.json", "data/model_results.json",
+var DATA = ["data/meta.json", "data/stations.json", "data/model_results.json",
             "data/data_quality.json", "data/kenya_boundaries.geojson", "data/crop_guide.json", "contact.json"];
 
 self.addEventListener("install", function (event) {

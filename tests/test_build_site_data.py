@@ -61,7 +61,7 @@ def synthetic_build(folder):
         builder.synthetic_deploy(Path(deploy), builder.load_boundaries(builder.BOUNDARIES), date(2026, 11, 25))
         builder.build(deploy, folder, ROOT / "reports", synthetic=True)
     return {name: json.loads((Path(folder) / name).read_text(encoding="utf-8"))
-            for name in ["meta.json", "stations.json", "scenarios.json", "model_results.json", "data_quality.json"]}
+            for name in ["meta.json", "stations.json", "model_results.json", "data_quality.json"]}
 
 
 def write_deploy(folder, stations):
@@ -84,6 +84,7 @@ class SyntheticBuildTests(unittest.TestCase):
         cls.tmp = tempfile.TemporaryDirectory()
         cls.out = Path(cls.tmp.name)
         cls.data = synthetic_build(cls.out)
+        cls.files = {path.name for path in cls.out.iterdir()}
 
     @classmethod
     def tearDownClass(cls):
@@ -128,18 +129,9 @@ class SyntheticBuildTests(unittest.TestCase):
                     self.assertTrue(item[key], key)
                 self.assertLessEqual(len(item["sms_text"]), limit)
 
-    def test_scenarios_come_from_the_real_engine(self):
-        scenarios = {s["key"]: s for s in self.data["scenarios.json"]["scenarios"]}
-        self.assertEqual(set(scenarios), {"dry", "normal", "planting", "heavy"})
-        self.assertEqual(scenarios["heavy"]["status"]["code"], "warning")
-        self.assertEqual(scenarios["planting"]["status"]["code"], "planting")
-        self.assertIsNone(scenarios["dry"]["sms_text"])
-        heavy = scenarios["heavy"]
-        frame = pd.DataFrame({"device_id": "Scenario", "date": heavy["dates"], "rain_mm": heavy["rain_mm"],
-                              "rain_upper": heavy["rain_mm"], "temp_min": float("nan"), "temp_max": float("nan"),
-                              "wind_max": float("nan")})
-        expected = {sms_text(item, area="Scenario") for item in generate_insights(frame)}
-        self.assertEqual({item["sms_text"] for item in heavy["insights"]}, expected)
+    def test_no_test_scenarios_are_built(self):
+        self.assertNotIn("scenarios.json", self.files)
+        self.assertFalse((WEB / "data" / "scenarios.json").exists(), "web/data/scenarios.json must be removed")
 
     def test_model_results_match_the_report_file_and_show_no_lstm_numbers(self):
         models = self.data["model_results.json"]
@@ -362,31 +354,53 @@ class NeverShowTests(unittest.TestCase):
             self.assertIsNone(EIGHTEEN_DIGITS.search(joined), path.name)
 
 
-    def test_crop_guide_sms_text_never_shows_banned_words(self):
-        """Every crop guide SMS, built by the shared JS builder exactly as it is sent, is scanned too."""
-        guide = WEB / "data" / "crop_guide.json"
+    def test_every_sms_never_shows_banned_words(self):
+        """Every SMS the demo can send (latest readings, crop guide, alert; en and sw), built by the shared
+        JS builder exactly as it is sent, is scanned too."""
+        guide, stations = WEB / "data" / "crop_guide.json", WEB / "data" / "stations.json"
         node = shutil.which("node")
-        if not guide.is_file() or not node:
-            self.skipTest("crop_guide.json or node is missing")
+        if not guide.is_file() or not stations.is_file() or not node:
+            self.skipTest("web/data or node is missing")
         script = (
-            "const b = require(process.argv[1]); const g = require(process.argv[2]); const out = [];"
-            "for (const s of b.stations(g)) for (const c of b.CROPS) for (const l of b.LANGS) {"
-            " const m = b.buildCropMessage(g, s, c, l); if (m) out.push(m.text); }"
+            "const b = require(process.argv[1]); const data = {stations: require(process.argv[2]).stations,"
+            " guide: require(process.argv[3])}; const out = [];"
+            "for (const s of data.stations) for (const lang of b.LANGS) {"
+            " for (const scenario of ['latest', 'alert']) { const m = b.buildMessage(data, {scenario, station: s.id, lang});"
+            "  if (m) out.push([scenario, m.text]); }"
+            " for (const crop of b.CROPS) { const m = b.buildMessage(data, {scenario: 'crop_guide', station: s.id, crop, lang});"
+            "  if (m) out.push(['crop_guide', m.text]); } }"
             "process.stdout.write(JSON.stringify(out));"
         )
-        result = subprocess.run([node, "-e", script, str(WEB / "js" / "sms-message.js"), str(guide)],
+        result = subprocess.run([node, "-e", script, str(WEB / "js" / "sms-message.js"), str(stations), str(guide)],
                                 capture_output=True, text=True, encoding="utf-8", check=True)
         messages = json.loads(result.stdout)
-        self.assertGreater(len(messages), 0)
-        for text in messages:
+        self.assertTrue({"latest", "crop_guide"} <= {kind for kind, _ in messages})
+        for kind, text in messages:
             lower = text.lower()
-            for phrase in NEVER_SHOW + PAGE_ONLY:
-                self.assertNotIn(phrase, lower, f"crop guide SMS contains {phrase!r}: {text}")
-            for word in JARGON + ["AI"]:
-                self.assertIsNone(re.search(rf"\b{word}\b", text), f"crop guide SMS contains {word}: {text}")
-            self.assertIsNone(re.search(r"\{(RAIN|TEMP)\}|\bF0\d\b", text), text)
+            for phrase in NEVER_SHOW + PAGE_ONLY + ["test scenario", "scenario"]:
+                self.assertNotIn(phrase, lower, f"{kind} SMS contains {phrase!r}: {text}")
+            for word in JARGON + ["AI", "now", "live", "sasa"]:
+                self.assertIsNone(re.search(rf"\b{word}\b", text, 0 if word.isupper() else re.I),
+                                  f"{kind} SMS contains {word}: {text}")
+            self.assertIsNone(re.search(r"\{(RAIN|TEMP)\}|\bF0\d\b|°", text), text)
             self.assertIsNone(EIGHTEEN_DIGITS.search(text), text)
             self.assertLessEqual(len(text), 306)
+            if kind == "latest":  # the reading's date and time are always there
+                self.assertRegex(text, r"(Last reading|Kipimo cha mwisho) \w+ \d{1,2} \w+, \d{2}:\d{2}")
+
+    def test_sms_page_shows_no_now_live_or_test_scenario(self):
+        """Visible words only: i18n strings and page text (tags, attributes and scripts removed)."""
+        strings = json.loads((WEB / "i18n" / "en.json").read_text(encoding="utf-8"))
+        texts = list(string_values(strings))
+        for path in [WEB / "sms.html", SRC / "pages" / "sms.html"]:
+            html = re.sub(r"<script.*?</script>", " ", path.read_text(encoding="utf-8"), flags=re.S)
+            texts.append(re.sub(r"<[^>]+>", " ", html))
+        for text in texts:
+            self.assertIsNone(re.search(r"\b(now|live)\b", text, re.I), text[:120])
+            self.assertNotIn("scenario", text.lower(), text[:120])
+        sms_js = (WEB / "js" / "sms.js").read_text(encoding="utf-8")
+        self.assertNotIn("scenarios.json", sms_js)
+        self.assertNotIn("scenarios.json", (WEB / "sw.js").read_text(encoding="utf-8"))
 
 
 class RealDataTests(unittest.TestCase):

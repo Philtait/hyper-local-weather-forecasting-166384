@@ -68,14 +68,24 @@ node --env-file=.env scripts/serve_web.js      # then open http://127.0.0.1:8080
 
 `.env` must set `AT_USERNAME=sandbox` and `AT_API_KEY`; the server listens on 127.0.0.1 and prints neither.
 
-## SMS demo: crop guide
+## SMS demo
 
-Step 2 has a "Crop guide" group (English or Kiswahili, six crops) built from `data/crop_guide.json`
-(`scripts/build_crop_guide.py`). `js/sms-message.js` builds the message for both the page preview and
-`api/send-sms.js`: "Imarika <area>:" then sentences 1, 3 and 2, each only if the message stays within 306
-characters (two SMS), never cutting a sentence, plain GSM characters. The browser sends only
-`{scenario: "crop_guide", station, crop, lang, phone}`; the function checks them against `crop_guide.json`
-and builds the text itself.
+Every message is built from a station's own data; there are no example or test messages. Step 1 lists
+the stations by area; only stations sending data (`active` in `stations.json`) can be chosen, the others
+say "Not sending data". Step 2 offers, in English or Kiswahili:
+
+- Latest readings: "Imarika <area>, station <id>." and the last reading with its date and time in Kenya
+  time (EAT, 24-hour clock), temperature, humidity and rain since 08:00 when present, then one outlook
+  line from the first forecast day ("similar to recent days" when `forecast_variation_mm` is under 1). If
+  the message would pass 306 characters, the outlook is dropped, never the reading time.
+- Crop guide: from `data/crop_guide.json` (`scripts/build_crop_guide.py`): "Imarika <area>:" then
+  sentences 1, 3 and 2, each only if the message stays within 306 characters.
+- Weather alert: the engine's advice for the station (English wording), only when there is one.
+
+`js/sms-message.js` builds the text for both the page preview and `api/send-sms.js`, so they cannot differ:
+at most 306 characters (two SMS), whole sentences, plain GSM characters. The browser sends only
+`{scenario: "latest" | "crop_guide" | "alert", station, crop (crop guide only), lang, phone}`; the function
+checks these against `data/stations.json` and `data/crop_guide.json` and builds the text itself.
 
 ## Deploy (Vercel)
 
