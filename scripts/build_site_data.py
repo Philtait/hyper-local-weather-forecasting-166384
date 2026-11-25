@@ -33,7 +33,7 @@ import pandas as pd  # noqa: E402
 
 from app import (  # noqa: E402  (same precedence and wording as the Streamlit app)
     DEPLOY_FILES, LOCAL_TZ, RELIABILITY, STATUS, main_insight, prepare_forecast, prepare_latest,
-    prepare_status, short_ids, status_key, summary_sentence, what_to_do,
+    prepare_status, short_ids, status_key, what_to_do,
 )
 from geo import BOUNDARIES, load_boundaries, sub_county  # noqa: E402
 from insights import generate_insights, load_config, sms_action, sms_text  # noqa: E402
@@ -44,6 +44,20 @@ REQUIRED = ["forecast_daily.csv", "station_status.csv", "insights_latest.csv", "
 HISTORY_FILE = "history_daily.csv"
 HISTORY_COLUMNS = ["device_id", "date", "rain_mm", "temp_min", "temp_max", "humidity_mean", "readings_received"]
 HISTORY_DAYS = 14
+# history_daily.csv counts hours 0 to 17 of each observing day (08:00 to 01:59 EAT): 18 is a full day.
+HISTORY_HOURS = 18
+# A forecast whose daily rain barely changes over days 1 to 5 (forecast_variation_mm in insights_latest.csv)
+# is too flat to support planting or spraying advice; flood alerts still apply.
+FLAT_LIMIT_MM = 1.0
+FLAT_DAYS = 5
+ADVICE_TYPES = {"planting_window", "rain_delay"}
+FLAT_NOTE = ("The forecast shows no day-to-day change, so we are not giving planting or spraying advice.")
+RECENT_HOURS = 48  # station_status.csv: active means a valid reading within 48 h of the newest reading
+# latest_readings.csv columns shown on the site, with units documented in deploy_data/README.md.
+# Wind speed, gust and light level are left out: their units are not verified.
+LATEST_FIELDS = {"air_temperature": ("temperature_c", 1), "air_humidity": ("humidity_pct", 0),
+                 "rain_since_morning_mm": ("rain_since_morning_mm", 1), "uv_index": ("uv_index", 0),
+                 "barometric_pressure": ("pressure_hpa", 0)}
 STATUS_CODES = list(STATUS)  # precedence order, worst first
 ALERT_TITLES = {
     ("flood_alert", "warning"): "Very heavy rain",
@@ -269,12 +283,30 @@ def read_history(deploy_dir):
     return frame
 
 
-def read_coverage(deploy_dir):
-    """coverage_14d per device from station_status.csv, when the column exists."""
-    frame = read_csv(Path(deploy_dir) / "station_status.csv")
-    if "coverage_14d" not in frame.columns:
+def read_variation(deploy_dir):
+    """forecast_variation_mm per device from insights_latest.csv, when the column exists."""
+    frame = read_csv(Path(deploy_dir) / "insights_latest.csv")
+    if "forecast_variation_mm" not in frame.columns:
         return {}
-    return {row.device_id: int(row.coverage_14d) for row in frame.itertuples() if pd.notna(row.coverage_14d)}
+    values = pd.to_numeric(frame.forecast_variation_mm, errors="coerce")
+    return {device: float(value) for device, value in zip(frame.device_id, values) if pd.notna(value)}
+
+
+def variation_of(rows):
+    """Same definition as the export: max minus min of daily rain over forecast days 1 to 5."""
+    rain = pd.to_numeric(rows.sort_values("date").rain_mm.head(FLAT_DAYS), errors="coerce").dropna()
+    return round(float(rain.max() - rain.min()), 1) if len(rain) else None
+
+
+def read_extra(deploy_dir, name, columns):
+    """Extra columns from an export file, keyed by device; empty when the file or columns are absent."""
+    path = Path(deploy_dir) / name
+    if not path.is_file():
+        return {}
+    frame = read_csv(path)
+    wanted = [column for column in columns if column in frame.columns]
+    return {row["device_id"]: {column: row[column] for column in wanted}
+            for row in frame.drop_duplicates("device_id", keep="last").to_dict("records")}
 
 
 def history_rows(history, device_id, as_of):
@@ -297,7 +329,8 @@ def history_rows(history, device_id, as_of):
     return out
 
 
-def build_stations(forecast, status, latest, features, config, history=None, coverage=None, as_of=None):
+def build_stations(forecast, status, latest, features, config, history=None, variation=None, as_of=None,
+                   extra_latest=None, extra_status=None):
     ids = sorted(set(forecast.device_id) | set(status.device_id))
     endings = short_ids(ids)
     stations = []
@@ -311,6 +344,10 @@ def build_stations(forecast, status, latest, features, config, history=None, cov
             insights = generate_insights(rows, config) if len(rows) else []
         except ValueError:
             insights = []
+        spread = (variation or {}).get(device_id, variation_of(rows) if len(rows) else None)
+        flat = bool(active and len(rows) and spread is not None and spread < FLAT_LIMIT_MM)
+        if flat:  # no planting or rain-delay advice from a flat forecast; flood alerts still count
+            insights = [item for item in insights if item["type"] not in ADVICE_TYPES]
         code = status_key(insights, active)
         area = sub_county(features, lon, lat) if lat is not None and lon is not None else None
         label = f"Station {endings[device_id]}"
@@ -323,9 +360,13 @@ def build_stations(forecast, status, latest, features, config, history=None, cov
             match = latest.loc[latest.device_id.eq(device_id)]
             if len(match) and pd.notna(match.reading_time.iloc[0]):
                 row = match.iloc[0]
-                reading = {"time_utc": iso_utc(row.reading_time), "temperature_c": number(row.air_temperature),
-                           "humidity_pct": number(row.air_humidity, 0), "wind_ms": number(row.wind_speed),
-                           "rain_today_mm": number(row.rain_today_mm)}
+                values = dict((extra_latest or {}).get(device_id, {}))
+                values.update({"air_temperature": row.air_temperature, "air_humidity": row.air_humidity})
+                reading = {"time_utc": iso_utc(row.reading_time)}
+                for column, (key, digits) in LATEST_FIELDS.items():
+                    reading[key] = number(values.get(column), digits)
+                if reading["uv_index"] is not None and reading["uv_index"] < 0:
+                    reading["uv_index"] = None
         past = history_rows(history, device_id, as_of) if as_of else []
         stations.append({
             "id": endings[device_id],
@@ -335,20 +376,23 @@ def build_stations(forecast, status, latest, features, config, history=None, cov
             "lat": lat,
             "lon": lon,
             "active": active,
-            "reason": (str(known.reason.iloc[0]) if len(known) and pd.notna(known.reason.iloc[0]) else None),
             "last_reading_utc": iso_utc(known.last_seen.iloc[0]) if len(known) else None,
             "status": status_block(code),
             "what_to_do": what_to_do(code, insights, config),
             "latest": reading if active else None,
             "forecast": day_rows(rows, insights, config) if active else [],
+            "forecast_status": str((extra_status or {}).get(device_id, {}).get("forecast_status") or "")
+            or ("ok" if active and len(rows) else "not available"),
             "insights": [describe(item, days, name, config) for item in ordered] if active else [],
-            "planting": planting_card(insights, config) if active and len(rows) else None,
+            "flat": flat,
+            "forecast_variation_mm": number(spread) if active and len(rows) else None,
+            "advice_note": FLAT_NOTE if flat else None,
+            "planting": planting_card(insights, config) if active and len(rows) and not flat else None,
             "operations": operations(rows, insights, rows.date.min() - timedelta(days=1), config)
-            if active and len(rows) else [],
+            if active and len(rows) and not flat else [],
             "history": past,
-            # Days with data in the last 14: from the export when it has coverage_14d, else counted from history.
-            "coverage_14d": (coverage or {}).get(device_id,
-                                                 sum(day["readings_received"] > 0 for day in past) if past else None),
+            # Days in the last 14 with at least one reading, counted from history_daily.csv.
+            "days_with_data_14d": sum(day["readings_received"] > 0 for day in past) if past else None,
         })
     return stations
 
@@ -516,15 +560,19 @@ def synthetic_deploy(folder, features, today):
             forecast.append([device_id, (start + timedelta(days=offset)).isoformat(), round(value, 1),
                              round(value * 1.6, 1), low, round(low + rng.uniform(10, 13), 1), round(rng.uniform(2, 6), 1)])
         latest.append([device_id, seen.isoformat(), round(rng.uniform(19, 27), 1), round(rng.uniform(55, 90)),
-                       round(rng.uniform(0.5, 4), 1), round(rng.uniform(0, 3), 1), 0.3])
+                       round(rng.uniform(0.5, 4), 1), round(rng.uniform(0, 3), 1), 0.3,
+                       rng.randint(0, 9), round(rng.uniform(872, 878), 1), round(rng.uniform(0, 4), 1)])
     history = synthetic_history(status, today)
     tables = {"forecast_daily.csv": forecast, "station_status.csv": status, "latest_readings.csv": latest}
+    extra = {"latest_readings.csv": ["uv_index", "barometric_pressure", "rain_since_morning_mm"]}
     for name, rows in tables.items():
-        pd.DataFrame(rows, columns=DEPLOY_FILES[name]).to_csv(folder / name, index=False)
+        pd.DataFrame(rows, columns=DEPLOY_FILES[name] + extra.get(name, [])).to_csv(folder / name, index=False)
     pd.DataFrame(history, columns=HISTORY_COLUMNS).to_csv(folder / HISTORY_FILE, index=False)
     frame = pd.read_csv(folder / "forecast_daily.csv", dtype={"device_id": "string"})
-    pd.DataFrame(generate_insights(frame)).reindex(columns=DEPLOY_FILES["insights_latest.csv"]).to_csv(
-        folder / "insights_latest.csv", index=False)
+    found = pd.DataFrame(generate_insights(frame)).reindex(columns=DEPLOY_FILES["insights_latest.csv"])
+    spread = {device: variation_of(group) for device, group in frame.groupby("device_id")}
+    found["forecast_variation_mm"] = found.device_id.map(spread)
+    found.to_csv(folder / "insights_latest.csv", index=False)
     (folder / "README.md").write_text("SYNTHETIC PREVIEW DATA - NOT REAL FORECASTS\n", encoding="utf-8")
 
 
@@ -547,7 +595,10 @@ def build(deploy_dir, out_dir, reports_dir, synthetic=False):
     as_of = forecast.date.min() - timedelta(days=1)
 
     history = read_history(deploy_dir)
-    stations = build_stations(forecast, status, latest, features, config, history, read_coverage(deploy_dir), as_of)
+    extra_latest = read_extra(deploy_dir, "latest_readings.csv", list(LATEST_FIELDS))
+    extra_status = read_extra(deploy_dir, "station_status.csv", ["forecast_status"])
+    stations = build_stations(forecast, status, latest, features, config, history, read_variation(deploy_dir), as_of,
+                              extra_latest, extra_status)
     if history is None:
         print(f"Note: {HISTORY_FILE} is not in {deploy_dir}; the station charts will show the forecast only.")
     generated = sum(len(station["insights"]) for station in stations)
@@ -558,8 +609,10 @@ def build(deploy_dir, out_dir, reports_dir, synthetic=False):
 
     out_dir.mkdir(parents=True, exist_ok=True)
     alert_codes = {"warning", "watch", "planting", "delay"}
-    headline = summary_sentence(pd.DataFrame({"active": [station["active"] for station in stations],
-                                              "key": [station["status"]["code"] for station in stations]}))
+    recent = sum(station["active"] for station in stations)
+    seen = [station["last_reading_utc"] for station in stations if station["last_reading_utc"]]
+    # Plain counts from the data; the engine's week summary is not used because flat forecasts give no advice.
+    headline = f"{recent} of {len(stations)} stations sent data in the last 2 days."
     meta = {
         "synthetic": bool(synthetic),
         "as_of": as_of.isoformat(),
@@ -568,14 +621,18 @@ def build(deploy_dir, out_dir, reports_dir, synthetic=False):
         "timezone": LOCAL_TZ,
         "counts": {
             "stations_total": len(stations),
-            "stations_reporting": sum(station["active"] for station in stations),
+            "stations_reporting": recent,
+            "stations_with_forecast": sum(bool(station["forecast"]) for station in stations),
+            "stations_flat_forecast": sum(station["flat"] for station in stations),
             "stations_with_alerts": sum(station["status"]["code"] in alert_codes for station in stations),
             "stations_heavy_rain": sum(station["status"]["code"] in {"warning", "watch"} for station in stations),
             "alerts_total": generated,
         },
-        # The engine's one-line summary (same words as the Streamlit overview).
         "headline": headline,
-        "headline_week": headline.split(". ", 1)[-1],
+        "latest_reading_utc": max(seen) if seen else None,
+        "recent_hours": RECENT_HOURS,
+        "history_hours_per_day": HISTORY_HOURS,
+        "flat_note": FLAT_NOTE,
         "statuses": [dict(status_block(code), order=index) for index, code in enumerate(STATUS_CODES)],
         "thresholds": {"heavy_rain_mm": config["flood_alert"]["watch_mm"],
                        "very_heavy_rain_mm": config["flood_alert"]["warning_mm"],
