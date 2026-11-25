@@ -10,7 +10,7 @@
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="preload" href="fonts/lexend-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="img/about-field.webp" as="image" type="image/webp">
+<link rel="preload" href="img/about-field.webp" as="image" type="image/webp" fetchpriority="high">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body data-page="home">
@@ -32,21 +32,17 @@
 </header>
 <main id="main" tabindex="-1">
 <p class="offline-note wrap" id="offline-note" role="status" hidden></p>
-<section class="band page-top home-top" aria-labelledby="hero-title">
+<!-- Full-bleed hero: the maize field is a decorative CSS background (no alt, no text in the image). -->
+<section class="band page-top hero-banner hero-home" aria-labelledby="hero-title">
   <div class="wrap">
-    <div class="page-hero">
-      <div class="page-hero-text">
-        <h1 id="hero-title">Weather from stations near your farm.</h1>
-        <p class="lead">Readings and outlook for farmers in Busia County.</p>
-        <div class="actions">
-          <a class="btn btn-primary" href="map.html"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#pin"></use></svg><span>See the weather map</span></a>
-          <a class="btn btn-secondary" href="sms.html"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#message"></use></svg><span>Try the SMS demo</span></a>
-        </div>
-        <p class="summary-line" id="hero-week" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#station"></use></svg><span id="hero-week-text"></span></p>
+    <div class="hero-copy">
+      <h1 id="hero-title">Weather from stations near your farm.</h1>
+      <p class="lead">Readings and outlook for farmers in Busia County.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="map.html"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#pin"></use></svg><span>See the weather map</span></a>
+        <a class="btn btn-secondary" href="sms.html"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#message"></use></svg><span>Try the SMS demo</span></a>
       </div>
-      <div class="page-hero-media">
-        <img src="img/about-field.webp" width="1600" height="533" fetchpriority="high" alt="Illustration of a maize field after rain in western Kenya">
-      </div>
+      <p class="summary-line" id="hero-week" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#station"></use></svg><span id="hero-week-text"></span></p>
     </div>
   </div>
 </section>

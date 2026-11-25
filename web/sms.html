@@ -10,6 +10,7 @@
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="preload" href="fonts/lexend-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="img/farmer.webp" as="image" type="image/webp">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body data-page="sms">
@@ -31,17 +32,17 @@
 </header>
 <main id="main" tabindex="-1">
 <p class="offline-note wrap" id="offline-note" role="status" hidden></p>
-<section class="band page-top" aria-labelledby="page-title">
+<!-- Slim banner: the farmer with a phone is a decorative CSS background (no alt, no text in the image). -->
+<section class="band page-top hero-banner hero-sms" aria-labelledby="page-title">
   <div class="wrap">
-    <div class="page-hero">
-      <div class="page-hero-text">
-        <h1 id="page-title">See the SMS a farmer receives</h1>
-        <p class="lead">Pick a station and a message built from its own data, then send it to a test phone number.</p>
-      </div>
-      <div class="page-hero-media">
-        <img src="img/farmer.webp" width="960" height="720" fetchpriority="high" alt="Illustration of a farmer checking a message on a phone at the edge of a maize field">
-      </div>
+    <div class="hero-copy">
+      <h1 id="page-title">See the SMS a farmer receives</h1>
+      <p class="lead">Choose a station and a message, then send it to a test phone.</p>
     </div>
+  </div>
+</section>
+<section class="band band-tight sms-band">
+  <div class="wrap">
     <div class="sms-layout">
       <form class="sms-form" id="sms-form" novalidate>
         <fieldset>

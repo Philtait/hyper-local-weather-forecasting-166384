@@ -24,11 +24,11 @@ STRINGS = WEB / "i18n" / "en.json"
 # key, output file, title string, nav icon, extra head lines, scripts
 PAGES = [
     ("home", "index.html", "home.title", "home",
-     ['<link rel="preload" href="img/about-field.webp" as="image" type="image/webp">'], ["js/map-logic.js", "js/home.js"]),
+     ['<link rel="preload" href="img/about-field.webp" as="image" type="image/webp" fetchpriority="high">'], ["js/map-logic.js", "js/home.js"]),
     ("how", "how-it-works.html", "how.page_title", "info", [], []),
     ("map", "map.html", "map.page_title", "pin",
      ['<link rel="stylesheet" href="vendor/leaflet/leaflet.css">'], ["vendor/leaflet/leaflet.js", "js/units.js", "js/map-logic.js", "js/map.js"]),
-    ("sms", "sms.html", "sms.page_title", "message", [], ["js/units.js", "js/sms-message.js", "js/sms.js"]),
+    ("sms", "sms.html", "sms.page_title", "message", ['<link rel="preload" href="img/farmer.webp" as="image" type="image/webp">'], ["js/units.js", "js/sms-message.js", "js/sms.js"]),
     ("contact", "contact.html", "contact.page_title", "mail", [], ["js/contact.js"]),
 ]
 # Pages that are not in the main navigation: key, output file, title string, nav item kept highlighted, head, scripts

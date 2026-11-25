@@ -129,8 +129,6 @@ main:focus { outline: none; }
 .offline-note { margin: var(--space-2) auto 0; padding: 12px var(--space-3); color: var(--text-2); }
 
 /* ---------------------------------------------------------------- Home */
-.home-top { padding-bottom: var(--space-4); }
-.hero-who { color: var(--text-2); }
 .actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-3) 0; }
 .summary-line { display: flex; gap: var(--space-1); align-items: flex-start; font-size: var(--fs-small); color: var(--text-2);
   padding-top: var(--space-2); border-top: 1px solid var(--border); }
@@ -313,14 +311,33 @@ main:focus { outline: none; }
 .media-intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: var(--space-4); align-items: center; margin-bottom: var(--space-4); }
 .media-intro img { width: 100%; height: auto; border-radius: var(--radius-card); }
 
-/* Page hero shared by Home and the SMS demo: text left, the image right at the same height as the text,
-   one crop and a 16 px radius. On phones the image becomes a slim wide strip under the intro. */
-.page-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px); gap: var(--space-4); align-items: stretch;
-  margin-bottom: var(--space-4); }
-.page-hero-text { align-self: center; }
-.page-hero-text > :last-child { margin-bottom: 0; }
-.page-hero-media { position: relative; min-height: 180px; border-radius: var(--radius-card); overflow: hidden; background: var(--mint); }
-.page-hero-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
+/* Hero banners (Home and the SMS demo): a decorative photo as a CSS background, under a left-to-right
+   dark-green overlay that stays at 72% behind the text and fades to 35%, so white text keeps 4.5:1 or more
+   (checked on screenshots by tests/node/hero_contrast.test.js). Fixed padding, so nothing shifts on load. */
+.hero-banner { position: relative; isolation: isolate; overflow: hidden; color: var(--white); background-color: var(--forest);
+  background-repeat: no-repeat; background-size: cover; }
+.hero-banner h1, .hero-banner .lead { color: var(--white); }
+.hero-copy { max-width: 620px; }
+.hero-copy > :last-child { margin-bottom: 0; }
+.hero-banner .summary-line { color: var(--white); border-top-color: rgba(255, 255, 255, .45); }
+.hero-banner .summary-line .icon { color: #b8e6cb; }
+.hero-banner .btn-primary { background: var(--white); border-color: var(--white); color: var(--forest); }
+.hero-banner .btn-primary:hover { background: var(--mint); border-color: var(--mint); color: var(--forest); }
+.hero-banner .btn-secondary { background: transparent; border-color: var(--white); color: var(--white); }
+.hero-banner .btn-secondary:hover { background: rgba(255, 255, 255, .14); color: var(--white); }
+.hero-home { display: flex; align-items: center; min-height: 480px; padding: 64px 0 var(--space-4);
+  background-image: linear-gradient(90deg, rgba(15, 61, 46, .74) 0%, rgba(15, 61, 46, .74) 52%, rgba(15, 61, 46, .35) 100%),
+    url("../img/about-field.webp");
+  background-position: center, 72% 40%; }
+.hero-home .wrap { width: 100%; }
+/* The SMS banner flips the photo so the farmer stands on the right, clear of the title. */
+.hero-sms { display: flex; align-items: center; min-height: 200px; padding: var(--space-4) 0; }
+.hero-sms::before, .hero-sms::after { content: ""; position: absolute; inset: 0; z-index: -1; }
+.hero-sms::before { background: url("../img/farmer.webp") no-repeat; background-size: cover; background-position: 50% 32%; transform: scaleX(-1); }
+.hero-sms::after { background: linear-gradient(90deg, rgba(15, 61, 46, .74) 0%, rgba(15, 61, 46, .74) 52%, rgba(15, 61, 46, .35) 100%); }
+.hero-sms h1 { margin-bottom: var(--space-1); }
+.hero-sms .wrap { width: 100%; }
+.sms-band { padding-top: var(--space-4); }
 .status-table { width: 100%; border-collapse: collapse; background: var(--white); border: 1px solid var(--border); }
 .status-table th, .status-table td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 .status-table thead th { background: var(--mint); color: var(--forest); font-size: 16px; }
@@ -464,7 +481,6 @@ textarea.field { max-width: 640px; resize: vertical; }
 
 @media (max-width: 1000px) {
   .media-intro { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
-  .page-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 280px); gap: var(--space-3); }
   .sms-layout { grid-template-columns: minmax(0, 1fr); gap: 32px; }
   .phone-col { position: static; }
 }
@@ -475,8 +491,20 @@ textarea.field { max-width: 640px; resize: vertical; }
   .phone { max-width: none; }
 }
 @media (max-width: 760px) {
-  .page-hero { grid-template-columns: minmax(0, 1fr); gap: var(--space-2); margin-bottom: var(--space-3); }
-  .page-hero-media { min-height: 0; aspect-ratio: 16 / 5; }
+  /* Phones: text spans the full width, so the overlay stays strong all the way across. */
+  .hero-home { min-height: 0; padding: var(--space-4) 0;
+    background-image: linear-gradient(90deg, rgba(15, 61, 46, .76) 0%, rgba(15, 61, 46, .68) 100%), url("../img/about-field.webp");
+    background-position: center, 80% 40%; }
+  .hero-sms { min-height: 140px; padding: var(--space-3) 0; }
+  .hero-sms::before { background-position: 50% 29%; }
+  .hero-sms::after { background: linear-gradient(90deg, rgba(15, 61, 46, .78) 0%, rgba(15, 61, 46, .68) 100%); }
+  .hero-sms h1 { font-size: 26px; }
+  .hero-sms .lead { font-size: var(--fs-small); }
+  .sms-band { padding-top: var(--space-3); }
+  /* The phone preview comes first on phones, so it is on the first screen with step 1. */
+  .sms-layout .phone-col { order: -1; }
+  .phone-screen { min-height: 0; }
+  .phone { padding: 12px; }
   .helps, .steps { grid-template-columns: minmax(0, 1fr); gap: var(--space-2); }
   .helps li, .steps li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 0 var(--space-2); align-items: start; }
   .helps .icon-circle, .steps .icon-circle { grid-row: 1 / 3; }
