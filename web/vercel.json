@@ -20,6 +20,10 @@
       "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
     },
     {
+      "source": "/contact.json",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+    },
+    {
       "source": "/data/(.*)",
       "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
     }

@@ -32,10 +32,30 @@
 <main id="main" tabindex="-1">
 <p class="offline-note wrap" id="offline-note" role="status" hidden></p>
 <section class="band page-top" aria-labelledby="page-title">
-  <div class="wrap placeholder">
-    <span class="icon-circle"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#mail"></use></svg></span>
-    <h1 id="page-title">Contact</h1>
-    <p class="lead">This page will show how to reach the Imarika project with questions or feedback.</p>
+  <div class="wrap">
+    <h1 id="page-title">Contact us</h1>
+    <p class="lead">Questions, ideas or a forecast that did not match your weather? We would like to hear from you.</p>
+    <div class="contact-actions">
+      <a class="btn btn-solid" id="email-button" href="#" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#mail"></use></svg><span>Send an email</span></a>
+      <a class="btn btn-outline" id="report-button" href="#" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#warning"></use></svg><span>Report a wrong forecast</span></a>
+      <p class="muted" id="no-email" hidden>The contact email address has not been added yet.</p>
+    </div>
+    <ul class="contact-details" id="contact-details"></ul>
+  </div>
+</section>
+<section class="band band-alt" aria-labelledby="form-title">
+  <div class="wrap">
+    <h2 id="form-title">Write to us</h2>
+    <p>Fill in your name and message. Your email app opens with the text ready to send.</p>
+    <form class="contact-form" id="contact-form" novalidate>
+      <label class="field-label" for="c-name">Your name</label>
+      <input class="field" id="c-name" name="name" type="text" autocomplete="name">
+      <label class="field-label" for="c-message">Your message</label>
+      <textarea class="field" id="c-message" name="message" rows="6" aria-describedby="c-error"></textarea>
+      <p class="field-error" id="c-error" role="alert"></p>
+      <button class="btn btn-solid" type="submit" id="c-send"><svg class="icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#mail"></use></svg><span>Open my email app</span></button>
+    </form>
+    <p class="helper">We do not store the details you type here.</p>
   </div>
 </section>
 </main>
@@ -57,5 +77,6 @@
   </ul>
 </nav>
 <script src="js/common.js"></script>
+<script src="js/contact.js"></script>
 </body>
 </html>
