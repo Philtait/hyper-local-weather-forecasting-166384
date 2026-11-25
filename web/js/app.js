@@ -502,6 +502,7 @@
       $("#sms-phone").focus();
       return;
     }
+    $("#sms-phone-error").textContent = "";
     var msg = currentMessage();
     if (!msg || !msg.text) return;
     var button = $("#sms-send");
