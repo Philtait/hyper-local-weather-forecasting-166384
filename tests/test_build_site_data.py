@@ -154,6 +154,23 @@ class SyntheticBuildTests(unittest.TestCase):
             self.assertTrue(item["source"])
         self.assertTrue(all("#40" in item["source"] for item in quality["fixes"]))
 
+    def test_history_covers_14_days_with_unknown_days_never_zero(self):
+        stations = self.data["stations.json"]["stations"]
+        gaps = 0
+        for station in stations:
+            history = station["history"]
+            self.assertEqual(len(history), builder.HISTORY_DAYS, station["id"])
+            self.assertEqual(history[-1]["date"], self.data["meta.json"]["as_of"])
+            for day in history:
+                if day["readings_received"] == 0:
+                    gaps += 1
+                    self.assertIsNone(day["rain_mm"])
+                    self.assertIsNone(day["humidity_mean"])
+            self.assertEqual(station["coverage_14d"], sum(day["readings_received"] > 0 for day in history))
+            if not station["active"]:
+                self.assertEqual(station["forecast"], [])
+        self.assertGreater(gaps, 0, "synthetic history should include days without data")
+
     def test_no_raw_device_numbers_or_upper_estimate_in_the_data(self):
         for name, document in self.data.items():
             text = json.dumps(document)
@@ -182,8 +199,35 @@ class StatusPrecedenceTests(unittest.TestCase):
         self.assertEqual(got, {key[-3:]: expected for key, (_, _, expected) in cases.items()})
         self.assertIs(meta["synthetic"], False)
         spraying = {s["id"]: next(o for o in s["operations"] if o["key"] == "spraying")["state"] for s in stations if s["active"]}
+        # Without history_daily.csv the charts get no history and no coverage count.
+        self.assertTrue(all(s["history"] == [] and s["coverage_14d"] is None for s in stations))
         self.assertEqual(spraying["004"], "hold")
         self.assertEqual(spraying["005"], "go")
+
+
+class HistoryFileTests(unittest.TestCase):
+    """history_daily.csv and coverage_14d are read when the export has them."""
+
+    def test_history_rows_and_coverage_come_from_the_export(self):
+        device = "101990961244800083"
+        with tempfile.TemporaryDirectory() as deploy, tempfile.TemporaryDirectory() as out:
+            folder = Path(deploy)
+            write_deploy(folder, {device: (True, [0, 0, 0, 0, 0, 0, 0])})
+            status = pd.read_csv(folder / "station_status.csv", dtype={"device_id": "string"})
+            status["coverage_14d"] = 11
+            status.to_csv(folder / "station_status.csv", index=False)
+            rows = [[device, "2026-11-30", 4.2, 15.1, 27.3, 81, 24], [device, "2026-11-29", None, None, None, None, 0],
+                    [device, "2026-11-28", 0.0, 15.0, 26.0, 70, 12]]
+            pd.DataFrame(rows, columns=builder.HISTORY_COLUMNS).to_csv(folder / builder.HISTORY_FILE, index=False)
+            builder.build(deploy, out, ROOT / "reports")
+            station = json.loads((Path(out) / "stations.json").read_text(encoding="utf-8"))["stations"][0]
+        history = {day["date"]: day for day in station["history"]}
+        self.assertEqual(len(history), builder.HISTORY_DAYS)
+        self.assertEqual(history["2026-11-30"]["rain_mm"], 4.2)
+        self.assertIsNone(history["2026-11-29"]["rain_mm"])           # no readings: unknown, not zero
+        self.assertEqual(history["2026-11-28"]["rain_mm"], 0.0)       # a measured dry day stays zero
+        self.assertIsNone(history["2026-11-20"]["rain_mm"])           # absent from the file: unknown
+        self.assertEqual(station["coverage_14d"], 11)                 # the export's value wins
 
 
 class SyntheticGuardTests(unittest.TestCase):
@@ -215,7 +259,8 @@ class NeverShowTests(unittest.TestCase):
             data_dir = Path(cls.tmp.name)
         cls.data_dir = data_dir
         cls.pages = sorted(WEB.glob("*.html")) + sorted(WEB.glob("*.js")) + sorted((WEB / "js").glob("*.js")) \
-            + sorted((WEB / "api").glob("*.js")) + [WEB / "manifest.webmanifest"]
+            + sorted((WEB / "api").glob("*.js")) + sorted((WEB / "i18n").glob("*.json")) \
+            + sorted(SRC.rglob("*.html")) + [WEB / "manifest.webmanifest", WEB / "contact.json"]
 
     @classmethod
     def tearDownClass(cls):
@@ -275,6 +320,26 @@ class PagesTests(unittest.TestCase):
         for name in self.PAGES + ["img/icons.svg", "i18n/en.json", "img/about-field.webp"]:
             self.assertIn(f'"{name}"', worker, name)
         self.assertNotIn("tile.openstreetmap.org", worker)
+
+    def test_no_contact_details_are_invented(self):
+        email = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+")
+        for path in sorted(WEB.glob("*.html")) + sorted((WEB / "js").glob("*.js")) + [WEB / "i18n" / "en.json"]:
+            self.assertIsNone(email.search(path.read_text(encoding="utf-8")), path.name)
+        contact = json.loads((WEB / "contact.json").read_text(encoding="utf-8"))
+        for key in ["email", "phone", "organisation", "address"]:
+            self.assertIn(key, contact)
+
+    def test_new_pages_carry_their_required_lines(self):
+        sms = (WEB / "sms.html").read_text(encoding="utf-8")
+        self.assertIn("See the SMS a farmer receives", sms)
+        self.assertIn("Test mode: the message goes to a simulator, not a real phone.", sms)
+        how = (WEB / "how-it-works.html").read_text(encoding="utf-8")
+        for code in ["warning", "watch", "planting", "delay", "none", "offline"]:
+            self.assertIn(f"badge st-{code}", how)
+        self.assertIn("iLabAfrica Anga Weather Network", how)
+        contact = (WEB / "contact.html").read_text(encoding="utf-8")
+        self.assertIn("We do not store the details you type here.", contact)
+        self.assertNotIn("action=", contact)  # mailto only: the form never posts to a server
 
     def test_home_numbers_are_not_hard_coded(self):
         text = (WEB / "index.html").read_text(encoding="utf-8")

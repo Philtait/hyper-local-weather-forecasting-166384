@@ -26,9 +26,20 @@ python scripts/build_site_data.py --deploy-dir deploy_data --out web/data
 python scripts/build_site_data.py --synthetic --out web/data      # fake preview data
 ```
 
+If the export has `history_daily.csv` (device_id, date, rain_mm, temp_min, temp_max, humidity_mean,
+readings_received) and a `coverage_14d` column in `station_status.csv`, the station charts show the last
+14 days; a day without readings is shown as "No reading", never as zero. Without them the charts show
+the forecast only. Synthetic mode makes up history with gaps.
+
 `--reports-dir` (default `reports/`) is read for the accuracy and data-quality numbers. The
 synthetic flag lives only in `meta.json` and is never shown on a page. Do not commit `web/data` while it
 is synthetic; a test fails if a committed `meta.json` has `"synthetic": true`.
+
+## Contact details
+
+`contact.json` holds the email address, phone, organisation and address shown on the Contact page.
+They are empty until filled in; empty values are hidden, and the email buttons appear only once an
+email address is set. The contact form opens the visitor's email app (mailto); nothing is stored.
 
 ## Run locally
 
