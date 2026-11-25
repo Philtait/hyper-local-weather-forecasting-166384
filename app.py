@@ -1,10 +1,12 @@
 """Streamlit dashboard for the Imarika project.
 
 Run: streamlit run app.py
-Reads saved results in reports/, exported forecasts in deploy_data/ (the only
-forecast source in the deployed app) and, when present locally, data/. It runs
-no trained models. Maps use local Plotly coordinates rather than web tiles.
-Test SMS sending goes through sms_sender.py and needs a confirm click.
+Weather pages (Weather Map, What if?, About this forecast) read only the
+forecast export in deploy_data/ and assets/kenya_boundaries.geojson, in plain
+language. Technical pages read saved results in reports/ and, when present
+locally, data/. No trained model runs here. The Weather Map uses carto-positron
+tiles through plotly's scatter_map, with an offline mode that draws outlines
+only. Test SMS sending goes through sms_sender.py and needs a confirm click.
 """
 
 import json
@@ -17,8 +19,10 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from insights import generate_insights, sms_text
+from geo import BOUNDARIES, features_at, load_boundaries, polygons, sub_county
+from insights import generate_insights, load_config, sms_action, sms_text
 from sms_sender import send_with_fallback, validate_phone
+from ui_style import INK, NAVY, card, header, inject_style, text
 
 
 # =============================================================================
@@ -37,15 +41,30 @@ DEPLOY_FILES = {
     "forecast_daily.csv": ["device_id", "date", "rain_mm", "rain_upper", "temp_min", "temp_max", "wind_max"],
     "station_status.csv": ["device_id", "latitude", "longitude", "last_reading_utc", "active", "reason"],
     "insights_latest.csv": ["device_id", "type", "severity", "start_date", "message", "basis", "as_of", "caveat"],
+    "latest_readings.csv": ["device_id", "reading_utc", "air_temperature", "air_humidity", "wind_speed",
+                            "rain_today_mm", "age_hours"],
     "README.md": None,
 }
-NOT_GENERATED = "Forecasts have not been generated yet."
-FORECAST_CAVEATS = [
-    "Model orders are reused from one station and not tuned per station.",
-    "Rainfall forecasts are less reliable than temperature forecasts.",
-    "The rain upper envelope is not a statistical interval.",
+OPTIONAL_FILES = {"latest_readings.csv"}
+LOCAL_TZ = "Africa/Nairobi"
+BANNER = None  # set only by the local preview script
+BOUNDARY_CREDIT = "Boundaries: geoBoundaries (open licence)"
+# Plain-language status: label and colour, in precedence order (words always shown with colour).
+STATUS = {
+    "warning": ("Very heavy rain expected", "#C62828"),
+    "watch": ("Heavy rain expected", "#E65100"),
+    "planting": ("Good rain for planting", "#2E7D32"),
+    "delay": ("Rain coming: delay spraying", "#1565C0"),
+    "none": ("No alerts this week", "#5B7A99"),
+    "offline": ("Not reporting", "#9E9E9E"),
+}
+RELIABILITY = [
+    "Every station's forecast is made the same way; it is not adjusted for each station.",
+    "Rain is harder to predict than temperature.",
+    "Check local advice before big decisions.",
+    "The possible heavy-rain case is a cautious high estimate, not a certain outcome.",
 ]
-INSIGHT_LABELS = {"flood_alert": "Flood alert", "planting_window": "Planting window", "rain_delay": "Rain delay"}
+NOT_GENERATED = "Forecasts have not been generated yet."
 VARIABLES = {
     "air_temperature": ("Temperature", "°C", ["air_temperature", "iot_air_temperature"]),
     "air_humidity": ("Humidity", "%", ["air_humidity", "iot_air_humidity"]),
@@ -53,7 +72,9 @@ VARIABLES = {
     "wind_speed": ("Wind speed", "m/s", ["wind_speed", "iot_wind_speed"]),
     "rainfall_mm": ("Rainfall", "mm", ["rainfall_mm", "iot_rainfall_mm"]),
 }
-PAGES = ["Project Overview", "Data Collection", "Model Results", "Forecast and Advisories", "Network Status", "About"]
+WEATHER_PAGES = ["Weather Map", "What if? Try a rain forecast", "About this forecast"]
+TECH_PAGES = ["Project Overview", "Data Collection", "Model Results", "About the project"]
+PAGES = WEATHER_PAGES + TECH_PAGES
 
 # Collection snapshot from the supplied files. IoT count is BEFORE Busia/QC
 # filtering; the quality report instead counts 717,471 geographically valid rows.
@@ -240,12 +261,20 @@ def data_collection():
             marker={"color": GREEN, "size": 11, "line": {"color": "white", "width": 1.5}},
             hovertemplate="Station %{customdata}<br>Latitude %{y:.5f}<br>Longitude %{x:.5f}<extra></extra>",
         ))
+        features = load_boundaries(BOUNDARIES)
+        for level, names, width in [("county", {"Busia"}, 2.5), ("sub-county", None, 1)]:
+            lons, lats = outline(features, level, names)
+            if lons:
+                figure.add_trace(go.Scatter(x=lons, y=lats, mode="lines", hoverinfo="skip", showlegend=False,
+                                            line={"color": "#7A8CA5", "width": width}))
         figure.update_xaxes(title="Longitude (°E)", range=[34.1, 34.6])
         figure.update_yaxes(title="Latitude (°N)", range=[0.1, 0.7], scaleanchor="x", scaleratio=1)
         map_column, detail_column = st.columns([3, 2])
         with map_column:
             st.plotly_chart(style_figure(figure, 420), width="stretch", config={"displayModeBar": False})
-            st.caption("Offline coordinate map within the study bounding box. No web tiles or inferred county boundary.")
+            st.caption("Offline coordinate map within the study bounding box, with Busia County and "
+                       "sub-county outlines. No web tiles.")
+            st.caption(BOUNDARY_CREDIT)
         with detail_column:
             st.metric("Mapped Busia stations", len(stations))
             st.dataframe(stations.rename(columns={"device_id": "Station", "lat": "Latitude", "lon": "Longitude"}),
@@ -353,15 +382,16 @@ def model_results():
 
 
 # =============================================================================
-# Forecast export (deploy_data/): readers and labels
+# Forecast export (deploy_data/): readers
 # =============================================================================
 def deploy_missing():
-    return [name for name in DEPLOY_FILES if not (DEPLOY / name).is_file()]
+    """Required export files that are absent (latest_readings.csv is optional)."""
+    return [name for name in DEPLOY_FILES if name not in OPTIONAL_FILES and not (DEPLOY / name).is_file()]
 
 
 def deploy_notice(missing):
-    st.info(f"{NOT_GENERATED} The forecast export writes these files to deploy_data/; "
-            f"missing: {', '.join(missing)}.")
+    st.info(f"{NOT_GENERATED} Please check back after the next forecast update "
+            f"(missing: {', '.join(missing)}).")
 
 
 def load_deploy_csv(name, allow_empty=False):
@@ -372,14 +402,14 @@ def load_deploy_csv(name, allow_empty=False):
     try:
         frame = read_csv_cached(str(path), file_signature(path)).copy()
     except (OSError, ValueError, pd.errors.ParserError) as error:
-        st.warning(f"Cannot read deploy_data/{name}: {error}")
+        st.warning(f"Cannot read {name}: {error}")
         return None
     absent = set(DEPLOY_FILES[name]) - set(frame.columns)
     if absent:
-        st.warning(f"deploy_data/{name} is missing columns: {', '.join(sorted(absent))}")
+        st.warning(f"{name} is missing columns: {', '.join(sorted(absent))}")
         return None
     if frame.empty and not allow_empty:
-        st.warning(f"deploy_data/{name} contains no rows.")
+        st.warning(f"{name} contains no rows.")
         return None
     frame["device_id"] = clean_ids(frame.device_id)
     return frame.loc[frame.device_id.notna() & frame.device_id.ne("")]
@@ -399,72 +429,301 @@ def prepare_status(frame):
         frame[column] = pd.to_numeric(frame[column], errors="coerce")
     frame["last_seen"] = pd.to_datetime(frame.last_reading_utc, utc=True, errors="coerce", format="mixed")
     frame["is_active"] = frame.active.astype("string").str.strip().str.lower().isin(["true", "1", "yes", "active"])
-    frame["reason"] = frame.reason.fillna("").astype(str)
-    return frame.sort_values("device_id")
+    return frame.drop_duplicates("device_id").sort_values("device_id")
 
 
-def station_area(device_id, status):
-    """Area name if the export provides an optional 'area' column, else None."""
-    if status is None or "area" not in status:
+def prepare_latest(frame):
+    frame = frame.copy()
+    frame["reading_time"] = pd.to_datetime(frame.reading_utc, utc=True, errors="coerce", format="mixed")
+    for column in ["air_temperature", "air_humidity", "wind_speed", "rain_today_mm", "age_hours"]:
+        frame[column] = pd.to_numeric(frame[column], errors="coerce").replace([np.inf, -np.inf], np.nan)
+    return frame.drop_duplicates("device_id", keep="last")
+
+
+# =============================================================================
+# Plain-language station status, names and summary
+# =============================================================================
+def status_key(insights, active):
+    """Precedence: not reporting, flood warning, flood watch, planting, rain delay, none."""
+    if not active:
+        return "offline"
+    kinds = {(item["type"], item["severity"]) for item in insights}
+    types = {item["type"] for item in insights}
+    if ("flood_alert", "warning") in kinds:
+        return "warning"
+    if ("flood_alert", "watch") in kinds:
+        return "watch"
+    if "planting_window" in types:
+        return "planting"
+    if "rain_delay" in types:
+        return "delay"
+    return "none"
+
+
+def main_insight(insights, key):
+    """The insight that decided the status (first by date), or None."""
+    wanted = {"warning": ("flood_alert", "warning"), "watch": ("flood_alert", "watch"),
+              "planting": ("planting_window", None), "delay": ("rain_delay", None)}.get(key)
+    if wanted is None:
         return None
-    match = status.loc[status.device_id.eq(device_id), "area"].dropna().astype(str).str.strip()
-    return match.iloc[0] if len(match) and match.iloc[0] else None
+    return next((item for item in insights if item["type"] == wanted[0]
+                 and (wanted[1] is None or item["severity"] == wanted[1])), None)
 
 
-def station_label(device_id, status):
-    label = f"Station {device_id}"
-    area = station_area(device_id, status)
-    if area:
-        return f"{area} · {label}"
-    if status is not None:
-        row = status.loc[status.device_id.eq(device_id)]
-        if len(row) and row.latitude.notna().iloc[0] and row.longitude.notna().iloc[0]:
-            return f"{label} ({row.latitude.iloc[0]:.3f}°N, {row.longitude.iloc[0]:.3f}°E)"
-    return label
+def short_ids(device_ids):
+    """Shortest unique ending (at least 3 digits) for each station number."""
+    ids = sorted(set(device_ids))
+    for size in range(3, max([len(value) for value in ids] + [3]) + 1):
+        endings = [value[-size:] for value in ids]
+        if len(set(endings)) == len(endings):
+            return dict(zip(ids, endings))
+    return {value: value for value in ids}
 
 
-def forecast_figures(rows):
-    days = [str(day) for day in rows.date]
-    rain = go.Figure()
-    rain.add_trace(go.Bar(x=days, y=rows.rain_mm, name="Rain forecast", marker_color=GREEN))
-    rain.add_trace(go.Scatter(x=days, y=rows.rain_upper, name="Upper envelope (not a statistical interval)",
-                              mode="lines+markers", line={"color": "#D9822B", "dash": "dash"}))
-    rain.update_yaxes(title="Rain (mm/day)", rangemode="tozero")
-    temperature = go.Figure()
-    temperature.add_trace(go.Scatter(x=days, y=rows.temp_max, name="Maximum", mode="lines+markers",
-                                     line={"color": RED}))
-    temperature.add_trace(go.Scatter(x=days, y=rows.temp_min, name="Minimum", mode="lines+markers",
-                                     line={"color": "#1565C0"}))
-    temperature.update_yaxes(title="Temperature (°C)")
-    wind = go.Figure(go.Scatter(x=days, y=rows.wind_max, name="Maximum wind", mode="lines+markers",
-                                line={"color": "#526159"}))
-    wind.update_yaxes(title="Wind (m/s)", rangemode="tozero")
-    return [style_figure(figure, 320) for figure in (rain, temperature, wind)]
+def station_names(device_ids, status, features):
+    """Plain names such as 'Station 083, Nambale' (no sub-county if outside all)."""
+    endings = short_ids(device_ids)
+    names = {}
+    for device_id in device_ids:
+        name = f"Station {endings[device_id]}"
+        if status is not None:
+            row = status.loc[status.device_id.eq(device_id)]
+            if len(row):
+                area = sub_county(features, row.longitude.iloc[0], row.latitude.iloc[0])
+                if area:
+                    name = f"{name}, {area}"
+        names[device_id] = name
+    return names
 
 
-def render_insight(item):
-    with st.container(border=True):
-        st.markdown(f"**{INSIGHT_LABELS.get(item['type'], item['type'])} · {item['severity']}** "
-                    f"· from {item['start_date']}")
-        st.write(item["message"])
-        st.caption(f"Basis: {item['basis']}")
-        st.caption(f"Caveat: {item['caveat']}")
+def build_network(forecast, status, features):
+    """One row per station with its name, activity, insights and status."""
+    ids = sorted(set(forecast.device_id if forecast is not None else [])
+                 | set(status.device_id if status is not None else []))
+    names = station_names(ids, status, features)
+    rows = []
+    for device_id in ids:
+        known = status.loc[status.device_id.eq(device_id)] if status is not None else pd.DataFrame()
+        active = bool(known.is_active.iloc[0]) if len(known) else forecast is not None
+        days = forecast.loc[forecast.device_id.eq(device_id)] if forecast is not None else pd.DataFrame()
+        try:
+            insights = generate_insights(days) if len(days) else []
+        except ValueError:
+            insights = []
+        key = status_key(insights, active)
+        rows.append({
+            "device_id": device_id, "name": names[device_id], "active": active, "key": key,
+            "label": STATUS[key][0], "colour": STATUS[key][1], "insights": insights,
+            "latitude": known.latitude.iloc[0] if len(known) else np.nan,
+            "longitude": known.longitude.iloc[0] if len(known) else np.nan,
+            "last_seen": known.last_seen.iloc[0] if len(known) else pd.NaT,
+        })
+    return pd.DataFrame(rows, columns=["device_id", "name", "active", "key", "label", "colour", "insights",
+                                       "latitude", "longitude", "last_seen"])
 
 
-def insight_name(item):
-    return f"{INSIGHT_LABELS.get(item['type'], item['type'])} ({item['severity']}) from {item['start_date']}"
+def plural(count, word):
+    return f"{count} {word}" + ("" if count == 1 else "s")
+
+
+def summary_sentence(network):
+    total, reporting = len(network), int(network.active.sum())
+    heavy = int(network.key.isin(["warning", "watch"]).sum())
+    rain = (f"{plural(heavy, 'station')} {'expects' if heavy == 1 else 'expect'} heavy rain this week."
+            if heavy else "No station expects heavy rain this week.")
+    return f"Busia County: {reporting} of {plural(total, 'station')} are reporting. {rain}"
+
+
+def local_time(value, pattern="%d %b %Y, %H:%M"):
+    if value is None or pd.isna(value):
+        return None
+    return pd.Timestamp(value).tz_convert(LOCAL_TZ).strftime(pattern) + " (Kenya time)"
+
+
+# =============================================================================
+# Maps: boundary outlines, station markers, Kenya locator
+# =============================================================================
+def outline(features, level, names=None):
+    """Longitude and latitude lists for the outer rings, separated by None."""
+    lons, lats = [], []
+    for feature in features_at(features, level):
+        if names is not None and feature["properties"].get("name") not in names:
+            continue
+        for rings in polygons(feature["geometry"]):
+            lons += [point[0] for point in rings[0]] + [None]
+            lats += [point[1] for point in rings[0]] + [None]
+    return lons, lats
+
+
+def map_view(features, network):
+    """Centre and bounds of Busia County (or of the stations, or a default)."""
+    lons, lats = outline(features, "county", {"Busia"})
+    lons, lats = [value for value in lons if value is not None], [value for value in lats if value is not None]
+    if not lons and len(network.dropna(subset=["latitude", "longitude"])):
+        lons, lats = list(network.longitude.dropna()), list(network.latitude.dropna())
+    if not lons:
+        return (34.25, 0.45), (34.0, 34.5), (0.1, 0.8)
+    return ((min(lons) + max(lons)) / 2, (min(lats) + max(lats)) / 2), (min(lons), max(lons)), (min(lats), max(lats))
+
+
+def map_figure(network, features, offline):
+    """Station map. Online: carto-positron tiles via scatter_map. Offline: outlines only."""
+    line_trace = go.Scatter if offline else go.Scattermap
+    point_trace = go.Scatter if offline else go.Scattermap
+    figure = go.Figure()
+    areas = {name.split(", ", 1)[1] for name in network.name if ", " in name} or {"Nambale", "Butula"}
+    for level, names, colour, width in [("country", None, "#5B6B80", 1.5), ("county", {"Busia"}, NAVY, 3),
+                                        ("sub-county", areas, "#7A8CA5", 1.5)]:
+        lons, lats = outline(features, level, names)
+        if lons:
+            figure.add_trace(line_trace(x=lons, y=lats, mode="lines", line={"color": colour, "width": width},
+                                        hoverinfo="skip", showlegend=False) if offline else
+                             line_trace(lon=lons, lat=lats, mode="lines", line={"color": colour, "width": width},
+                                        hoverinfo="skip", showlegend=False))
+    placed = network.dropna(subset=["latitude", "longitude"])
+    for key, (label, colour) in STATUS.items():
+        group = placed.loc[placed.key.eq(key)]
+        if group.empty:
+            continue
+        hover = [f"{row.name}<br>{label}<br>Last reading: {local_time(row.last_seen) or 'not available'}"
+                 for row in group.itertuples()]
+        marker = {"color": colour, "size": 20}
+        if offline:
+            marker["line"] = {"color": "white", "width": 2}
+            trace = point_trace(x=group.longitude, y=group.latitude, mode="markers", name=label, marker=marker,
+                                customdata=group.device_id, text=hover, hovertemplate="%{text}<extra></extra>")
+        else:
+            trace = point_trace(lon=group.longitude, lat=group.latitude, mode="markers", name=label,
+                                marker=marker, customdata=group.device_id, text=hover,
+                                hovertemplate="%{text}<extra></extra>")
+        figure.add_trace(trace)
+    centre_point, lon_range, lat_range = map_view(features, network)
+    layout = {"height": 520, "margin": {"l": 0, "r": 0, "t": 10, "b": 0}, "paper_bgcolor": "white",
+              "legend": {"orientation": "h", "y": -0.02, "yanchor": "top", "x": 0, "font": {"size": 15}},
+              "font": {"size": 15, "color": INK}}
+    if offline:
+        pad = 0.05
+        figure.update_xaxes(range=[lon_range[0] - pad, lon_range[1] + pad], visible=False)
+        figure.update_yaxes(range=[lat_range[0] - pad, lat_range[1] + pad], visible=False, scaleanchor="x")
+        layout["plot_bgcolor"] = "#F7F9FC"
+    else:
+        layout["map"] = {"style": "carto-positron", "zoom": 9.2,
+                         "center": {"lon": centre_point[0], "lat": centre_point[1]}}
+    figure.update_layout(**layout)
+    return figure
+
+
+def locator_figure(features):
+    """Small Kenya outline with Busia County filled, drawn without tiles."""
+    kenya_lon, kenya_lat = outline(features, "country")
+    busia_lon, busia_lat = outline(features, "county", {"Busia"})
+    if not kenya_lon:
+        return None
+    figure = go.Figure([
+        go.Scatter(x=kenya_lon, y=kenya_lat, mode="lines", line={"color": "#5B6B80", "width": 1.2},
+                   hoverinfo="skip", showlegend=False),
+        go.Scatter(x=busia_lon, y=busia_lat, mode="lines", fill="toself", fillcolor="#E65100",
+                   line={"color": "#E65100", "width": 1}, hoverinfo="skip", showlegend=False),
+    ])
+    figure.update_xaxes(visible=False)
+    figure.update_yaxes(visible=False, scaleanchor="x")
+    figure.update_layout(height=220, margin={"l": 0, "r": 0, "t": 0, "b": 0},
+                         paper_bgcolor="white", plot_bgcolor="white")
+    return figure
+
+
+def boundary_credit():
+    st.markdown(f'<div class="im-credit">{BOUNDARY_CREDIT}</div>', unsafe_allow_html=True)
+
+
+# =============================================================================
+# Station card
+# =============================================================================
+def what_to_do(key, insights, config):
+    item = main_insight(insights, key)
+    if item is not None:
+        return sms_action(item, config)
+    if key == "offline":
+        return "This station is not reporting, so there is no forecast for it. Check a nearby station."
+    return "No rain alerts for this station this week."
+
+
+def day_tiles(rows, insights, config):
+    flood = config["flood_alert"]
+    delay_days = {item["start_date"] for item in insights if item["type"] == "rain_delay"}
+    lookahead = rows.date.min() + timedelta(days=config["rain_delay"]["lookahead_days"] - 1) if len(rows) else None
+    tiles = []
+    for row in rows.itertuples():
+        rain, colour = row.rain_mm, None
+        if pd.notna(rain) and rain >= flood["warning_mm"]:
+            colour = STATUS["warning"][1]
+        elif pd.notna(rain) and rain >= flood["watch_mm"]:
+            colour = STATUS["watch"][1]
+        elif (delay_days and pd.notna(rain) and rain >= config["rain_delay"]["rain_day_mm"]
+              and row.date <= lookahead):
+            colour = STATUS["delay"][1]
+        rain_text = f"Rain: {rain:.0f} mm" if pd.notna(rain) else "Rain: no data"
+        temp_text = (f"{row.temp_min:.0f}–{row.temp_max:.0f}°C"
+                     if pd.notna(row.temp_min) and pd.notna(row.temp_max) else "Temp: no data")
+        style = f' style="border-color:{colour};background:{colour}14"' if colour else ""
+        tiles.append(f'<div class="im-day{" alert" if colour else ""}"{style}><b>{row.date:%a}</b>'
+                     f'<span>{row.date:%d %b}</span><span>{rain_text}</span><span>{temp_text}</span></div>')
+    return '<div class="im-days">' + "".join(tiles) + "</div>"
+
+
+def right_now(station, latest):
+    if not station.active:
+        seen = station.last_seen
+        when = f"on {pd.Timestamp(seen).tz_convert(LOCAL_TZ):%d %B %Y}" if pd.notna(seen) else ""
+        return f'<p class="im-big">This station stopped reporting {when}.</p>'.replace(" .", ".")
+    row = latest.loc[latest.device_id.eq(station.device_id)] if latest is not None else pd.DataFrame()
+    if row.empty or pd.isna(row.reading_time.iloc[0]):
+        return '<p class="im-big">No recent sensor reading is available.</p>'
+    row = row.iloc[0]
+    value = lambda number, unit: f"{number:.0f}{unit}" if pd.notna(number) else "no data"
+    cells = [("Temperature", value(row.air_temperature, "°C")), ("Humidity", value(row.air_humidity, "%")),
+             ("Wind", f"{row.wind_speed:.1f} m/s" if pd.notna(row.wind_speed) else "no data"),
+             ("Rain so far today", f"{row.rain_today_mm:.1f} mm" if pd.notna(row.rain_today_mm) else "no data")]
+    tiles = "".join(f"<div>{name}<b>{text(reading)}</b></div>" for name, reading in cells)
+    return f'<div class="im-now">{tiles}</div><p>Reading from {text(local_time(row.reading_time))}</p>'
+
+
+def planting_figure(rows, insights, config):
+    rule = config["planting_window"]
+    item = next((entry for entry in insights if entry["type"] == "planting_window"), None)
+    start = pd.Timestamp(item["start_date"]).date() if item else rows.date.min()
+    window = rows.loc[rows.date >= start].head(rule["window_days"])
+    days = [f"{day:%a %d}" for day in window.date]
+    total = window.rain_mm.fillna(0).cumsum()
+    figure = go.Figure([
+        go.Bar(x=days, y=window.rain_mm, name="Rain each day (mm)", marker_color=NAVY,
+               text=[f"{value:.0f} mm" if pd.notna(value) else "" for value in window.rain_mm],
+               textposition="outside"),
+        go.Scatter(x=days, y=total, name="Rain added up (mm)", mode="lines+markers",
+                   line={"color": "#2E7D32", "width": 3}),
+    ])
+    figure.add_trace(go.Scatter(x=days, y=[rule["min_total_mm"]] * len(days), mode="lines",
+                                name=f"{rule['min_total_mm']:g} mm needed over {rule['window_days']} days",
+                                line={"color": "#C62828", "dash": "dash", "width": 2}))
+    figure.update_yaxes(title="Rain (mm)", rangemode="tozero")
+    figure.update_layout(height=300, margin={"l": 10, "r": 10, "t": 30, "b": 10}, paper_bgcolor="white",
+                         plot_bgcolor="white", legend={"orientation": "h", "y": 1.15, "x": 0},
+                         font={"size": 15, "color": INK})
+    return figure
 
 
 def sms_control(insights, area):
-    st.header("Send test SMS")
+    """Preview card and the confirm-before-send control for one station."""
     if not insights:
-        st.caption("There is no advisory to send for this station.")
+        st.write("There is no alert to send for this station this week.")
         return
-    choice = st.selectbox("Advisory", list(range(len(insights))), key="sms_advisory",
-                          format_func=lambda index: insight_name(insights[index]))
-    text = sms_text(insights[choice], area=area)
-    st.text_area("Message preview", text, disabled=True, key="sms_preview")
-    st.caption(f"{len(text)} characters (single SMS).")
+    choice = 0
+    if len(insights) > 1:
+        choice = st.selectbox("Which alert?", list(range(len(insights))), key="sms_advisory",
+                              format_func=lambda index: sms_action(insights[index], load_config()))
+    message = sms_text(insights[choice], area=area)
+    st.markdown(f'<div class="im-sms" id="sms-preview">{text(message)}</div>', unsafe_allow_html=True)
+    st.caption(f"{len(message)}/160 characters. Preview. Sandbox only.")
     phone = st.text_input("Phone number (+254 format)", key="sms_phone", placeholder="+254712345678")
     if st.button("Confirm and send", key="sms_confirm"):
         try:
@@ -472,7 +731,7 @@ def sms_control(insights, area):
         except ValueError as error:
             st.error(str(error))
             return
-        result = send_with_fallback(number, text)
+        result = send_with_fallback(number, message)
         if result.sent:
             st.success(result.detail)
         else:
@@ -481,137 +740,137 @@ def sms_control(insights, area):
     st.caption("Nothing is sent until Confirm and send is pressed.")
 
 
+def station_card(station, forecast, latest, config):
+    label, colour = STATUS[station.key]
+    card(f'<div class="im-label">Station status</div>'
+         f'<div class="im-headline" style="color:{colour}">{text(label)}</div>'
+         f'<div class="im-station">{text(station["name"])}</div>', colour)
+    card(f'<div class="im-label">What to do</div>'
+         f'<div class="im-big">{text(what_to_do(station.key, station.insights, config))}</div>', colour)
+    rows = forecast.loc[forecast.device_id.eq(station.device_id)] if forecast is not None else pd.DataFrame()
+    if station.active and len(rows):
+        st.markdown('<div class="im-label">This week</div>', unsafe_allow_html=True)
+        st.markdown(day_tiles(rows, station.insights, config), unsafe_allow_html=True)
+    card(f'<div class="im-label">Right now</div>{right_now(station, latest)}')
+    if station.active and len(rows):
+        planting = next((item for item in station.insights if item["type"] == "planting_window"), None)
+        rule = config["planting_window"]
+        message = planting["message"] if planting else (
+            f"No good planting rain in the next {config['forecast']['horizon_days']} days: the rain does not "
+            f"reach {rule['min_total_mm']:g} mm over {rule['window_days']} days with at least "
+            f"{rule['min_rain_days']} rainy days.")
+        card(f'<div class="im-label">Planting</div><div class="im-big">{text(message)}</div>',
+             STATUS["planting"][1] if planting else None)
+        st.plotly_chart(planting_figure(rows, station.insights, config), width="stretch",
+                        config={"displayModeBar": False}, key="planting_chart")
+    with st.expander("How reliable is this?"):
+        for line in RELIABILITY:
+            st.markdown(f"- {line}")
+    with st.expander("Text message preview"):
+        main = main_insight(station.insights, station.key)
+        ordered = ([main] if main else []) + [item for item in station.insights if item is not main]
+        sms_control(ordered if station.active else [], station["name"])
+
+
 # =============================================================================
-# Page 4. Forecast and advisories (with scenario mode)
+# Weather pages: Weather Map (landing), What if?, About this forecast
 # =============================================================================
-def scenario_mode():
-    st.subheader("Scenario, not a forecast")
-    st.warning("Scenario, not a forecast: enter seven daily rainfall amounts to see which advisories "
-               "the rules would issue. Nothing here comes from a model, and no SMS is sent.")
-    columns = st.columns(7)
+def issued_line(forecast):
+    if forecast is None or forecast.empty:
+        return NOT_GENERATED
+    return f"Imarika forecast, issued {forecast.date.min() - timedelta(days=1):%d %B %Y}"
+
+
+def weather_map():
+    missing = deploy_missing()
+    forecast = load_deploy_csv("forecast_daily.csv")
+    forecast = prepare_forecast(forecast) if forecast is not None else None
+    header("Busia County weather", issued_line(forecast))
+    if missing:
+        deploy_notice(missing)
+    status = load_deploy_csv("station_status.csv")
+    status = prepare_status(status) if status is not None else None
+    latest = load_deploy_csv("latest_readings.csv", allow_empty=True)
+    latest = prepare_latest(latest) if latest is not None else None
+    features = load_boundaries(BOUNDARIES)
+    if forecast is None and status is None:
+        return
+    network = build_network(forecast, status, features)
+    if network.empty:
+        st.warning("The forecast files list no stations.")
+        return
+    st.markdown(f'<div class="im-summary">{text(summary_sentence(network))}</div>', unsafe_allow_html=True)
+    config = load_config()
+    left, right = st.columns([3, 2])
+    with left:
+        offline = st.toggle("Offline map", key="offline_map",
+                            help="Draws only the outlines and stations, with no map background.")
+        event = st.plotly_chart(map_figure(network, features, offline), width="stretch", key="station_map",
+                                on_select="rerun", selection_mode="points", config={"displayModeBar": False})
+        if not features:
+            st.caption("Boundary outlines are not available, so only the stations are shown.")
+        boundary_credit()
+        picked = [point.get("customdata") for point in (getattr(getattr(event, "selection", None), "points", None) or [])
+                  if point.get("customdata") in set(network.device_id)]
+        if picked and picked[0] != st.session_state.get("last_map_pick"):
+            st.session_state["last_map_pick"] = picked[0]
+            st.session_state["station_choice"] = picked[0]
+        locator = locator_figure(features)
+        if locator is not None:
+            st.markdown('<div class="im-label">Where Busia is in Kenya</div>', unsafe_allow_html=True)
+            st.plotly_chart(locator, width="stretch", config={"displayModeBar": False}, key="locator_map")
+    with right:
+        order = network.sort_values("name").device_id.tolist()
+        names = dict(zip(network.device_id, network.name))
+        choice = st.selectbox("Choose a station", order, key="station_choice", format_func=names.get)
+        station_card(network.loc[network.device_id.eq(choice)].iloc[0], forecast, latest, config)
+
+
+def what_if():
+    header("What if? Try a rain forecast", "Scenario, not a forecast")
+    st.warning("Scenario, not a forecast. Type how much rain might fall on each of the next seven days "
+               "to see what advice Imarika would give. No text message is sent from this page.")
     start = date.today() + timedelta(days=1)
     dates = [start + timedelta(days=offset) for offset in range(7)]
-    values = [column.number_input(f"Day {index + 1} ({day:%d %b}) mm", min_value=0.0, max_value=1000.0,
-                                  value=0.0, step=1.0, key=f"scenario_rain_{index}")
+    columns = st.columns(7)
+    values = [column.number_input(f"{day:%a %d %b} (mm)", min_value=0.0, max_value=1000.0, value=0.0,
+                                  step=1.0, key=f"scenario_rain_{index}")
               for index, (column, day) in enumerate(zip(columns, dates))]
     frame = pd.DataFrame({"device_id": "Scenario", "date": dates, "rain_mm": values, "rain_upper": values,
                           "temp_min": np.nan, "temp_max": np.nan, "wind_max": np.nan})
-    insights = generate_insights(frame)
-    st.header("Scenario advisories")
+    config = load_config()
+    insights = generate_insights(frame, config)
+    key = status_key(insights, True)
+    label, colour = STATUS[key]
+    card(f'<div class="im-label">Scenario result</div>'
+         f'<div class="im-headline" style="color:{colour}">{text(label)}</div>'
+         f'<div class="im-big">{text(what_to_do(key, insights, config))}</div>', colour)
     if not insights:
-        st.success("Scenario: no advisory would be issued for these rainfall values.")
+        st.success("Scenario: no alert would be given for this rain.")
     for item in insights:
-        render_insight(item)
-        st.text_area(f"Scenario SMS preview: {insight_name(item)}", sms_text(item, area="Scenario"),
-                     disabled=True, key=f"scenario_sms_{item['type']}_{item['start_date']}")
+        card(f'<div class="im-big">{text(item["message"])}</div>'
+             f'<div class="im-label" style="margin-top:10px">Text message preview</div>'
+             f'<div class="im-sms">{text(sms_text(item, area="Scenario", config=config))}</div>')
 
 
-def forecast_and_advisories():
-    st.title("Forecast and Advisories")
-    mode = st.radio("Mode", ["Forecast", "Scenario"], horizontal=True, key="advisory_mode")
-    if mode == "Scenario":
-        scenario_mode()
-        return
-    missing = deploy_missing()
-    if missing:
-        deploy_notice(missing)
-    forecast = load_deploy_csv("forecast_daily.csv")
-    if forecast is None:
-        st.caption("Scenario mode works without exported forecasts.")
-        return
-    forecast = prepare_forecast(forecast)
-    status = load_deploy_csv("station_status.csv")
-    status = prepare_status(status) if status is not None else None
-    stations = sorted(forecast.device_id.unique())
-    if not stations:
-        st.warning("deploy_data/forecast_daily.csv has no rows with a usable date.")
-        return
-    station = st.selectbox("Station", stations, key="forecast_station",
-                           format_func=lambda device_id: station_label(device_id, status))
-    rows = forecast.loc[forecast.device_id.eq(station)]
-    try:
-        insights = generate_insights(rows)
-    except ValueError as error:
-        st.warning(f"Advisories could not be produced: {error}")
-        insights = []
-    as_of = rows.date.min() - timedelta(days=1)
-    cards = st.columns(3)
-    cards[0].metric("Forecast as of", f"{as_of:%d %b %Y}")
-    cards[1].metric("Forecast days", str(rows.date.nunique()))
-    cards[2].metric("Advisories", str(len(insights)))
-    st.info("Caveats:\n\n" + "\n".join(f"- {caveat}" for caveat in FORECAST_CAVEATS))
-
-    st.header("7-day forecast")
-    table = rows[["date", "rain_mm", "rain_upper", "temp_min", "temp_max", "wind_max"]].rename(columns={
-        "date": "Date", "rain_mm": "Rain (mm)", "rain_upper": "Rain upper envelope (mm)",
-        "temp_min": "Min temp (°C)", "temp_max": "Max temp (°C)", "wind_max": "Max wind (m/s)"})
-    st.dataframe(table, hide_index=True, width="stretch")
-    for tab, figure in zip(st.tabs(["Rainfall", "Temperature", "Wind"]), forecast_figures(rows)):
-        with tab:
-            st.plotly_chart(figure, width="stretch", config={"displayModeBar": False})
-
-    st.header("Advisories")
-    if not insights:
-        st.success("No advisories for this station in the forecast period.")
-    for item in insights:
-        render_insight(item)
-    exported = load_deploy_csv("insights_latest.csv", allow_empty=True)
-    if exported is not None:
-        saved = exported.loc[exported.device_id.eq(station)]
-        if sorted(zip(saved.type, saved.start_date.astype(str))) != sorted(
-                (item["type"], item["start_date"]) for item in insights):
-            st.warning("deploy_data/insights_latest.csv differs from the advisories recomputed from "
-                       "forecast_daily.csv for this station; the export may be out of date.")
-
-    sms_control(insights, station_area(station, status) or f"Station {station}")
-    readme = DEPLOY / "README.md"
-    if readme.is_file():
-        with st.expander("About this forecast export"):
-            st.markdown(load_text(readme) or "")
+def about_forecast():
+    header("About this forecast", "What Imarika does and what it cannot do")
+    card('<div class="im-label">What this site does</div><div class="im-big">'
+         "Imarika gives a weather forecast for the next seven days at each weather station in Busia County. "
+         "It shows how much rain is expected each day and the lowest and highest temperature. "
+         "It turns the rain forecast into simple advice about floods, planting and spraying. "
+         "It can show the same advice as a short text message. "
+         "It is a student project and does not replace advice from local experts.</div>")
+    card('<div class="im-label">Where the data comes from</div><div class="im-big">'
+         "Weather sensors at stations in Busia County, Kenya, mostly in Nambale and Butula sub-counties "
+         "(two stations are in Matayos). Each station measures temperature, humidity, wind and rain.</div>")
+    card('<div class="im-label">Limits</div><div class="im-big">'
+         + "<br>".join(text(line) for line in RELIABILITY) + "</div>")
+    boundary_credit()
 
 
 # =============================================================================
-# Page 5. Network status from the forecast export
-# =============================================================================
-def network_status():
-    st.title("Network Status")
-    missing = deploy_missing()
-    if missing:
-        deploy_notice(missing)
-    status = load_deploy_csv("station_status.csv")
-    if status is None:
-        return
-    status = prepare_status(status)
-    active, inactive = status.loc[status.is_active], status.loc[~status.is_active]
-    cards = st.columns(3)
-    cards[0].metric("Active stations", str(len(active)))
-    cards[1].metric("Inactive stations", str(len(inactive)))
-    cards[2].metric("Stations listed", str(len(status)))
-    figure = go.Figure()
-    for subset, name, colour in [(active, "Active", GREEN), (inactive, "Inactive", GREY)]:
-        mapped = subset.loc[subset.latitude.notna() & subset.longitude.notna()]
-        seen = mapped.last_seen.dt.strftime("%Y-%m-%d %H:%M UTC").fillna("never")
-        figure.add_trace(go.Scatter(
-            x=mapped.longitude, y=mapped.latitude, mode="markers", name=name,
-            customdata=np.column_stack([mapped.device_id, seen, mapped.reason]) if len(mapped) else None,
-            marker={"color": colour, "size": 12, "line": {"color": "white", "width": 1.5}},
-            hovertemplate=(f"Station %{{customdata[0]}}<br>{name}<br>Last seen %{{customdata[1]}}"
-                           "<br>%{customdata[2]}<extra></extra>")))
-    figure.update_xaxes(title="Longitude (°E)", range=[34.1, 34.6])
-    figure.update_yaxes(title="Latitude (°N)", range=[0.1, 0.7], scaleanchor="x", scaleratio=1)
-    st.plotly_chart(style_figure(figure, 460), width="stretch", config={"displayModeBar": False})
-    unmapped = int((status.latitude.isna() | status.longitude.isna()).sum())
-    if unmapped:
-        st.caption(f"{unmapped} station(s) have no usable coordinates and are not mapped.")
-    st.caption("Offline coordinate map within the study bounding box. Green: active. Grey: inactive.")
-    st.dataframe(status.assign(last_seen=status.last_seen.dt.strftime("%Y-%m-%d %H:%M UTC"))[
-        ["device_id", "is_active", "last_seen", "reason"]].rename(columns={
-            "device_id": "Station", "is_active": "Active", "last_seen": "Last reading", "reason": "Reason"}),
-        hide_index=True, width="stretch")
-
-
-# =============================================================================
-# Page 6. Academic attribution
+# Technical page: academic attribution
 # =============================================================================
 def about():
     st.title("About the Project")
@@ -634,38 +893,40 @@ Ms. Julliet Kirui
 """)
     st.divider()
     st.markdown("**Imarika** brings local sensor measurements and complementary weather datasets together to support forecasting research for smallholder farmers in Busia County, Kenya.")
+    st.caption(BOUNDARY_CREDIT + ". Kenya and county outlines: RCMRD (public domain); "
+               "sub-county outlines: IEBC and OCHA ROSEA (CC BY 3.0 IGO). See assets/README.md.")
+
+
+def switch_to_weather():
+    st.session_state["nav_tech"] = None
+
+
+def switch_to_tech():
+    st.session_state["nav_weather"] = None
 
 
 def main():
-    st.set_page_config(page_title="Imarika | Busia Weather Forecasting", page_icon="🌿", layout="wide")
-    st.markdown("""
-    <style>
-      .block-container { max-width: 1280px; padding-top: 2.1rem; }
-      h1, h2, h3 { color: #234D28; }
-      [data-testid="stMetric"] { background: #F4F8F4; border: 1px solid #DFEADF;
-        border-top: 3px solid #2E7D32; border-radius: 8px; padding: 14px; }
-      [data-testid="stMetricValue"] { font-size: 1.75rem; }
-      .architecture { display: flex; align-items: stretch; gap: 10px; margin: 16px 0; flex-wrap: wrap; }
-      .stage { flex: 1; min-width: 145px; padding: 18px 14px; border: 1px solid #CFE0CF;
-        border-radius: 8px; background: #F7FAF7; }
-      .stage b { display: block; color: #2E7D32; margin-bottom: 10px; }
-      .stage span { font-size: 0.88rem; line-height: 1.6; color: #3E5142; }
-      .arrow { align-self: center; color: #2E7D32; font-size: 1.4rem; }
-    </style>
-    """, unsafe_allow_html=True)
+    st.set_page_config(page_title="Imarika | Busia weather", page_icon="🌦", layout="wide")
+    inject_style()
+    if BANNER:
+        st.markdown(f'<div class="im-preview-banner">{text(BANNER)}</div>', unsafe_allow_html=True)
     with st.sidebar:
         st.title("Imarika")
         st.caption("BUSIA COUNTY · KENYA")
-        page = st.radio("Navigation", PAGES)
+        weather = st.radio("Weather", WEATHER_PAGES, key="nav_weather", on_change=switch_to_weather)
         st.divider()
-        st.caption("ICS 4101 · Project presentation\n\nLocal data and saved results · Offline-ready")
+        st.caption("Project details (technical)")
+        technical = st.radio("Project details (technical)", TECH_PAGES, index=None, key="nav_tech",
+                             on_change=switch_to_tech, label_visibility="collapsed")
+    page = technical or weather or WEATHER_PAGES[0]
     {
+        "Weather Map": weather_map,
+        "What if? Try a rain forecast": what_if,
+        "About this forecast": about_forecast,
         "Project Overview": project_overview,
         "Data Collection": data_collection,
         "Model Results": model_results,
-        "Forecast and Advisories": forecast_and_advisories,
-        "Network Status": network_status,
-        "About": about,
+        "About the project": about,
     }[page]()
 
 
