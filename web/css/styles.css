@@ -277,3 +277,4 @@ main:focus { outline: none; }
   .days-small .day { grid-template-columns: 7em minmax(0, 1fr); }
   .days-small .day-temp { grid-column: 1; grid-row: 2; }
 }
+.days-big, .days-small { list-style: none; padding: 0; margin: 0; }
