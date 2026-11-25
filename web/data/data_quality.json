@@ -1,0 +1,57 @@
+{
+  "audit": [
+    {
+      "label": "Station readings kept for Busia County",
+      "value": 717471,
+      "of": 764309,
+      "source": "reports/data_quality/report.md"
+    },
+    {
+      "label": "Weather stations in Busia County",
+      "value": 26,
+      "source": "reports/data_quality/report.md"
+    },
+    {
+      "label": "Readings removed because the sensor's error flag was missing",
+      "value": 36384,
+      "source": "reports/data_quality/sensor_error_counts.csv"
+    },
+    {
+      "label": "Rain gauge counter resets found and handled",
+      "value": 2,
+      "source": "reports/data_quality/rain_reset_events.csv"
+    }
+  ],
+  "temperature_agreement": {
+    "label": "Agreement between station temperatures and Open-Meteo (correlation, 1 = perfect)",
+    "min": 0.875,
+    "max": 0.912,
+    "source": "reports/data_quality/temperature_correlations.csv"
+  },
+  "fixes": [
+    {
+      "label": "Faulty air-pressure values removed (below 850 hPa)",
+      "value": 1683,
+      "unit": "hourly values",
+      "source": "GitHub pull request #40, fix(preprocess): mask faulty pressure and rain after long gaps"
+    },
+    {
+      "label": "Rain totals removed where the gauge was offline for more than 6 hours",
+      "value": 388,
+      "unit": "hourly values",
+      "source": "GitHub pull request #40, fix(preprocess): mask faulty pressure and rain after long gaps"
+    },
+    {
+      "label": "Hours with more than 50 mm of rain",
+      "value": "38 before, 20 after",
+      "unit": null,
+      "source": "GitHub pull request #40, fix(preprocess): mask faulty pressure and rain after long gaps"
+    }
+  ],
+  "other_fixes": [
+    "Pressure converted from pascals to hectopascals.",
+    "Rainfall worked out from the gauge's running total, restarting at counter resets.",
+    "Gaps shorter than 6 hours filled by straight-line interpolation; longer gaps left empty."
+  ],
+  "other_fixes_source": "preprocess.py"
+}

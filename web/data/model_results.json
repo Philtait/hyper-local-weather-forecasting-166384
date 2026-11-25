@@ -1,0 +1,74 @@
+{
+  "sarima": {
+    "plain_name": "a statistical time-series model (SARIMA)",
+    "use": "Used for the forecasts on this site.",
+    "evaluation": "Tested one hour ahead at one station on the last 15% of the data, kept aside.",
+    "evaluation_source": "sarima_model.py (causal one-step forecasts on hourly data)",
+    "variables": [
+      {
+        "variable": "air_temperature",
+        "label": "Temperature",
+        "unit": "°C",
+        "typical_error": 1.2416,
+        "average_error": 0.7479,
+        "persistence_error": 1.8689,
+        "skill_vs_persistence": 0.336,
+        "test_hours_evaluated": 421,
+        "source": "reports/sarima_results.csv"
+      },
+      {
+        "variable": "air_humidity",
+        "label": "Humidity",
+        "unit": "%",
+        "typical_error": 5.2116,
+        "average_error": 3.356,
+        "persistence_error": 7.2258,
+        "skill_vs_persistence": 0.279,
+        "test_hours_evaluated": 421,
+        "source": "reports/sarima_results.csv"
+      },
+      {
+        "variable": "barometric_pressure_hpa",
+        "label": "Air pressure",
+        "unit": "hPa",
+        "typical_error": 0.3277,
+        "average_error": 0.2366,
+        "persistence_error": 0.6131,
+        "skill_vs_persistence": 0.466,
+        "test_hours_evaluated": 409,
+        "source": "reports/sarima_results.csv"
+      },
+      {
+        "variable": "wind_speed",
+        "label": "Wind speed",
+        "unit": "m/s",
+        "typical_error": 0.5059,
+        "average_error": 0.3636,
+        "persistence_error": 0.6647,
+        "skill_vs_persistence": 0.239,
+        "test_hours_evaluated": 421,
+        "source": "reports/sarima_results.csv"
+      },
+      {
+        "variable": "rainfall_mm",
+        "label": "Rainfall",
+        "unit": "mm per hour",
+        "typical_error": 0.083,
+        "average_error": 0.0304,
+        "persistence_error": 0.1095,
+        "skill_vs_persistence": 0.242,
+        "test_hours_evaluated": 414,
+        "source": "reports/sarima_results.csv"
+      }
+    ],
+    "station": "Station 083"
+  },
+  "lstm": {
+    "plain_name": "a neural network (LSTM)",
+    "status": "Evaluated at one station; results under review; not used for live forecasts."
+  },
+  "notes": {
+    "typical_error": "root mean square error on the test hours",
+    "skill_vs_persistence": "1 - error of the model / error of 'same as one hour ago'"
+  }
+}
