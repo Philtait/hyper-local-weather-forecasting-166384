@@ -23,6 +23,7 @@ from app import STATUS  # noqa: E402
 from insights import generate_insights, load_config, sms_text  # noqa: E402
 
 WEB = ROOT / "web"
+SRC = ROOT / "site_src"
 EIGHTEEN_DIGITS = re.compile(r"(?<!\d)\d{18}(?!\d)")
 # Words and phrases the site must never show (case-insensitive substrings).
 NEVER_SHOW = [
@@ -31,7 +32,11 @@ NEVER_SHOW = [
     "chance of rain", "sms balance", "delivery rate", "shortcode", "short code", "subscriber", "reply stop",
     "sender id", "sender name", "issued by", "county agro-met", "field protocol", "valid through",
     "live telemetry", "dismiss", "confidence interval", "envelope", "busia central station",
+    # removed from the site: the sample-data banner and presentation mode
+    "sample data", "presentation mode", "synthetic",
 ]
+# The pages show no model names or accuracy figures at all.
+PAGE_ONLY = ["neural network", "accuracy", "skill score", "typical error"]
 # Technical terms: never on the page; SARIMA and LSTM may appear once each in model_results.json.
 JARGON = ["SARIMA", "LSTM", "RMSE", "AIC"]
 
@@ -220,7 +225,7 @@ class NeverShowTests(unittest.TestCase):
         for path in self.pages:
             text = path.read_text(encoding="utf-8")
             lower = text.lower()
-            for phrase in NEVER_SHOW:
+            for phrase in NEVER_SHOW + PAGE_ONLY:
                 self.assertNotIn(phrase, lower, f"{path.name} contains {phrase!r}")
             for word in JARGON:
                 self.assertIsNone(re.search(rf"\b{word}\b", text), f"{path.name} contains {word}")
@@ -230,13 +235,51 @@ class NeverShowTests(unittest.TestCase):
         for path in sorted(self.data_dir.glob("*.json")):
             values = list(string_values(json.loads(path.read_text(encoding="utf-8"))))
             joined = "\n".join(values)
-            for phrase in NEVER_SHOW:
+            for phrase in [p for p in NEVER_SHOW if p != "synthetic"]:  # the flag is a key, never a value
                 self.assertNotIn(phrase, joined.lower(), f"{path.name} contains {phrase!r}")
             for word in JARGON:
                 count = len(re.findall(rf"\b{word}\b", joined))
                 allowed = 1 if path.name == "model_results.json" and word in {"SARIMA", "LSTM"} else 0
                 self.assertLessEqual(count, allowed, f"{path.name} names {word} {count} times")
             self.assertIsNone(EIGHTEEN_DIGITS.search(joined), path.name)
+
+
+class PagesTests(unittest.TestCase):
+    """Five pages share one header, footer and bottom navigation, built from site_src/."""
+
+    PAGES = ["index.html", "how-it-works.html", "map.html", "sms.html", "contact.html"]
+
+    def test_pages_are_up_to_date_with_their_sources(self):
+        import build_pages
+        self.assertEqual(build_pages.main(["--check"]), 0, "run python scripts/build_pages.py")
+
+    def test_every_page_has_the_shared_layout_and_accessibility_basics(self):
+        for name in self.PAGES:
+            text = (WEB / name).read_text(encoding="utf-8")
+            self.assertRegex(text, r'<html lang="\w+">', name)
+            self.assertIn('class="skip-link" href="#main"', text, name)
+            self.assertIn('<main id="main"', text, name)
+            self.assertIn('class="site-header"', text, name)
+            self.assertIn('class="bottom-nav"', text, name)
+            self.assertEqual(text.count('aria-current="page"'), 2, name)  # top nav and bottom nav
+            self.assertIn("Final-year project, Strathmore University. Philip Tait Lemaron.", text, name)
+            self.assertIn("Images are illustrative and generated with AI.", text, name)
+            self.assertIn("CC BY 3.0 IGO; IEBC and OCHA ROSEA", text, name)
+            for target in self.PAGES:
+                self.assertIn(f'href="{target}"', text, f"{name} does not link to {target}")
+
+    def test_images_are_small_and_service_worker_caches_every_page(self):
+        for name in ["about-field.webp", "station.webp", "farmer.webp"]:
+            self.assertLess((WEB / "img" / name).stat().st_size, 150 * 1024, name)
+        worker = (WEB / "sw.js").read_text(encoding="utf-8")
+        for name in self.PAGES + ["img/icons.svg", "i18n/en.json", "img/about-field.webp"]:
+            self.assertIn(f'"{name}"', worker, name)
+        self.assertNotIn("tile.openstreetmap.org", worker)
+
+    def test_home_numbers_are_not_hard_coded(self):
+        text = (WEB / "index.html").read_text(encoding="utf-8")
+        numbers = re.search(r'<ul class="numbers".*?</ul>', text, re.S).group(0)
+        self.assertIsNone(re.search(r"<strong[^>]*>\s*\d", numbers))
 
 
 if __name__ == "__main__":

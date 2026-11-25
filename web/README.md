@@ -1,8 +1,21 @@
 # Imarika website
 
-Static showcase site for Imarika: station map, 7-day forecasts, weekly alerts, an SMS sandbox demo and an
-explanation of how reliable the forecasts are. No build step and no runtime npm dependencies; fonts
-(Lexend, OFL) and Leaflet 1.9.4 are vendored in `fonts/` and `vendor/`.
+Static site for Imarika with five pages: Home, How it works, Weather map, SMS demo and Contact.
+No build step at deploy time and no runtime npm dependencies; fonts (Lexend, OFL) and Leaflet 1.9.4
+are vendored in `fonts/` and `vendor/`.
+
+## Pages, strings and images
+
+The pages share one header, footer and bottom navigation. They are written from `site_src/` and the
+strings in `i18n/en.json`; edit those, then regenerate the HTML (the output is committed):
+
+```
+python scripts/build_pages.py            # writes web/*.html
+python scripts/make_images.py            # docs/reference/images-src/*.png -> web/img/*.webp
+```
+
+All visible words live in `i18n/en.json`. Icons are one sprite, `img/icons.svg`. The map uses
+OpenStreetMap tiles when online and falls back to the boundary outlines when they cannot load.
 
 ## Data
 
@@ -10,11 +23,12 @@ The site reads only `data/*.json`, written by the Python builder from the foreca
 
 ```
 python scripts/build_site_data.py --deploy-dir deploy_data --out web/data
-python scripts/build_site_data.py --synthetic --out web/data      # fake preview data, red banner
+python scripts/build_site_data.py --synthetic --out web/data      # fake preview data
 ```
 
-`--reports-dir` (default `reports/`) is read for the accuracy and data-quality numbers. Do not commit
-`web/data` while it is synthetic; a test fails if a committed `meta.json` has `"synthetic": true`.
+`--reports-dir` (default `reports/`) is read for the accuracy and data-quality numbers. The
+synthetic flag lives only in `meta.json` and is never shown on a page. Do not commit `web/data` while it
+is synthetic; a test fails if a committed `meta.json` has `"synthetic": true`.
 
 ## Run locally
 
