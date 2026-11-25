@@ -275,8 +275,8 @@ class FakeGenerator:
 
 def test_shared_answer_gets_each_stations_numbers(tmp_path):
     output, summary = build(tmp_path, FakeGenerator(GOOD))
-    first = output["stations"]["101990961244800001"]["crops"]["maize"]["en"]
-    other = output["stations"]["101990961244800395"]["crops"]["maize"]["en"]
+    first = output["stations"]["001"]["crops"]["maize"]["en"]
+    other = output["stations"]["395"]["crops"]["maize"]["en"]
     assert first["source"] == other["source"] == "ai"
     assert "about 8 mm" in first["sentences"][0]["text"] and "near 29 degrees" in first["sentences"][0]["text"]
     assert "about 6 mm" in other["sentences"][0]["text"] and "near 30 degrees" in other["sentences"][0]["text"]
@@ -424,10 +424,20 @@ def test_cached_answers_are_still_used_after_calls_stop(tmp_path):
     stopped = cg.Generator(["cache"], None, None)
     stopped.stopped = "cache only (no calls)"
     output, summary = cg.build(deploy=tmp_path, facts_path=facts_path, generator=stopped, log=lambda *_: None)
-    maize_en = output["stations"]["101990961244800001"]["crops"]["maize"]["en"]
+    maize_en = output["stations"]["001"]["crops"]["maize"]["en"]
     assert maize_en["source"] == "ai" and maize_en["model"] == "models/a"
     assert "about 8 mm" in maize_en["sentences"][0]["text"]
     assert summary["counts"] == {"ai": 2, "template": 22}  # maize/en for both stations, no calls made
+
+
+def test_stations_are_keyed_by_the_sites_short_ids(tmp_path):
+    output, _ = build(tmp_path)
+    assert sorted(output["stations"]) == ["001", "395"]
+    assert not re.search(r"(?<!\d)\d{18}(?!\d)", json.dumps(output)), "no raw device number in the guide"
+    sys.path.insert(0, str(ROOT))
+    from app import short_ids
+    ids = ["101990961244800001", "101990961244800395", "101990961244800083", "202003536241300473"]
+    assert cg.short_ids(ids) == short_ids(ids)
 
 
 def test_model_chain_keeps_only_listed_text_models():

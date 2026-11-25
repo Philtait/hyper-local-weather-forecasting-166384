@@ -614,11 +614,23 @@ def read_inputs(deploy=DEPLOY):
     return daily.dropna(subset=["rain_mm", "temp_max"]), status, insights
 
 
+def short_ids(device_ids):
+    """Shortest unique ending (at least 3 digits); the same rule as app.short_ids and the site's station ids."""
+    ids = sorted(set(device_ids))
+    for size in range(3, max([len(value) for value in ids] + [3]) + 1):
+        endings = [value[-size:] for value in ids]
+        if len(set(endings)) == len(endings):
+            return dict(zip(ids, endings))
+    return {value: value for value in ids}
+
+
 def build(deploy=DEPLOY, facts_path=FACTS, generator=None, log=print):
     daily, status, insights = read_inputs(deploy)
     facts = load_facts(facts_path)
     station_buckets = buckets(daily, insights)
     areas = status.set_index("device_id").area.to_dict() if "area" in status else {}
+    # Keyed by the site's short station id ("001"), never the raw device number.
+    endings = short_ids(list(status.device_id) + list(station_buckets))
     failures, memo, distinct = [], {}, []
     counts = {"ai": 0, "template": 0}
     stations, stop_logged = {}, False
@@ -648,7 +660,7 @@ def build(deploy=DEPLOY, facts_path=FACTS, generator=None, log=print):
                 counts[entry["source"]] += 1
                 crops[crop][language] = {**entry, "sentences": fill(entry["sentences"], bucket)}
         public = {name: bucket[name] for name in ["rain_mm", "temp_max", "same_every_day", "season"]}
-        stations[device_id] = {"area": areas.get(device_id), "bucket": public, "crops": crops}
+        stations[endings[device_id]] = {"area": areas.get(device_id), "bucket": public, "crops": crops}
     models_used = sorted({entry["model"] for entry in memo.values() if entry["model"]})
     output = {
         "generated_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),

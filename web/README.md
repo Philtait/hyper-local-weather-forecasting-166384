@@ -59,12 +59,31 @@ python -m http.server 8080 --directory web
 Open http://localhost:8080. The static server has no SMS function, so the demo shows
 "Demo mode: message shown on the phone only".
 
+To try the real send function locally (Africa's Talking sandbox only), run the small test server, which
+serves `web/` and routes `POST /api/send-sms` to the same handler Vercel deploys:
+
+```
+node --env-file=.env scripts/serve_web.js      # then open http://127.0.0.1:8080/sms.html
+```
+
+`.env` must set `AT_USERNAME=sandbox` and `AT_API_KEY`; the server listens on 127.0.0.1 and prints neither.
+
+## SMS demo: crop guide
+
+Step 2 has a "Crop guide" group (English or Kiswahili, six crops) built from `data/crop_guide.json`
+(`scripts/build_crop_guide.py`). `js/sms-message.js` builds the message for both the page preview and
+`api/send-sms.js`: "Imarika <area>:" then sentences 1, 3 and 2, each only if the message stays within 306
+characters (two SMS), never cutting a sentence, plain GSM characters. The browser sends only
+`{scenario: "crop_guide", station, crop, lang, phone}`; the function checks them against `crop_guide.json`
+and builds the text itself.
+
 ## Deploy (Vercel)
 
 1. Build `web/data` from the real export and commit it.
 2. Create a Vercel project with root directory `web` (no framework, no build command).
 3. Set the environment variables `AT_USERNAME` (must be exactly `sandbox`) and `AT_API_KEY`.
-4. Deploy. `api/send-sms.js` becomes `/api/send-sms`; `vercel.json` bundles `data/` with it.
+4. Deploy. `api/send-sms.js` becomes `/api/send-sms`; `vercel.json` bundles `data/` (including
+   `crop_guide.json`) with it, and Vercel's file tracer bundles `js/sms-message.js` through its `require`.
 
 The function sends only to the Africa's Talking sandbox and refuses to run with any other username.
 
@@ -72,6 +91,6 @@ The function sends only to the Africa's Talking sandbox and refuses to run with 
 
 ```
 python -m pytest -q tests/test_build_site_data.py
-node --test tests/node/send_sms.test.js
+node --test tests/node/send_sms.test.js tests/node/sms_message.test.js
 python scripts/make_icons.py     # redraws the PWA icons
 ```
