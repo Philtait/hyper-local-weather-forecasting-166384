@@ -2,10 +2,10 @@
    Bump VERSION when shell files change so old caches are removed. */
 "use strict";
 
-var VERSION = "imarika-v7";
+var VERSION = "imarika-v8";
 var SHELL = [
   "./", "index.html", "how-it-works.html", "map.html", "sms.html", "contact.html",
-  "css/styles.css", "js/common.js", "js/home.js", "js/map.js", "js/charts.js", "js/sms-message.js", "js/sms.js", "js/contact.js", "i18n/en.json", "manifest.webmanifest",
+  "css/styles.css", "js/common.js", "js/home.js", "js/map-logic.js", "js/map.js", "js/charts.js", "js/sms-message.js", "js/sms.js", "js/contact.js", "i18n/en.json", "manifest.webmanifest",
   "vendor/leaflet/leaflet.js", "vendor/leaflet/leaflet.css",
   "fonts/lexend-latin-400-normal.woff2", "fonts/lexend-latin-500-normal.woff2", "fonts/lexend-latin-600-normal.woff2",
   "fonts/lexend-latin-700-normal.woff2",

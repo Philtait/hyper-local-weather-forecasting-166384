@@ -18,6 +18,7 @@
   --radius: 10px;
   --wrap: 1200px;
   --focus: #f2b705;
+  --rain: #2f6fb0;
 
   --st-warning-fg: #b3261e;  --st-warning-bg: #fde8e6;
   --st-watch-fg: #b45309;    --st-watch-bg: #fff0dc;
@@ -136,92 +137,91 @@ main:focus { outline: none; }
 .area-btn:hover { border-color: var(--leaf); }
 .area-btn[aria-pressed="true"] { background: var(--leaf); border-color: var(--leaf); color: var(--white); }
 
-.map-layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 28px; align-items: start; }
-.map-col { order: 1; min-width: 0; }
-.result-card { order: 2; min-width: 0; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; background: var(--white); }
+/* Weather map: one status line, chips, Map | List, one panel. Card style: white, 1px border, 16px radius. */
+.map-page { font-size: 18px; }
+.status-line { font-size: 18px; color: var(--text-2); margin: 0 0 24px; }
+.map-controls { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: inherit; font-size: 18px; min-height: 44px; padding: 8px 20px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--white); color: var(--text); cursor: pointer; }
+.chip:hover { border-color: var(--leaf); }
+.chip[aria-pressed="true"] { background: var(--forest); border-color: var(--forest); color: var(--white); }
+.view-switch { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+.view-btn { font: inherit; font-size: 18px; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 20px;
+  border: 0; background: var(--white); color: var(--text); cursor: pointer; }
+.view-btn + .view-btn { border-left: 1px solid var(--border); }
+.view-btn[aria-pressed="true"] { background: var(--mint); color: var(--forest); font-weight: 600; }
+.view-btn .icon, .details-btn .icon { width: 24px; height: 24px; }
+
+.map-layout { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 24px; align-items: start; }
+.map-main { min-width: 0; }
 .map-box { position: relative; }
-#map { height: 620px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--soft); }
-.map-note { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 500; margin: 0; max-width: none;
-  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; font-size: 16px; color: var(--text-2); }
+#map { height: 600px; border-radius: 16px; border: 1px solid var(--border); background: #f3f6f4; }
+.map-note { position: absolute; left: 16px; right: 16px; bottom: 16px; z-index: 500; margin: 0; max-width: none;
+  background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 8px 16px; font-size: 16px; color: var(--text-2); }
+.legend { list-style: none; padding: 0; margin: 16px 0 8px; display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.legend li { display: flex; align-items: center; gap: 8px; }
+.map-help { color: var(--text-2); margin: 0; }
 
-.result-card h2 { font-size: 30px; margin-bottom: 4px; }
-.station-line { color: var(--text-2); font-size: 16px; margin-bottom: 14px; }
-.action { font-size: 20px; font-weight: 500; margin: 16px 0 24px; }
-.result-card h3 { font-size: 18px; margin: 24px 0 10px; color: var(--text); }
-/* One row per day: weekday, status, rain, temperature. Rows reflow by the card's own width. */
-.result-card { container-type: inline-size; }
-.day-rows { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
-.day { display: grid; grid-template-columns: 6.2em minmax(0, 1fr) 4.6em 7.4em; align-items: center; gap: 4px 12px;
-  min-height: 48px; padding: 8px 12px; border: 1px solid var(--border); border-left-width: 6px; border-radius: var(--radius); background: var(--white); }
-.day-name { font-weight: 600; }
-.day-status, .day-mm, .day-temp { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.day-status { font-weight: 600; line-height: 1.25; }
-.day .icon { width: 18px; height: 18px; flex: none; }
-.day-mm, .day-temp { color: var(--text-2); font-size: 16px; white-space: nowrap; }
-.day-mm .icon, .day-temp .icon { color: var(--leaf); }
-.day-warning { border-left-color: var(--st-warning-fg); background: var(--st-warning-bg); }
-.day-watch { border-left-color: var(--st-watch-fg); background: var(--st-watch-bg); }
-.day-planting { border-left-color: var(--st-planting-fg); }
-.day-delay { border-left-color: var(--st-delay-fg); }
-.day-none { border-left-color: var(--border); }
-.day-warning .day-status { color: var(--st-warning-fg); }
-.day-watch .day-status { color: var(--st-watch-fg); }
-.day-planting .day-status { color: var(--st-planting-fg); }
-.day-delay .day-status { color: var(--st-delay-fg); }
-.day-none .day-status { color: var(--text-2); font-weight: 500; }
-@container (max-width: 460px) {
-  .day { grid-template-columns: minmax(0, 1fr) auto auto; gap: 2px 12px; }
-  .day-name { grid-column: 1; grid-row: 1; }
-  .day-mm { grid-column: 2; grid-row: 1; }
-  .day-temp { grid-column: 3; grid-row: 1; }
-  .day-status { grid-column: 1 / -1; grid-row: 2; }
-}
-
-.now-list, .ops-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
-.now-list li { display: flex; align-items: center; gap: 10px; }
-.now-list .icon { color: var(--leaf); }
-.now-list strong { margin-left: auto; }
-.ops-list li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; align-items: start;
-  padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); }
-.ops-list .icon-wrap { grid-row: span 2; color: var(--forest); background: var(--mint); border-radius: 50%; width: 40px; height: 40px; display: grid; place-items: center; }
-.ops-list p { margin: 0; color: var(--text-2); font-size: 16px; }
-.chart-slot:empty { display: none; }
-.other-stations { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 20px; font-size: 16px; }
-.link-btn { font: inherit; font-size: 16px; background: none; border: 0; padding: 4px 2px; color: var(--leaf); text-decoration: underline; cursor: pointer; }
-
-.legend { margin-top: 12px; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; }
-.legend summary { cursor: pointer; font-weight: 600; }
-.legend ul { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
-
-.station-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; margin-top: 16px; }
-.station-groups h3 { font-size: 20px; margin-bottom: 8px; }
-.station-groups ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
-.station-row { width: 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; text-align: left; font: inherit;
-  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; cursor: pointer; color: var(--text); }
-.station-row:hover { border-color: var(--leaf); }
-.station-row[aria-current="true"] { border: 2px solid var(--leaf); }
-
-/* Leaflet markers and labels */
-.mk { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; color: var(--white); border: 2px solid var(--white); }
-.mk .icon { width: 16px; height: 16px; }
-.mk-warning { background: var(--st-warning-fg); }
-.mk-watch { background: var(--st-watch-fg); }
-.mk-planting { background: var(--st-planting-fg); }
-.mk-delay { background: var(--st-delay-fg); }
-.mk-none { background: var(--st-none-fg); }
-.mk-offline { background: var(--st-offline-fg); border: 2px dashed var(--white); }
-.mk-count { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
-  color: var(--white); font-weight: 700; font-size: 16px; border: 2px solid var(--white); }
-.mk-count.mk-offline { border: 2px dashed var(--white); }
-.mk.in-area, .mk-count.in-area { outline: 4px solid var(--forest); outline-offset: 1px; }
-.mk.is-selected { outline: 4px solid var(--forest); outline-offset: 1px; transform: scale(1.25); }
+/* Three station states, the same on the map, the legend, the list and the panel. */
+.dot { width: 16px; height: 16px; border-radius: 50%; flex: none; display: inline-block; vertical-align: -2px; }
+.dot-today { background: var(--leaf); }
+.dot-recent { background: #b5e2c6; box-shadow: inset 0 0 0 3px var(--leaf); }
+.dot-off { background: var(--white); box-shadow: inset 0 0 0 2px #6b7280; }
+.mk { width: 44px; height: 44px; display: grid; place-items: center; }
+.mk::before { content: ""; width: 18px; height: 18px; border-radius: 50%; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); }
+.mk-today::before { background: var(--leaf); border: 2px solid var(--white); }
+.mk-recent::before { background: #b5e2c6; border: 3px solid var(--leaf); }
+.mk-off::before { background: var(--white); border: 2px solid #6b7280; box-shadow: none; }
+.mk.is-selected::before { width: 28px; height: 28px; outline: 4px solid var(--forest); outline-offset: 2px; }
 .leaflet-container { font-family: inherit; }
-.leaflet-tile-pane { filter: grayscale(0.7) brightness(1.06) contrast(0.92); }
+.tiles-osm .leaflet-tile-pane { filter: grayscale(1) brightness(1.12) contrast(0.7); opacity: 0.45; }
 .leaflet-container .area-label { background: transparent; border: 0; box-shadow: none; padding: 0; color: var(--forest);
-  font-weight: 700; font-size: 14px; paint-order: stroke; -webkit-text-stroke: 4px #fff;
-  text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #fff; }
+  font-weight: 600; font-size: 15px; letter-spacing: .02em; paint-order: stroke; -webkit-text-stroke: 4px #fff;
+  text-shadow: 0 0 2px #fff, 0 0 4px #fff; }
 .leaflet-container .area-label::before { display: none; }
 .leaflet-marker-icon:focus-visible { outline: 3px solid var(--focus); border-radius: 50%; }
+
+/* Selected-station panel: right side on desktop, bottom sheet on smaller screens. */
+.panel { min-width: 0; border: 1px solid var(--border); border-radius: 16px; background: var(--white); padding: 24px; position: sticky; top: 88px; }
+.panel-head { display: flex; align-items: flex-start; gap: 16px; }
+.panel-head .dot { width: 20px; height: 20px; margin-top: 8px; }
+.panel-title { flex: 1; min-width: 0; }
+.panel-title h2 { font-size: 26px; margin: 0 0 4px; }
+.panel-status { color: var(--text-2); margin: 0; }
+.sheet-toggle { display: none; }
+.panel-label { font-size: 18px; color: var(--text); margin: 24px 0 8px; }
+.tiles { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.tile { border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: grid; grid-template-columns: 24px minmax(0, 1fr);
+  gap: 4px 8px; align-items: center; }
+.tile .icon { width: 24px; height: 24px; color: var(--leaf); }
+.tile-label { font-size: 16px; color: var(--text-2); line-height: 1.25; }
+.tile-value { grid-column: 1 / -1; font-size: 28px; font-weight: 700; color: var(--forest); line-height: 1.2; }
+.tile-value-text { font-size: 18px; font-weight: 600; color: var(--text-2); }
+.tile-note { grid-column: 1 / -1; font-size: 16px; color: var(--text-2); }
+.caption { font-size: 16px; color: var(--text-2); margin: 8px 0 0; }
+.caption-stale { color: #4b5563; }
+.outlook-line { display: flex; gap: 8px; align-items: flex-start; font-weight: 500; margin: 0; }
+.outlook-line .icon { color: var(--rain); width: 24px; height: 24px; flex: none; margin-top: 2px; }
+.panel-note { margin: 24px 0 0; color: var(--text-2); }
+.panel-alert { margin-top: 16px; }
+.panel-alert p { margin: 8px 0 0; }
+.details-btn { margin-top: 24px; width: 100%; justify-content: center; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0);
+  white-space: nowrap; border: 0; }
+
+/* List view */
+.station-table { width: 100%; border-collapse: collapse; font-size: 18px; }
+.station-table th, .station-table td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.station-table thead th { font-size: 16px; color: var(--text-2); font-weight: 600; padding-top: 0; }
+.station-table tbody tr { cursor: pointer; }
+.station-table tbody tr:hover { background: var(--soft); }
+.station-table tbody tr.is-selected { background: var(--mint); }
+.row-btn { font: inherit; font-weight: 600; background: none; border: 0; padding: 8px 0; min-height: 44px; color: var(--forest);
+  cursor: pointer; text-align: left; }
+.cell-status { white-space: nowrap; }
+.cell-status .dot { margin-right: 8px; }
+.station-table .badge { margin: 0 0 8px; }
 
 /* ---------------------------------------------------------------- footer and bottom nav */
 .site-footer { background: var(--forest); color: #e6efe9; padding: 40px 0 48px; }
@@ -236,10 +236,6 @@ main:focus { outline: none; }
   .numbers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .steps { grid-template-columns: minmax(0, 1fr); gap: 24px; }
   .stations-grid { grid-template-columns: minmax(0, 1fr); gap: 24px; }
-  .map-layout { grid-template-columns: minmax(0, 1fr); }
-  .map-col { order: 2; }
-  .result-card { order: 1; }
-  #map { height: 460px; }
 }
 @media (max-width: 760px) {
   body { font-size: 17px; padding-bottom: 76px; }
@@ -251,8 +247,6 @@ main:focus { outline: none; }
   .hero-text { font-size: 19px; }
   .hero-actions .btn { width: 100%; justify-content: center; }
   .numbers strong { font-size: 34px; }
-  .result-card { padding: 18px; }
-  #map { height: 380px; }
   .bottom-nav { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000; background: var(--white);
     border-top: 1px solid var(--border); }
   .bottom-nav ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); list-style: none; margin: 0; padding: 0; }
@@ -268,7 +262,6 @@ main:focus { outline: none; }
 }
 .status-counts li { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 
-@media (min-width: 1001px) { .map-col { position: sticky; top: 84px; } }
 
 /* ---------------------------------------------------------------- How it works, SMS demo, Contact */
 .sub-title { font-size: 24px; margin-top: 32px; }
@@ -410,8 +403,41 @@ textarea.field { max-width: 640px; resize: vertical; }
 .stale-note .icon, .flat-note .icon { color: var(--leaf); flex: none; margin-top: 2px; }
 .flat-note { margin-top: 20px; }
 .day-note { color: var(--text-2); font-size: 16px; margin: -4px 0 10px; }
-.station-row .row-name { font-weight: 600; }
-.station-row .row-name .muted { font-weight: 400; }
-.station-row .row-seen { color: var(--text-2); font-size: 15px; }
 .chart-key { gap: 6px 16px; }
 .key-item { display: inline-flex; align-items: center; gap: 6px; }
+
+/* ---------------------------------------------------------------- weather map: smaller screens */
+@media (max-width: 1000px) {
+  .map-layout { grid-template-columns: minmax(0, 1fr); }
+  #map { height: 460px; }
+  .map-page { padding-bottom: 120px; }
+  /* Bottom sheet: the header row is always visible; the readings open with the arrow button or a tap. */
+  .panel { position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 900; border-radius: 16px 16px 0 0;
+    border-bottom: 0; padding: 16px; max-height: 75vh; overflow-y: auto; box-shadow: 0 -4px 16px rgba(15, 61, 46, .14); }
+  .panel-title h2 { font-size: 22px; }
+  .panel-body { display: none; }
+  .panel.is-open .panel-body { display: block; }
+  .sheet-toggle { display: grid; place-items: center; width: 44px; height: 44px; flex: none; border: 1px solid var(--border);
+    border-radius: 50%; background: var(--white); color: var(--forest); cursor: pointer; }
+  .sheet-toggle .icon { width: 24px; height: 24px; transform: rotate(-90deg); }
+  .panel.is-open .sheet-toggle .icon { transform: rotate(90deg); }
+}
+@media (max-width: 760px) {
+  .map-page { padding-bottom: 104px; }
+  .panel { bottom: 81px; max-height: calc(100vh - 160px); border-bottom: 1px solid var(--border); }
+  #map { height: 420px; }
+  .map-controls { flex-direction: column; align-items: stretch; }
+  .view-switch { align-self: flex-start; }
+  /* List rows stack: station and status on top, then the last reading, temperature and rain. */
+  .station-table thead { display: none; }
+  .station-table, .station-table tbody { display: block; }
+  .station-table tr { display: grid; grid-template-columns: repeat(3, auto); justify-content: space-between; gap: 0 16px;
+    padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .station-table th, .station-table td { display: block; border: 0; padding: 0; }
+  .station-table th { grid-column: 1 / 3; grid-row: 1; }
+  .station-table .row-area { display: inline; font-weight: 400; color: var(--text-2); margin-left: 8px; }
+  .station-table .cell-status { grid-column: 3; grid-row: 1; align-self: center; justify-self: end; }
+  .station-table .cell-area { display: none; }
+  .station-table td.cell-data { grid-row: 2; color: var(--text-2); font-size: 16px; }
+}
+.row-area { display: none; }

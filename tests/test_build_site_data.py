@@ -433,7 +433,8 @@ class RealDataTests(unittest.TestCase):
         for key in ["eat", "date_time", "measured_today", "measured_on", "last_reading"]:
             self.assertIn("EAT", strings["time"][key])
         self.assertIn("EAT", strings["home"]["hero_data"])
-        self.assertIn("EAT", strings["map"]["last_seen_short"])
+        for key in ["status_line_on", "status_line_off", "updated_today", "updated_on", "stale"]:
+            self.assertIn("EAT", strings["map"][key], key)
         self.assertIn("EAT", strings["charts"]["last_reading"])
 
 
@@ -445,17 +446,40 @@ class PagesTests(unittest.TestCase):
     def test_map_and_hero_polish(self):
         css = (WEB / "css" / "styles.css").read_text(encoding="utf-8")
         self.assertIn("scroll-margin-top", css)                      # sticky header never covers an anchor
-        self.assertRegex(css, r"\.leaflet-tile-pane \{ filter: grayscale\(0\.7\)")
+        self.assertRegex(css, r"\.tiles-osm \.leaflet-tile-pane \{ filter: grayscale\(1\)")  # quiet basemap
         self.assertRegex(css, r"\.area-btn \{[^}]*border-radius: 10px")
-        self.assertNotRegex(css, r"\.mk-count \{[^}]*background")    # cluster colour comes from its status class
+        for state in ["today", "recent", "off"]:                    # three marker states, one per class
+            self.assertRegex(css, rf"\.mk-{state}::before \{{")
+            self.assertRegex(css, rf"\.dot-{state} \{{")
+        self.assertNotIn(".mk-count", css)                           # no clustering
+        self.assertRegex(css, r"\.panel \{[^}]*border-radius: 16px")
         map_js = (WEB / "js" / "map.js").read_text(encoding="utf-8")
-        self.assertNotIn("days-small", map_js)                       # one row per day, no narrow tiles
-        self.assertIn("mk-count mk-' + code", map_js)
-        self.assertIn("zoomArea: true", map_js)                      # choosing an area zooms to it
-        # A day's status checks codes in the same order as the engine's precedence.
-        order = re.search(r"function dayStatus\(day\) \{(.*?)\n  \}", map_js, re.S).group(1)
-        positions = [order.index('"' + code + '"') for code in ["warning", "watch", "planting", "delay", "none"]]
-        self.assertEqual(positions, sorted(positions))
+        self.assertNotIn("days-small", map_js)
+        self.assertIn('"#station=" + id', map_js)                   # map.html#station=113
+        self.assertIn('href="station.html?id=', map_js)             # See full details
+
+    def test_weather_map_page_layout(self):
+        """Status line, chips, Map | List, map with legend and help note, list, one panel; no card grid."""
+        page = (WEB / "map.html").read_text(encoding="utf-8")
+        for marker in ['id="map-status"', 'id="area-chips"', 'data-view="map"', 'data-view="list"', 'id="map"',
+                       'id="legend"', 'class="map-help"', 'id="station-list"', 'id="panel"']:
+            self.assertIn(marker, page)
+        for gone in ["station-groups", "all-title", "js/charts.js", "result-card"]:
+            self.assertNotIn(gone, page)
+        strings = json.loads((WEB / "i18n" / "en.json").read_text(encoding="utf-8"))["map"]
+        self.assertEqual(strings["view_map"], "Map")
+        self.assertEqual(strings["view_list"], "List")
+        self.assertIn("{n} of {total} stations sent data in the last 2 days", strings["status_line"])
+        self.assertEqual(strings["latest"], "Latest readings")
+        self.assertEqual(strings["updated_today"], "Updated {time} EAT")
+        self.assertEqual(strings["rain_window"], "Rain between 8 am and midnight (night rain is not measured)")
+        self.assertIn("mostly repeats the recent daily pattern", strings["outlook_note"])
+        self.assertEqual(strings["no_reading_today"], "No reading today")
+        self.assertEqual(strings["after_dark"], "after dark")
+        text = re.sub(r"<[^>]+>", " ", re.sub(r"<script.*?</script>", " ", page, flags=re.S))
+        self.assertIsNone(re.search(r"\b(now|live)\b", text + " ".join(string_values(strings)), re.I))
+        self.assertNotIn("wind", " ".join(string_values(strings)).lower())  # no wind or light level on the map
+        self.assertNotIn("light", " ".join(string_values(strings)).lower())
         home_js = (WEB / "js" / "home.js").read_text(encoding="utf-8")
         self.assertIn('I.t("home.hero_data"', home_js)               # plain counts, not the engine's week line
         self.assertNotIn("headline_week", home_js)
