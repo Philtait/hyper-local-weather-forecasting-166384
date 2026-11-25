@@ -204,6 +204,40 @@ def day_rows(rows, insights, config):
     return out
 
 
+def planting_card(insights, config):
+    """The planting card: the engine's advisory, or the Streamlit app's 'no planting rain' wording."""
+    item = next((entry for entry in insights if entry["type"] == "planting_window"), None)
+    if item:
+        return {"status": "planting", "badge": STATUS["planting"][0], "text": sms_action(item, config),
+                "detail": item["message"]}
+    rule = config["planting_window"]
+    return {"status": None, "badge": None, "detail": None,
+            "text": (f"No good planting rain in the next {config['forecast']['horizon_days']} days: the rain "
+                     f"does not reach {rule['min_total_mm']:g} mm over {rule['window_days']} days with at "
+                     f"least {rule['min_rain_days']} rainy days.")}
+
+
+def operations(rows, insights, as_of, config):
+    """Two field-work tiles driven by the planting-window and rain-delay rules."""
+    planting = next((entry for entry in insights if entry["type"] == "planting_window"), None)
+    delay = next((entry for entry in insights if entry["type"] == "rain_delay"), None)
+    rule = config["rain_delay"]
+    out = [{"key": "planting", "title": "Planting", "state": "go" if planting else "wait",
+            "text": (sms_action(planting, config).split(". ")[0] + "." if planting
+                     else "Not enough rain is forecast for planting this week.")}]
+    if delay:
+        out.append({"key": "spraying", "title": "Spraying", "state": "hold", "text": sms_action(delay, config)})
+    else:
+        last = as_of + timedelta(days=rule["lookahead_days"])
+        window = [number(row.rain_mm) for row in rows.itertuples() if as_of < row.date <= last]
+        known = len(window) == rule["lookahead_days"] and all(value is not None for value in window)
+        out.append({"key": "spraying", "title": "Spraying", "state": "go" if known else "unknown",
+                    "text": (f"No day with {rule['rain_day_mm']:g} mm of rain or more in the next "
+                             f"{rule['lookahead_days']} days." if known
+                             else f"Not enough forecast data for the next {rule['lookahead_days']} days.")})
+    return out
+
+
 # =============================================================================
 # Stations, scenarios
 # =============================================================================
@@ -262,6 +296,9 @@ def build_stations(forecast, status, latest, features, config):
             "latest": reading if active else None,
             "forecast": day_rows(rows, insights, config) if active else [],
             "insights": [describe(item, days, name, config) for item in ordered] if active else [],
+            "planting": planting_card(insights, config) if active and len(rows) else None,
+            "operations": operations(rows, insights, rows.date.min() - timedelta(days=1), config)
+            if active and len(rows) else [],
         })
     return stations
 
