@@ -1,0 +1,28 @@
+device_id,status,seconds,errors,notes,python,pandas,numpy,statsmodels,scikit-learn,as_of
+101990961244800001,ok,69.9,,,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800005,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800061,partial,150.5,"wind_speed: RuntimeError: Optimizer did not converge within 1000 iterations: Setting the shape on a NumPy array has been deprecated in NumPy 2.5.
+As an alternative, you can create a new view using np.reshape (with copy=False if needed). | Maximum Likelihood optimization failed to converge. Check mle_retvals",wind forecast failed to converge,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800083,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800101,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800102,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800113,ok,109.0,,,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800131,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800184,ok,62.1,,,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800201,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800207,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800222,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800246,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800270,ok,67.8,,,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800281,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800302,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800306,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800317,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800336,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800342,ok,66.2,,,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800348,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800361,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800375,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800389,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800393,inactive,,,not forecast: station not reporting,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
+101990961244800395,ok,90.1,,,3.12.10,2.3.3,2.5.3,0.14.5,1.9.1,2026-11-24T17:26:33Z
