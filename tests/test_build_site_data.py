@@ -435,7 +435,7 @@ class RealDataTests(unittest.TestCase):
         self.assertIn("EAT", strings["home"]["hero_data"])
         for key in ["status_line_on", "status_line_off", "updated_today", "updated_on", "stale"]:
             self.assertIn("EAT", strings["map"][key], key)
-        self.assertIn("EAT", strings["charts"]["last_reading"])
+        self.assertIn("EAT", strings["station"]["working_last"])
 
 
 class PagesTests(unittest.TestCase):
@@ -457,6 +457,33 @@ class PagesTests(unittest.TestCase):
         self.assertNotIn("days-small", map_js)
         self.assertIn('"#station=" + id', map_js)                   # map.html#station=113
         self.assertIn('href="station.html?id=', map_js)             # See full details
+
+    def test_station_page(self):
+        """station.html: not in the main nav (Weather map stays highlighted), three accessible tabs, cached offline."""
+        page = (WEB / "station.html").read_text(encoding="utf-8")
+        self.assertEqual(page.count('aria-current="page"'), 2)
+        self.assertEqual(page.count('href="map.html" aria-current="page"'), 2)    # top nav and bottom nav
+        for name in self.PAGES:
+            self.assertNotIn('href="station.html"', (WEB / name).read_text(encoding="utf-8"), f"{name} links station.html in its nav")
+        self.assertIn('role="tablist"', page)
+        self.assertEqual(page.count('role="tab"'), 3)
+        self.assertEqual(page.count('role="tabpanel"'), 3)
+        for tab in ["latest", "days", "working"]:
+            self.assertIn(f'id="tab-{tab}" data-tab="{tab}" aria-controls="panel-{tab}"', page)
+        self.assertIn("Back to the map", page)
+        scripts = re.findall(r'<script src="([^"]+)"', page)
+        self.assertEqual(scripts[-4:], ["js/map-logic.js", "js/station-logic.js", "js/charts.js", "js/station.js"])
+        worker = (WEB / "sw.js").read_text(encoding="utf-8")
+        for name in ["station.html", "js/station.js", "js/station-logic.js", "js/charts.js", "js/map-logic.js"]:
+            self.assertIn(f'"{name}"', worker, name)
+        strings = json.loads((WEB / "i18n" / "en.json").read_text(encoding="utf-8"))["station"]
+        self.assertEqual(strings["tab_latest"], "Latest readings")   # never "Now"
+        self.assertEqual(strings["rain_measured"], "Rain was measured on {n} of the last {total} days (total {mm} mm).")
+        self.assertIn("so a chart would be misleading", strings["sparse"])
+        station_js = (WEB / "js" / "station.js").read_text(encoding="utf-8")
+        self.assertIn('t("map.no_forecast")', station_js)                 # model failed: readings, no outlook strip
+        self.assertIn("ArrowRight", station_js)                          # keyboard tabs
+        self.assertIn('history.replaceState(null, "", "#" + state.tab)', station_js)
 
     def test_weather_map_page_layout(self):
         """Status line, chips, Map | List, map with legend and help note, list, one panel; no card grid."""

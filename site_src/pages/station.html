@@ -1,0 +1,15 @@
+<section class="band page-top station-page" aria-labelledby="station-title">
+  <div class="wrap">
+    <p class="back-link"><a href="map.html">{{icon:arrow}}<span>{{t:station.back}}</span></a></p>
+    <h1 id="station-title">{{t:station.loading}}</h1>
+    <p class="status-line station-status" id="station-status"></p>
+    <div class="tabs" id="station-tabs" role="tablist" aria-label="{{t:station.tabs_label}}">
+      <button type="button" role="tab" class="tab" id="tab-latest" data-tab="latest" aria-controls="panel-latest" aria-selected="true">{{t:station.tab_latest}}</button>
+      <button type="button" role="tab" class="tab" id="tab-days" data-tab="days" aria-controls="panel-days" aria-selected="false" tabindex="-1">{{t:station.tab_days}}</button>
+      <button type="button" role="tab" class="tab" id="tab-working" data-tab="working" aria-controls="panel-working" aria-selected="false" tabindex="-1">{{t:station.tab_working}}</button>
+    </div>
+    <div class="tab-panel" role="tabpanel" id="panel-latest" aria-labelledby="tab-latest" tabindex="0"></div>
+    <div class="tab-panel" role="tabpanel" id="panel-days" aria-labelledby="tab-days" tabindex="0" hidden></div>
+    <div class="tab-panel" role="tabpanel" id="panel-working" aria-labelledby="tab-working" tabindex="0" hidden></div>
+  </div>
+</section>

@@ -101,6 +101,6 @@ The function sends only to the Africa's Talking sandbox and refuses to run with 
 
 ```
 python -m pytest -q tests/test_build_site_data.py
-node --test tests/node/send_sms.test.js tests/node/sms_message.test.js tests/node/map_logic.test.js
+node --test tests/node/send_sms.test.js tests/node/sms_message.test.js tests/node/map_logic.test.js tests/node/station_logic.test.js
 python scripts/make_icons.py     # redraws the PWA icons
 ```
