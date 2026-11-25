@@ -34,6 +34,8 @@ NEVER_SHOW = [
     "live telemetry", "dismiss", "confidence interval", "envelope", "busia central station",
     # removed from the site: the sample-data banner and presentation mode
     "sample data", "presentation mode", "synthetic",
+    # real data: no "right now" for old readings, no unverified units, no export jargon
+    "right now", "reporting now", "km/h", "lux", "light level", "light intensity", "as-of",
 ]
 # The pages show no model names or accuracy figures at all.
 PAGE_ONLY = ["neural network", "accuracy", "skill score", "typical error"]
@@ -166,7 +168,7 @@ class SyntheticBuildTests(unittest.TestCase):
                     gaps += 1
                     self.assertIsNone(day["rain_mm"])
                     self.assertIsNone(day["humidity_mean"])
-            self.assertEqual(station["coverage_14d"], sum(day["readings_received"] > 0 for day in history))
+            self.assertEqual(station["days_with_data_14d"], sum(day["readings_received"] > 0 for day in history))
             if not station["active"]:
                 self.assertEqual(station["forecast"], [])
         self.assertGreater(gaps, 0, "synthetic history should include days without data")
@@ -198,24 +200,94 @@ class StatusPrecedenceTests(unittest.TestCase):
         got = {station["id"]: station["status"]["code"] for station in stations}
         self.assertEqual(got, {key[-3:]: expected for key, (_, _, expected) in cases.items()})
         self.assertIs(meta["synthetic"], False)
-        spraying = {s["id"]: next(o for o in s["operations"] if o["key"] == "spraying")["state"] for s in stations if s["active"]}
-        # Without history_daily.csv the charts get no history and no coverage count.
-        self.assertTrue(all(s["history"] == [] and s["coverage_14d"] is None for s in stations))
+        spraying = {s["id"]: next(o for o in s["operations"] if o["key"] == "spraying")["state"]
+                    for s in stations if s["active"] and s["operations"]}
+        # Without history_daily.csv the charts get no history and no day count.
+        self.assertTrue(all(s["history"] == [] and s["days_with_data_14d"] is None for s in stations))
         self.assertEqual(spraying["004"], "hold")
-        self.assertEqual(spraying["005"], "go")
+        # An all-dry week does not change from day to day, so it gets no field-work advice at all.
+        flat = next(s for s in stations if s["id"] == "005")
+        self.assertTrue(flat["flat"])
+        self.assertEqual(flat["operations"], [])
+        self.assertEqual(flat["advice_note"], builder.FLAT_NOTE)
+
+
+class FlatForecastTests(unittest.TestCase):
+    """A forecast with almost no day-to-day change gives no planting or rain-delay advice anywhere."""
+
+    def build(self, stations, variation=None):
+        with tempfile.TemporaryDirectory() as deploy, tempfile.TemporaryDirectory() as out:
+            folder = Path(deploy)
+            write_deploy(folder, stations)
+            if variation is not None:  # the export's forecast_variation_mm column
+                rows = [[device, "planting_window", "advisory", "2026-12-01", "m", "b", "2026-11-30", "c", value]
+                        for device, value in variation.items()]
+                pd.DataFrame(rows, columns=builder.DEPLOY_FILES["insights_latest.csv"] + ["forecast_variation_mm"]).to_csv(
+                    folder / "insights_latest.csv", index=False)
+            builder.build(deploy, out, ROOT / "reports")
+            stations = json.loads((Path(out) / "stations.json").read_text(encoding="utf-8"))["stations"]
+            meta = json.loads((Path(out) / "meta.json").read_text(encoding="utf-8"))
+        return {s["id"]: s for s in stations}, meta
+
+    def test_flat_forecast_drops_planting_and_delay_but_keeps_flood_alerts(self):
+        got, meta = self.build({
+            "101990961244800001": (True, [6, 6, 6, 6, 6, 6, 6]),        # would be planting: flat, so none
+            "101990961244800002": (True, [25, 25, 25.5, 25, 25, 25, 25]),  # flat, but heavy rain still counts
+            "101990961244800003": (True, [5, 6, 5, 4, 0, 0, 0]),        # changes: planting as before
+        })
+        self.assertEqual(got["001"]["status"]["code"], "none")
+        self.assertTrue(got["001"]["flat"])
+        self.assertEqual(got["001"]["operations"], [])
+        self.assertIsNone(got["001"]["planting"])
+        for station in got.values():
+            if station["flat"]:
+                self.assertFalse(any(item["type"] in builder.ADVICE_TYPES for item in station["insights"]))
+                self.assertFalse(any(day["planting"] or day["alert"] == "delay" for day in station["forecast"]))
+        self.assertEqual(got["002"]["status"]["code"], "watch")
+        self.assertEqual(got["003"]["status"]["code"], "planting")
+        self.assertFalse(got["003"]["flat"])
+        self.assertEqual(meta["counts"]["stations_flat_forecast"], 2)
+
+    def test_variation_from_the_export_wins(self):
+        got, _ = self.build({"101990961244800003": (True, [5, 6, 5, 4, 0, 0, 0])}, variation={"101990961244800003": 0.5})
+        self.assertTrue(got["003"]["flat"])
+        self.assertEqual(got["003"]["status"]["code"], "none")
+
+
+class LatestReadingTests(unittest.TestCase):
+    """Latest readings carry only values with a documented unit; wind, gust and light are left out."""
+
+    def test_latest_fields(self):
+        device = "101990961244800001"
+        with tempfile.TemporaryDirectory() as deploy, tempfile.TemporaryDirectory() as out:
+            folder = Path(deploy)
+            write_deploy(folder, {device: (True, [5, 6, 5, 4, 0, 0, 0])})
+            columns = builder.DEPLOY_FILES["latest_readings.csv"] + [
+                "light_intensity", "uv_index", "barometric_pressure", "peak_wind_gust", "wind_direction", "rain_since_morning_mm"]
+            pd.DataFrame([[device, "2026-11-30T05:55:00Z", 21.2, 85, 1.4, 3.0, 2.0, 110000, -1, 873.2, 2.5, 185, 1.2]],
+                         columns=columns).to_csv(folder / "latest_readings.csv", index=False)
+            builder.build(deploy, out, ROOT / "reports")
+            station = json.loads((Path(out) / "stations.json").read_text(encoding="utf-8"))["stations"][0]
+            meta = json.loads((Path(out) / "meta.json").read_text(encoding="utf-8"))
+        latest = station["latest"]
+        self.assertEqual(latest["time_utc"], "2026-11-30T05:55:00Z")
+        self.assertEqual(latest["rain_since_morning_mm"], 1.2)
+        self.assertEqual(latest["pressure_hpa"], 873)
+        self.assertIsNone(latest["uv_index"])                       # negative UV is not a reading
+        for key in latest:
+            self.assertNotRegex(key, "wind|gust|light")             # units not verified
+        self.assertEqual(meta["headline"], "1 of 1 stations sent data in the last 2 days.")
+        self.assertEqual(meta["latest_reading_utc"], "2026-11-30T06:00:00Z")
 
 
 class HistoryFileTests(unittest.TestCase):
-    """history_daily.csv and coverage_14d are read when the export has them."""
+    """history_daily.csv is read when the export has it; days with data are counted from it."""
 
-    def test_history_rows_and_coverage_come_from_the_export(self):
+    def test_history_rows_and_days_with_data_come_from_the_export(self):
         device = "101990961244800083"
         with tempfile.TemporaryDirectory() as deploy, tempfile.TemporaryDirectory() as out:
             folder = Path(deploy)
             write_deploy(folder, {device: (True, [0, 0, 0, 0, 0, 0, 0])})
-            status = pd.read_csv(folder / "station_status.csv", dtype={"device_id": "string"})
-            status["coverage_14d"] = 11
-            status.to_csv(folder / "station_status.csv", index=False)
             rows = [[device, "2026-11-30", 4.2, 15.1, 27.3, 81, 24], [device, "2026-11-29", None, None, None, None, 0],
                     [device, "2026-11-28", 0.0, 15.0, 26.0, 70, 12]]
             pd.DataFrame(rows, columns=builder.HISTORY_COLUMNS).to_csv(folder / builder.HISTORY_FILE, index=False)
@@ -227,7 +299,7 @@ class HistoryFileTests(unittest.TestCase):
         self.assertIsNone(history["2026-11-29"]["rain_mm"])           # no readings: unknown, not zero
         self.assertEqual(history["2026-11-28"]["rain_mm"], 0.0)       # a measured dry day stays zero
         self.assertIsNone(history["2026-11-20"]["rain_mm"])           # absent from the file: unknown
-        self.assertEqual(station["coverage_14d"], 11)                 # the export's value wins
+        self.assertEqual(station["days_with_data_14d"], 2)            # days with at least one reading
 
 
 class SyntheticGuardTests(unittest.TestCase):
@@ -289,6 +361,40 @@ class NeverShowTests(unittest.TestCase):
             self.assertIsNone(EIGHTEEN_DIGITS.search(joined), path.name)
 
 
+class RealDataTests(unittest.TestCase):
+    """web/data built from deploy_data: not synthetic, every station placed, times labelled EAT."""
+
+    @classmethod
+    def setUpClass(cls):
+        if not (WEB / "data" / "meta.json").is_file():
+            raise unittest.SkipTest("web/data is not built")
+        cls.meta = json.loads((WEB / "data" / "meta.json").read_text(encoding="utf-8"))
+        if cls.meta.get("synthetic"):
+            raise unittest.SkipTest("web/data is a synthetic preview")
+        cls.stations = json.loads((WEB / "data" / "stations.json").read_text(encoding="utf-8"))["stations"]
+
+    def test_counts_match_the_stations(self):
+        counts = self.meta["counts"]
+        self.assertEqual(counts["stations_total"], len(self.stations))
+        self.assertEqual(counts["stations_reporting"], sum(s["active"] for s in self.stations))
+        self.assertTrue(all(s["lat"] is not None and s["area"] for s in self.stations))
+        for s in self.stations:
+            if not s["active"]:
+                self.assertEqual(s["forecast"], [])
+            for day in s["forecast"]:
+                self.assertIsNone(day["temp_min"])  # no overnight low in the export
+            if s["flat"]:
+                self.assertNotIn(s["status"]["code"], {"planting", "delay"})
+
+    def test_every_shown_time_is_labelled_eat(self):
+        strings = json.loads((WEB / "i18n" / "en.json").read_text(encoding="utf-8"))
+        for key in ["eat", "date_time", "measured_today", "measured_on", "last_reading"]:
+            self.assertIn("EAT", strings["time"][key])
+        self.assertIn("EAT", strings["home"]["hero_data"])
+        self.assertIn("EAT", strings["map"]["last_seen_short"])
+        self.assertIn("EAT", strings["charts"]["last_reading"])
+
+
 class PagesTests(unittest.TestCase):
     """Five pages share one header, footer and bottom navigation, built from site_src/."""
 
@@ -309,7 +415,8 @@ class PagesTests(unittest.TestCase):
         positions = [order.index('"' + code + '"') for code in ["warning", "watch", "planting", "delay", "none"]]
         self.assertEqual(positions, sorted(positions))
         home_js = (WEB / "js" / "home.js").read_text(encoding="utf-8")
-        self.assertIn(r'replace(/\s+this week(\.?)\s*$/i, "$1")', home_js)
+        self.assertIn('I.t("home.hero_data"', home_js)               # plain counts, not the engine's week line
+        self.assertNotIn("headline_week", home_js)
 
     def test_pages_are_up_to_date_with_their_sources(self):
         import build_pages
