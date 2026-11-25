@@ -33,7 +33,7 @@ import pandas as pd  # noqa: E402
 
 from app import (  # noqa: E402  (same precedence and wording as the Streamlit app)
     DEPLOY_FILES, LOCAL_TZ, RELIABILITY, STATUS, main_insight, prepare_forecast, prepare_latest,
-    prepare_status, short_ids, status_key, what_to_do,
+    prepare_status, short_ids, status_key, summary_sentence, what_to_do,
 )
 from geo import BOUNDARIES, load_boundaries, sub_county  # noqa: E402
 from insights import generate_insights, load_config, sms_action, sms_text  # noqa: E402
@@ -481,6 +481,8 @@ def build(deploy_dir, out_dir, reports_dir, synthetic=False):
 
     out_dir.mkdir(parents=True, exist_ok=True)
     alert_codes = {"warning", "watch", "planting", "delay"}
+    headline = summary_sentence(pd.DataFrame({"active": [station["active"] for station in stations],
+                                              "key": [station["status"]["code"] for station in stations]}))
     meta = {
         "synthetic": bool(synthetic),
         "as_of": as_of.isoformat(),
@@ -494,6 +496,9 @@ def build(deploy_dir, out_dir, reports_dir, synthetic=False):
             "stations_heavy_rain": sum(station["status"]["code"] in {"warning", "watch"} for station in stations),
             "alerts_total": generated,
         },
+        # The engine's one-line summary (same words as the Streamlit overview).
+        "headline": headline,
+        "headline_week": headline.split(". ", 1)[-1],
         "statuses": [dict(status_block(code), order=index) for index, code in enumerate(STATUS_CODES)],
         "thresholds": {"heavy_rain_mm": config["flood_alert"]["watch_mm"],
                        "very_heavy_rain_mm": config["flood_alert"]["warning_mm"],
@@ -502,7 +507,7 @@ def build(deploy_dir, out_dir, reports_dir, synthetic=False):
         "reliability": [line for line in RELIABILITY if "high estimate" not in line],
         "boundary_file": "data/kenya_boundaries.geojson",
         "credits": {"boundaries": boundary_credit(), "data_sources": SOURCES,
-                    "map_tiles": "Map tiles by CARTO, map data by OpenStreetMap contributors"},
+                    "map_tiles": "Map data from OpenStreetMap contributors"},
         "source_dir": "synthetic" if synthetic else deploy_dir.name,
     }
     write_json(out_dir / "meta.json", meta)
