@@ -54,7 +54,8 @@
     if (!s.active) {
       var stopped = I.longDate(I.localDay(s.last_reading_utc));
       html += '<p class="station-line">' + esc(s.label) + "</p>" + I.badge("offline") +
-        '<p class="action">' + esc(t("map.not_reporting", { date: stopped })) + "</p>";
+        '<p class="action">' + esc(t("map.not_reporting", { date: stopped })) + "</p>" +
+        '<div class="chart-slot" id="chart-slot"></div>';
     } else {
       html += '<p class="station-line">' + esc(t("map.station_updated", { station: s.label, time: I.whenSeen(s.last_reading_utc, state.meta.as_of) })) + "</p>" +
         I.badge(s.status.code) + '<p class="action">' + esc(s.what_to_do) + "</p>" +
@@ -70,6 +71,7 @@
       }).join("") + "</p>";
     }
     document.getElementById("result").innerHTML = html;
+    if (I.charts) I.charts.render(document.getElementById("chart-slot"), s, state.meta);
   }
 
   /* ------------------------------------------------------------ selection */

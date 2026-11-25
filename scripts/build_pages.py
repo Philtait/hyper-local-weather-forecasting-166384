@@ -27,9 +27,9 @@ PAGES = [
      ['<link rel="preload" href="img/about-field.webp" as="image" type="image/webp">'], ["js/home.js"]),
     ("how", "how-it-works.html", "how.page_title", "info", [], []),
     ("map", "map.html", "map.page_title", "pin",
-     ['<link rel="stylesheet" href="vendor/leaflet/leaflet.css">'], ["vendor/leaflet/leaflet.js", "js/map.js"]),
-    ("sms", "sms.html", "sms.page_title", "message", [], []),
-    ("contact", "contact.html", "contact.page_title", "mail", [], []),
+     ['<link rel="stylesheet" href="vendor/leaflet/leaflet.css">'], ["vendor/leaflet/leaflet.js", "js/charts.js", "js/map.js"]),
+    ("sms", "sms.html", "sms.page_title", "message", [], ["js/sms.js"]),
+    ("contact", "contact.html", "contact.page_title", "mail", [], ["js/contact.js"]),
 ]
 PLACEHOLDER = re.compile(r"\{\{(t|icon):([\w.]+)\}\}")
 

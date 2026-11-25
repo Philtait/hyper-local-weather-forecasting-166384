@@ -40,6 +40,10 @@ from insights import generate_insights, load_config, sms_action, sms_text  # noq
 
 ASSETS_README = ROOT / "assets" / "README.md"
 REQUIRED = ["forecast_daily.csv", "station_status.csv", "insights_latest.csv", "README.md"]
+# Optional: measured daily history for the station charts, and days with data in the last 14 days.
+HISTORY_FILE = "history_daily.csv"
+HISTORY_COLUMNS = ["device_id", "date", "rain_mm", "temp_min", "temp_max", "humidity_mean", "readings_received"]
+HISTORY_DAYS = 14
 STATUS_CODES = list(STATUS)  # precedence order, worst first
 ALERT_TITLES = {
     ("flood_alert", "warning"): "Very heavy rain",
@@ -252,7 +256,48 @@ def iso_utc(value):
     return pd.Timestamp(value).tz_convert("UTC").strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def build_stations(forecast, status, latest, features, config):
+def read_history(deploy_dir):
+    """history_daily.csv as a frame with real dates, or None when the export does not have it yet."""
+    path = Path(deploy_dir) / HISTORY_FILE
+    if not path.is_file():
+        return None
+    frame = read_csv(path)
+    missing = set(HISTORY_COLUMNS) - set(frame.columns)
+    if missing:
+        raise SystemExit(f"{HISTORY_FILE} is missing columns: {', '.join(sorted(missing))}")
+    frame["date"] = pd.to_datetime(frame.date).dt.date
+    return frame
+
+
+def read_coverage(deploy_dir):
+    """coverage_14d per device from station_status.csv, when the column exists."""
+    frame = read_csv(Path(deploy_dir) / "station_status.csv")
+    if "coverage_14d" not in frame.columns:
+        return {}
+    return {row.device_id: int(row.coverage_14d) for row in frame.itertuples() if pd.notna(row.coverage_14d)}
+
+
+def history_rows(history, device_id, as_of):
+    """The last 14 days up to as_of. A day without readings has rain_mm None (unknown), never zero."""
+    if history is None:
+        return []
+    rows = history.loc[history.device_id.eq(device_id)].set_index("date")
+    out = []
+    for offset in range(HISTORY_DAYS - 1, -1, -1):
+        day = as_of - timedelta(days=offset)
+        row = rows.loc[day] if day in rows.index else None
+        if isinstance(row, pd.DataFrame):
+            row = row.iloc[-1]
+        received = int(row.readings_received) if row is not None and pd.notna(row.readings_received) else 0
+        value = (lambda name, digits=1: number(row[name], digits)
+                 if row is not None and received > 0 and pd.notna(row[name]) else None)
+        out.append({"date": day.isoformat(), "rain_mm": value("rain_mm"), "temp_min": value("temp_min"),
+                    "temp_max": value("temp_max"), "humidity_mean": value("humidity_mean", 0),
+                    "readings_received": received})
+    return out
+
+
+def build_stations(forecast, status, latest, features, config, history=None, coverage=None, as_of=None):
     ids = sorted(set(forecast.device_id) | set(status.device_id))
     endings = short_ids(ids)
     stations = []
@@ -281,6 +326,7 @@ def build_stations(forecast, status, latest, features, config):
                 reading = {"time_utc": iso_utc(row.reading_time), "temperature_c": number(row.air_temperature),
                            "humidity_pct": number(row.air_humidity, 0), "wind_ms": number(row.wind_speed),
                            "rain_today_mm": number(row.rain_today_mm)}
+        past = history_rows(history, device_id, as_of) if as_of else []
         stations.append({
             "id": endings[device_id],
             "label": label,
@@ -299,6 +345,10 @@ def build_stations(forecast, status, latest, features, config):
             "planting": planting_card(insights, config) if active and len(rows) else None,
             "operations": operations(rows, insights, rows.date.min() - timedelta(days=1), config)
             if active and len(rows) else [],
+            "history": past,
+            # Days with data in the last 14: from the export when it has coverage_14d, else counted from history.
+            "coverage_14d": (coverage or {}).get(device_id,
+                                                 sum(day["readings_received"] > 0 for day in past) if past else None),
         })
     return stations
 
@@ -405,6 +455,28 @@ def data_quality(reports):
 # =============================================================================
 # Synthetic preview data
 # =============================================================================
+def synthetic_history(status, today):
+    """Fake daily history with gaps: partial days, a missing day, and silence after a station stops."""
+    rng = random.Random(4940)
+    rows = []
+    for device_id, _lat, _lon, seen, active, _reason in status:
+        last = datetime.fromisoformat(seen).date()
+        gap = rng.randint(2, 11) if rng.random() < 0.4 else None
+        for offset in range(HISTORY_DAYS - 1, -1, -1):
+            day = today - timedelta(days=offset)
+            if day > last or offset == gap:
+                rows.append([device_id, day.isoformat(), None, None, None, None, 0])
+                continue
+            received = 24 if rng.random() < 0.8 else rng.randint(6, 22)
+            if day == today:
+                received = min(received, 8)
+            rain = rng.choice([0, 0, 0, 0.4, 1.5, 3, 6, 9, 14, 23])
+            low = round(rng.uniform(14.5, 17.0), 1)
+            rows.append([device_id, day.isoformat(), round(rain * rng.uniform(0.8, 1.2), 1), low,
+                         round(low + rng.uniform(9, 13), 1), round(rng.uniform(62, 88)), received])
+    return rows
+
+
 def synthetic_deploy(folder, features, today):
     """Fake but plausible deploy files covering every status. Never real forecasts."""
     rng = random.Random(49)
@@ -445,9 +517,11 @@ def synthetic_deploy(folder, features, today):
                              round(value * 1.6, 1), low, round(low + rng.uniform(10, 13), 1), round(rng.uniform(2, 6), 1)])
         latest.append([device_id, seen.isoformat(), round(rng.uniform(19, 27), 1), round(rng.uniform(55, 90)),
                        round(rng.uniform(0.5, 4), 1), round(rng.uniform(0, 3), 1), 0.3])
+    history = synthetic_history(status, today)
     tables = {"forecast_daily.csv": forecast, "station_status.csv": status, "latest_readings.csv": latest}
     for name, rows in tables.items():
         pd.DataFrame(rows, columns=DEPLOY_FILES[name]).to_csv(folder / name, index=False)
+    pd.DataFrame(history, columns=HISTORY_COLUMNS).to_csv(folder / HISTORY_FILE, index=False)
     frame = pd.read_csv(folder / "forecast_daily.csv", dtype={"device_id": "string"})
     pd.DataFrame(generate_insights(frame)).reindex(columns=DEPLOY_FILES["insights_latest.csv"]).to_csv(
         folder / "insights_latest.csv", index=False)
@@ -472,7 +546,10 @@ def build(deploy_dir, out_dir, reports_dir, synthetic=False):
         raise SystemExit("forecast_daily.csv has no usable rows")
     as_of = forecast.date.min() - timedelta(days=1)
 
-    stations = build_stations(forecast, status, latest, features, config)
+    history = read_history(deploy_dir)
+    stations = build_stations(forecast, status, latest, features, config, history, read_coverage(deploy_dir), as_of)
+    if history is None:
+        print(f"Note: {HISTORY_FILE} is not in {deploy_dir}; the station charts will show the forecast only.")
     generated = sum(len(station["insights"]) for station in stations)
     exported = len(read_csv(deploy_dir / "insights_latest.csv"))
     if generated != exported:
