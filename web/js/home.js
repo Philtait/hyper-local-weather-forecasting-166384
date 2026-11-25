@@ -1,13 +1,19 @@
-/* Home page: numbers, the week's headline and a small station map. All numbers come from data/. */
+/* Home page: the stations summary line and a small station map. All numbers come from data/.
+   The circles use the same three states as the Weather map (js/map-logic.js). */
 (function () {
   "use strict";
-  var I = window.Imarika;
+  var I = window.Imarika, M = window.ImarikaMapLogic;
+  var STYLE = {
+    today: { fill: "#1f7a4d", stroke: "#ffffff", width: 2.5 },
+    recent: { fill: "#b5e2c6", stroke: "#1f7a4d", width: 3.5 },
+    off: { fill: "#ffffff", stroke: "#6b7280", width: 2.5 }
+  };
 
   function rings(geometry) {
     return (geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates).map(function (p) { return p[0]; });
   }
 
-  function miniMap(geo, stations) {
+  function miniMap(geo, stations, day) {
     var features = geo.features || [];
     var county = features.filter(function (f) { return f.properties.level === "county"; })[0];
     var areas = features.filter(function (f) { return f.properties.level === "sub-county"; });
@@ -38,46 +44,40 @@
       out.push('<text x="' + x(cx).toFixed(1) + '" y="' + y(cy).toFixed(1) + '" text-anchor="middle" font-size="15" font-weight="600" fill="#4a5a52">' +
         I.esc(f.properties.name) + "</text>");
     });
-    var fg = { warning: "#b3261e", watch: "#b45309", planting: "#166534", delay: "#1d4ed8", none: "#3d6b55", offline: "#6b7280" };
-    stations.slice().sort(function (a, b) { return I.ORDER[b.status.code] - I.ORDER[a.status.code]; }).forEach(function (s) {
-      if (s.lat == null) return;
-      var off = s.status.code === "offline";
-      out.push('<circle cx="' + x(s.lon).toFixed(1) + '" cy="' + y(s.lat).toFixed(1) + '" r="9" fill="' + (off ? "#ffffff" : fg[s.status.code]) +
-        '" stroke="' + (off ? fg.offline : "#ffffff") + '" stroke-width="2.5"' + (off ? ' stroke-dasharray="4 3"' : "") + "/>");
-    });
+    // Stations not reporting first, so the ones sending data sit on top.
+    stations.slice().sort(function (a, b) { return M.STATES.indexOf(M.stateOf(b, day)) - M.STATES.indexOf(M.stateOf(a, day)); })
+      .forEach(function (s) {
+        if (s.lat == null) return;
+        var st = STYLE[M.stateOf(s, day)];
+        out.push('<circle cx="' + x(s.lon).toFixed(1) + '" cy="' + y(s.lat).toFixed(1) + '" r="9" fill="' + st.fill +
+          '" stroke="' + st.stroke + '" stroke-width="' + st.width + '"/>');
+      });
     out.push("</svg>");
     return out.join("");
+  }
+
+  function dayWord(day) {
+    return day === I.localDay(new Date().toISOString()) ? I.t("time.today") : I.longDate(day);
   }
 
   I.ready.then(function (meta) {
     return Promise.all([I.getJSON("data/stations.json"), I.getJSON(meta.boundary_file).catch(function () { return null; })])
       .then(function (res) {
-        var stations = res[0].stations, geo = res[1];
-        var areas = {}, days = 0, counts = {};
-        stations.forEach(function (s) {
-          if (s.area) areas[s.area] = true;
-          days = Math.max(days, s.forecast.length);
-          counts[s.status.code] = (counts[s.status.code] || 0) + 1;
-        });
-        var values = { stations: stations.length, areas: Object.keys(areas).length,
-                       reporting: stations.filter(function (s) { return s.active; }).length, days: days };
-        Array.prototype.forEach.call(document.querySelectorAll("[data-count]"), function (el) {
-          el.textContent = values[el.getAttribute("data-count")];
-        });
-        document.getElementById("updated").textContent = I.t("home.updated", { time: I.dateTime(meta.generated_at) });
+        var stations = res[0].stations, geo = res[1], day = M.dataDay(meta, stations), counts = {};
+        stations.forEach(function (s) { var code = M.stateOf(s, day); counts[code] = (counts[code] || 0) + 1; });
         if (meta.latest_reading_utc) {
           // Plain counts from the data: stations that sent data recently and the newest reading, in Kenya time.
           document.getElementById("hero-week-text").textContent = I.t("home.hero_data", {
-            n: values.reporting, total: values.stations,
+            n: stations.filter(function (s) { return s.active; }).length, total: stations.length,
             date: I.longDate(I.localDay(meta.latest_reading_utc)), time: I.clock(meta.latest_reading_utc) });
           document.getElementById("hero-week").hidden = false;
         }
-        document.getElementById("status-counts").innerHTML = Object.keys(I.ORDER).filter(function (code) { return counts[code]; })
+        document.getElementById("status-counts").innerHTML = M.STATES.filter(function (code) { return counts[code]; })
           .map(function (code) {
-            var n = counts[code];
-            return "<li>" + I.badge(code) + ' <span class="muted">' + n + " " + I.esc(I.t(n === 1 ? "home.station_word" : "home.stations_word")) + "</span></li>";
+            return '<li><span class="dot dot-' + code + '" aria-hidden="true"></span><span>' +
+              I.esc(I.t("map.state_" + code, { day: dayWord(day) })) + '</span><strong>' + counts[code] + "</strong></li>";
           }).join("");
-        if (geo) document.getElementById("mini-map").innerHTML = miniMap(geo, stations);
+        if (geo) document.getElementById("mini-map").innerHTML = miniMap(geo, stations, day);
       });
   }).catch(function (err) { if (window.console) console.error(err); });
 })();

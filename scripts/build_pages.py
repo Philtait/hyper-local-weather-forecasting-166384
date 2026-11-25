@@ -24,7 +24,7 @@ STRINGS = WEB / "i18n" / "en.json"
 # key, output file, title string, nav icon, extra head lines, scripts
 PAGES = [
     ("home", "index.html", "home.title", "home",
-     ['<link rel="preload" href="img/about-field.webp" as="image" type="image/webp">'], ["js/home.js"]),
+     ['<link rel="preload" href="img/about-field.webp" as="image" type="image/webp">'], ["js/map-logic.js", "js/home.js"]),
     ("how", "how-it-works.html", "how.page_title", "info", [], []),
     ("map", "map.html", "map.page_title", "pin",
      ['<link rel="stylesheet" href="vendor/leaflet/leaflet.css">'], ["vendor/leaflet/leaflet.js", "js/map-logic.js", "js/map.js"]),

@@ -606,8 +606,25 @@ class PagesTests(unittest.TestCase):
 
     def test_home_numbers_are_not_hard_coded(self):
         text = (WEB / "index.html").read_text(encoding="utf-8")
-        numbers = re.search(r'<ul class="numbers".*?</ul>', text, re.S).group(0)
-        self.assertIsNone(re.search(r"<strong[^>]*>\s*\d", numbers))
+        self.assertIn('<ul class="status-counts" id="status-counts"></ul>', text)   # filled from data/
+        self.assertIn('<span id="hero-week-text"></span>', text)
+        # First screen: one h1, one primary button to the map and one secondary to the SMS demo.
+        hero = re.search(r'<div class="page-hero">.*?<div class="page-hero-media">', text, re.S).group(0)
+        self.assertEqual(hero.count("<h1"), 1)
+        self.assertIn('class="btn btn-primary" href="map.html"', hero)
+        self.assertIn('class="btn btn-secondary" href="sms.html"', hero)
+        self.assertEqual(hero.count('class="btn '), 2)
+        home_js = (WEB / "js" / "home.js").read_text(encoding="utf-8")
+        self.assertIn("M.stateOf(", home_js)                             # the same three states as the map
+
+    def test_how_it_works_keeps_the_honest_limits_in_view(self):
+        how = (WEB / "how-it-works.html").read_text(encoding="utf-8")
+        self.assertEqual(how.count("<h1"), 1)
+        self.assertEqual(len(re.findall(r'<li><span class="step-badge"', how)), 4)
+        for phrase in ["Stations switch off overnight.", "Rain that falls at night is not measured.",
+                       "mostly repeats the recent daily pattern", "Only some stations send data."]:
+            self.assertIn(phrase, how)
+        self.assertNotRegex(how, r'<details[^>]*>[^<]*<summary[^>]*>[^<]*What to know')  # not hidden
 
 
 if __name__ == "__main__":

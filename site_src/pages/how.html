@@ -3,17 +3,31 @@
     <h1 id="page-title">{{t:how.title}}</h1>
     <p class="lead">{{t:how.lead}}</p>
     <h2 class="sub-title">{{t:how.steps_title}}</h2>
-    <ol class="steps steps-five">
-      <li><span class="icon-circle">{{icon:station}}</span><p>{{t:how.step1}}</p></li>
-      <li><span class="icon-circle">{{icon:check}}</span><p>{{t:how.step2}}</p></li>
-      <li><span class="icon-circle">{{icon:calendar}}</span><p>{{t:how.step3}}</p></li>
-      <li><span class="icon-circle">{{icon:sprout}}</span><p>{{t:how.step4}}</p></li>
-      <li><span class="icon-circle">{{icon:phone}}</span><p>{{t:how.step5}}</p></li>
+    <ol class="steps">
+      <li><span class="step-badge" aria-hidden="true">1</span><span class="icon-circle">{{icon:station}}</span><h3>{{t:how.step1_title}}</h3><p>{{t:how.step1}}</p></li>
+      <li><span class="step-badge" aria-hidden="true">2</span><span class="icon-circle">{{icon:check}}</span><h3>{{t:how.step2_title}}</h3><p>{{t:how.step2}}</p></li>
+      <li><span class="step-badge" aria-hidden="true">3</span><span class="icon-circle">{{icon:calendar}}</span><h3>{{t:how.step3_title}}</h3><p>{{t:how.step3}}</p></li>
+      <li><span class="step-badge" aria-hidden="true">4</span><span class="icon-circle">{{icon:phone}}</span><h3>{{t:how.step4_title}}</h3><p>{{t:how.step4}}</p></li>
     </ol>
   </div>
 </section>
 
-<section class="band band-alt" aria-labelledby="words-title">
+<section class="band band-alt" aria-labelledby="know-title">
+  <div class="wrap">
+    <div class="know card">
+      <h2 id="know-title">{{t:how.know_title}}</h2>
+      <ul class="check-list">
+        <li>{{icon:station}}<span>{{t:how.know_off}}</span></li>
+        <li>{{icon:drop}}<span>{{t:how.know_night}}</span></li>
+        <li>{{icon:calendar}}<span>{{t:how.know_pattern}}</span></li>
+        <li>{{icon:offline}}<span>{{t:how.know_some}}</span></li>
+        <li>{{icon:sprout}}<span>{{t:how.know_flat}}</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="words-title">
   <div class="wrap">
     <div class="media-intro">
       <div>
@@ -29,31 +43,16 @@
         <tr><th scope="row"><span class="badge st-watch">{{icon:drop}}<span>{{t:status.watch}}</span></span></th><td>{{t:how.do_watch}}</td></tr>
         <tr><th scope="row"><span class="badge st-planting">{{icon:sprout}}<span>{{t:status.planting}}</span></span></th><td>{{t:how.do_planting}}</td></tr>
         <tr><th scope="row"><span class="badge st-delay">{{icon:spray}}<span>{{t:status.delay}}</span></span></th><td>{{t:how.do_delay}}</td></tr>
-        <tr><th scope="row"><span class="badge st-none">{{icon:check}}<span>{{t:status.none}}</span></span></th><td><strong>{{t:how.word_none}}.</strong> {{t:how.do_none}}</td></tr>
+        <tr><th scope="row"><span class="badge st-none">{{icon:check}}<span>{{t:status.none}}</span></span></th><td>{{t:how.do_none}}</td></tr>
         <tr><th scope="row"><span class="badge st-offline">{{icon:offline}}<span>{{t:status.offline}}</span></span></th><td>{{t:how.do_offline}}</td></tr>
       </tbody>
     </table>
   </div>
 </section>
 
-<section class="band" aria-labelledby="sure-title">
+<section class="band band-mint band-tight" aria-labelledby="about-title">
   <div class="wrap">
-    <h2 id="sure-title">{{t:how.sure_title}}</h2>
-    <ul class="check-list">
-      <li>{{icon:calendar}}<span>{{t:how.sure_1}}</span></li>
-      <li>{{icon:drop}}<span>{{t:how.sure_2}}</span></li>
-      <li>{{icon:offline}}<span>{{t:how.sure_3}}</span></li>
-      <li>{{icon:drop}}<span>{{t:how.sure_4}}</span></li>
-      <li>{{icon:station}}<span>{{t:how.sure_5}}</span></li>
-      <li>{{icon:calendar}}<span>{{t:how.sure_6}}</span></li>
-      <li>{{icon:sprout}}<span>{{t:how.sure_7}}</span></li>
-    </ul>
-  </div>
-</section>
-
-<section class="band band-mint" aria-labelledby="about-title">
-  <div class="wrap">
-    <h2 id="about-title">{{t:how.about_title}}</h2>
+    <h2 id="about-title" class="h-small">{{t:how.about_title}}</h2>
     <p>{{t:how.about_1}}</p>
     <p>{{t:how.about_2}}</p>
   </div>
