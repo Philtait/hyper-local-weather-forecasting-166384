@@ -1,0 +1,2186 @@
+{
+ "generated_utc": "2026-11-25T12:58:45Z",
+ "model": "models/gemini-3.5-flash-lite",
+ "models_used": [
+  "models/gemini-3.5-flash-lite"
+ ],
+ "stations": {
+  "101990961244800001": {
+   "area": "Butula",
+   "bucket": {
+    "rain_mm": 8,
+    "temp_max": 29,
+    "same_every_day": true,
+    "season": "short-late"
+   },
+   "crops": {
+    "maize": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kutakuwa na mvua ya wastani ya milimita 8 kwa siku na joto la juu la nyuzi joto 29, na hali hii itakuwa sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Kilimo cha Busia ni cha kiwango kidogo na mahindi hulimwa hasa kwa ajili ya matumizi ya nyumbani.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Expect moderate rain of about 8 mm a day, with highs near 29 degrees, and this weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "December marks the end of the short rains in the area.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "During a past dry spell with high temperatures, maize and beans in Busia that were flowering began to wilt.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     }
+    },
+    "beans": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kuna mvua ya wastani ya milimita 8 kwa siku na joto la juu la nyuzi joto 29, na hali hii inafanana kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Katika ukame uliopita zamani wenye joto la juu, maharagwe huko Busia yalianza kunyauka wakati wa maua, ambayo ni hatua inayohitaji unyevu.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 8 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Beans need moist weather while they are flowering; in a past dry, hot spell in Busia, flowering beans began to wilt.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "sorghum": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kunatarajiwa mvua ya wastani, karibu milimita 8 kwa siku, na joto la juu karibu nyuzi joto 29; hali ni sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Tuko katika mwisho wa msimu wa mvua fupi, ambao huisha mwezi Desemba.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baada ya mvua kukosa Busia, watafiti wa ICRISAT na KALRO walieleza kuwa wakulima waliolima mtama badala ya mahindi waliathirika kidogo.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 8 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "After failed rains in Busia, researchers from ICRISAT and KALRO reported that farmers who grew sorghum instead of maize were hit less hard.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "cassava": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii huko Busia kutakuwa na mvua ya wastani ya milimita 8 kila siku na joto la juu la nyuzi joto 29 kila siku bila mabadiliko.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba ni mwisho wa msimu wa mvua fupi nchini Kenya.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baadhi ya wakulima wa Busia wanasema muhogo uliwasaidia familia zao wakati mavuno ya mahindi yalipofeli.",
+        "facts": [
+         "F08"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 8 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Some farmers in Busia say cassava fed their families when the maize harvest failed.",
+        "facts": [
+         "F08"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "cowpeas": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kunatarajiwa mvua ya wastani, karibu milimita 8 kwa siku, na joto la juu karibu nyuzi joto 29; hali ni sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Tuko katika mwisho wa msimu wa mvua fupi, ambao huisha mwezi Desemba.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baada ya mvua kukosa Busia, watafiti wa ICRISAT na KALRO walieleza kuwa kulima kunde badala ya mahindi kuliwasaidia wakulima.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 8 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "After failed rains in Busia, researchers from ICRISAT and KALRO reported that growing cowpeas instead of maize helped farmers.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "sweet potatoes": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii huko Busia kutakuwa na mvua ya wastani ya milimita 8 kwa siku na joto la juu la nyuzi joto 29, na hali hii inafanana kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi nchini Kenya.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Viazi vitamu hupandwa hasa kwa ajili ya matumizi ya nyumbani.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 8 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "In Busia, sweet potatoes are grown mainly for food at home.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    }
+   }
+  },
+  "101990961244800061": {
+   "area": "Butula",
+   "bucket": {
+    "rain_mm": 6,
+    "temp_max": 29,
+    "same_every_day": true,
+    "season": "short-late"
+   },
+   "crops": {
+    "maize": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kutakuwa na mvua ya wastani ya milimita 6 kwa siku na joto la juu la nyuzi joto 29, na hali hii itakuwa sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Kilimo cha Busia ni cha kiwango kidogo na mahindi hulimwa hasa kwa ajili ya matumizi ya nyumbani.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Expect moderate rain of about 6 mm a day, with highs near 29 degrees, and this weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "December marks the end of the short rains in the area.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "During a past dry spell with high temperatures, maize and beans in Busia that were flowering began to wilt.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     }
+    },
+    "beans": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kuna mvua ya wastani ya milimita 6 kwa siku na joto la juu la nyuzi joto 29, na hali hii inafanana kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Katika ukame uliopita zamani wenye joto la juu, maharagwe huko Busia yalianza kunyauka wakati wa maua, ambayo ni hatua inayohitaji unyevu.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Beans need moist weather while they are flowering; in a past dry, hot spell in Busia, flowering beans began to wilt.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "sorghum": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kunatarajiwa mvua ya wastani, karibu milimita 6 kwa siku, na joto la juu karibu nyuzi joto 29; hali ni sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Tuko katika mwisho wa msimu wa mvua fupi, ambao huisha mwezi Desemba.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baada ya mvua kukosa Busia, watafiti wa ICRISAT na KALRO walieleza kuwa wakulima waliolima mtama badala ya mahindi waliathirika kidogo.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "After failed rains in Busia, researchers from ICRISAT and KALRO reported that farmers who grew sorghum instead of maize were hit less hard.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "cassava": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii huko Busia kutakuwa na mvua ya wastani ya milimita 6 kila siku na joto la juu la nyuzi joto 29 kila siku bila mabadiliko.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba ni mwisho wa msimu wa mvua fupi nchini Kenya.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baadhi ya wakulima wa Busia wanasema muhogo uliwasaidia familia zao wakati mavuno ya mahindi yalipofeli.",
+        "facts": [
+         "F08"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Some farmers in Busia say cassava fed their families when the maize harvest failed.",
+        "facts": [
+         "F08"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "cowpeas": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kunatarajiwa mvua ya wastani, karibu milimita 6 kwa siku, na joto la juu karibu nyuzi joto 29; hali ni sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Tuko katika mwisho wa msimu wa mvua fupi, ambao huisha mwezi Desemba.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baada ya mvua kukosa Busia, watafiti wa ICRISAT na KALRO walieleza kuwa kulima kunde badala ya mahindi kuliwasaidia wakulima.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "After failed rains in Busia, researchers from ICRISAT and KALRO reported that growing cowpeas instead of maize helped farmers.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "sweet potatoes": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii huko Busia kutakuwa na mvua ya wastani ya milimita 6 kwa siku na joto la juu la nyuzi joto 29, na hali hii inafanana kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi nchini Kenya.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Viazi vitamu hupandwa hasa kwa ajili ya matumizi ya nyumbani.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "In Busia, sweet potatoes are grown mainly for food at home.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    }
+   }
+  },
+  "101990961244800113": {
+   "area": "Butula",
+   "bucket": {
+    "rain_mm": 6,
+    "temp_max": 29,
+    "same_every_day": true,
+    "season": "short-late"
+   },
+   "crops": {
+    "maize": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kutakuwa na mvua ya wastani ya milimita 6 kwa siku na joto la juu la nyuzi joto 29, na hali hii itakuwa sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Kilimo cha Busia ni cha kiwango kidogo na mahindi hulimwa hasa kwa ajili ya matumizi ya nyumbani.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Expect moderate rain of about 6 mm a day, with highs near 29 degrees, and this weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "December marks the end of the short rains in the area.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "During a past dry spell with high temperatures, maize and beans in Busia that were flowering began to wilt.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     }
+    },
+    "beans": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kuna mvua ya wastani ya milimita 6 kwa siku na joto la juu la nyuzi joto 29, na hali hii inafanana kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Katika ukame uliopita zamani wenye joto la juu, maharagwe huko Busia yalianza kunyauka wakati wa maua, ambayo ni hatua inayohitaji unyevu.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Beans need moist weather while they are flowering; in a past dry, hot spell in Busia, flowering beans began to wilt.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "sorghum": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kunatarajiwa mvua ya wastani, karibu milimita 6 kwa siku, na joto la juu karibu nyuzi joto 29; hali ni sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Tuko katika mwisho wa msimu wa mvua fupi, ambao huisha mwezi Desemba.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baada ya mvua kukosa Busia, watafiti wa ICRISAT na KALRO walieleza kuwa wakulima waliolima mtama badala ya mahindi waliathirika kidogo.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "After failed rains in Busia, researchers from ICRISAT and KALRO reported that farmers who grew sorghum instead of maize were hit less hard.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "cassava": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii huko Busia kutakuwa na mvua ya wastani ya milimita 6 kila siku na joto la juu la nyuzi joto 29 kila siku bila mabadiliko.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba ni mwisho wa msimu wa mvua fupi nchini Kenya.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baadhi ya wakulima wa Busia wanasema muhogo uliwasaidia familia zao wakati mavuno ya mahindi yalipofeli.",
+        "facts": [
+         "F08"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Some farmers in Busia say cassava fed their families when the maize harvest failed.",
+        "facts": [
+         "F08"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "cowpeas": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kunatarajiwa mvua ya wastani, karibu milimita 6 kwa siku, na joto la juu karibu nyuzi joto 29; hali ni sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Tuko katika mwisho wa msimu wa mvua fupi, ambao huisha mwezi Desemba.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baada ya mvua kukosa Busia, watafiti wa ICRISAT na KALRO walieleza kuwa kulima kunde badala ya mahindi kuliwasaidia wakulima.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "After failed rains in Busia, researchers from ICRISAT and KALRO reported that growing cowpeas instead of maize helped farmers.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "sweet potatoes": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii huko Busia kutakuwa na mvua ya wastani ya milimita 6 kwa siku na joto la juu la nyuzi joto 29, na hali hii inafanana kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi nchini Kenya.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Viazi vitamu hupandwa hasa kwa ajili ya matumizi ya nyumbani.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "In Busia, sweet potatoes are grown mainly for food at home.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    }
+   }
+  },
+  "101990961244800184": {
+   "area": "Butula",
+   "bucket": {
+    "rain_mm": 6,
+    "temp_max": 29,
+    "same_every_day": true,
+    "season": "short-late"
+   },
+   "crops": {
+    "maize": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kutakuwa na mvua ya wastani ya milimita 6 kwa siku na joto la juu la nyuzi joto 29, na hali hii itakuwa sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Kilimo cha Busia ni cha kiwango kidogo na mahindi hulimwa hasa kwa ajili ya matumizi ya nyumbani.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Expect moderate rain of about 6 mm a day, with highs near 29 degrees, and this weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "December marks the end of the short rains in the area.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "During a past dry spell with high temperatures, maize and beans in Busia that were flowering began to wilt.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     }
+    },
+    "beans": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kuna mvua ya wastani ya milimita 6 kwa siku na joto la juu la nyuzi joto 29, na hali hii inafanana kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Katika ukame uliopita zamani wenye joto la juu, maharagwe huko Busia yalianza kunyauka wakati wa maua, ambayo ni hatua inayohitaji unyevu.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Beans need moist weather while they are flowering; in a past dry, hot spell in Busia, flowering beans began to wilt.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "sorghum": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kunatarajiwa mvua ya wastani, karibu milimita 6 kwa siku, na joto la juu karibu nyuzi joto 29; hali ni sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Tuko katika mwisho wa msimu wa mvua fupi, ambao huisha mwezi Desemba.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baada ya mvua kukosa Busia, watafiti wa ICRISAT na KALRO walieleza kuwa wakulima waliolima mtama badala ya mahindi waliathirika kidogo.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "After failed rains in Busia, researchers from ICRISAT and KALRO reported that farmers who grew sorghum instead of maize were hit less hard.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "cassava": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii huko Busia kutakuwa na mvua ya wastani ya milimita 6 kila siku na joto la juu la nyuzi joto 29 kila siku bila mabadiliko.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba ni mwisho wa msimu wa mvua fupi nchini Kenya.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baadhi ya wakulima wa Busia wanasema muhogo uliwasaidia familia zao wakati mavuno ya mahindi yalipofeli.",
+        "facts": [
+         "F08"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Some farmers in Busia say cassava fed their families when the maize harvest failed.",
+        "facts": [
+         "F08"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "cowpeas": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kunatarajiwa mvua ya wastani, karibu milimita 6 kwa siku, na joto la juu karibu nyuzi joto 29; hali ni sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Tuko katika mwisho wa msimu wa mvua fupi, ambao huisha mwezi Desemba.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baada ya mvua kukosa Busia, watafiti wa ICRISAT na KALRO walieleza kuwa kulima kunde badala ya mahindi kuliwasaidia wakulima.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "After failed rains in Busia, researchers from ICRISAT and KALRO reported that growing cowpeas instead of maize helped farmers.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "sweet potatoes": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii huko Busia kutakuwa na mvua ya wastani ya milimita 6 kwa siku na joto la juu la nyuzi joto 29, na hali hii inafanana kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi nchini Kenya.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Viazi vitamu hupandwa hasa kwa ajili ya matumizi ya nyumbani.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "In Busia, sweet potatoes are grown mainly for food at home.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    }
+   }
+  },
+  "101990961244800270": {
+   "area": "Nambale",
+   "bucket": {
+    "rain_mm": 7,
+    "temp_max": 30,
+    "same_every_day": true,
+    "season": "short-late"
+   },
+   "crops": {
+    "maize": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kutakuwa na mvua ya wastani ya milimita 7 kwa siku na joto la juu la nyuzi joto 30, na hali hii itakuwa sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Kilimo cha Busia ni cha kiwango kidogo na mahindi hulimwa hasa kwa ajili ya matumizi ya nyumbani.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Expect moderate rain of about 7 mm a day, with highs near 30 degrees, and this weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "December marks the end of the short rains in the area.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "During a past dry spell with high temperatures, maize and beans in Busia that were flowering began to wilt.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     }
+    },
+    "beans": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kuna mvua ya wastani ya milimita 7 kwa siku na joto la juu la nyuzi joto 30, na hali hii inafanana kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Katika ukame uliopita zamani wenye joto la juu, maharagwe huko Busia yalianza kunyauka wakati wa maua, ambayo ni hatua inayohitaji unyevu.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 7 mm a day, with highs near 30 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Beans need moist weather while they are flowering; in a past dry, hot spell in Busia, flowering beans began to wilt.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "sorghum": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kunatarajiwa mvua ya wastani, karibu milimita 7 kwa siku, na joto la juu karibu nyuzi joto 30; hali ni sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Tuko katika mwisho wa msimu wa mvua fupi, ambao huisha mwezi Desemba.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baada ya mvua kukosa Busia, watafiti wa ICRISAT na KALRO walieleza kuwa wakulima waliolima mtama badala ya mahindi waliathirika kidogo.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 7 mm a day, with highs near 30 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "After failed rains in Busia, researchers from ICRISAT and KALRO reported that farmers who grew sorghum instead of maize were hit less hard.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "cassava": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii huko Busia kutakuwa na mvua ya wastani ya milimita 7 kila siku na joto la juu la nyuzi joto 30 kila siku bila mabadiliko.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba ni mwisho wa msimu wa mvua fupi nchini Kenya.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baadhi ya wakulima wa Busia wanasema muhogo uliwasaidia familia zao wakati mavuno ya mahindi yalipofeli.",
+        "facts": [
+         "F08"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 7 mm a day, with highs near 30 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Some farmers in Busia say cassava fed their families when the maize harvest failed.",
+        "facts": [
+         "F08"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "cowpeas": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kunatarajiwa mvua ya wastani, karibu milimita 7 kwa siku, na joto la juu karibu nyuzi joto 30; hali ni sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Tuko katika mwisho wa msimu wa mvua fupi, ambao huisha mwezi Desemba.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baada ya mvua kukosa Busia, watafiti wa ICRISAT na KALRO walieleza kuwa kulima kunde badala ya mahindi kuliwasaidia wakulima.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 7 mm a day, with highs near 30 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "After failed rains in Busia, researchers from ICRISAT and KALRO reported that growing cowpeas instead of maize helped farmers.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "sweet potatoes": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii huko Busia kutakuwa na mvua ya wastani ya milimita 7 kwa siku na joto la juu la nyuzi joto 30, na hali hii inafanana kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi nchini Kenya.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Viazi vitamu hupandwa hasa kwa ajili ya matumizi ya nyumbani.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 7 mm a day, with highs near 30 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "In Busia, sweet potatoes are grown mainly for food at home.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    }
+   }
+  },
+  "101990961244800342": {
+   "area": "Butula",
+   "bucket": {
+    "rain_mm": 8,
+    "temp_max": 29,
+    "same_every_day": true,
+    "season": "short-late"
+   },
+   "crops": {
+    "maize": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kutakuwa na mvua ya wastani ya milimita 8 kwa siku na joto la juu la nyuzi joto 29, na hali hii itakuwa sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Kilimo cha Busia ni cha kiwango kidogo na mahindi hulimwa hasa kwa ajili ya matumizi ya nyumbani.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Expect moderate rain of about 8 mm a day, with highs near 29 degrees, and this weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "December marks the end of the short rains in the area.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "During a past dry spell with high temperatures, maize and beans in Busia that were flowering began to wilt.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     }
+    },
+    "beans": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kuna mvua ya wastani ya milimita 8 kwa siku na joto la juu la nyuzi joto 29, na hali hii inafanana kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Katika ukame uliopita zamani wenye joto la juu, maharagwe huko Busia yalianza kunyauka wakati wa maua, ambayo ni hatua inayohitaji unyevu.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 8 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Beans need moist weather while they are flowering; in a past dry, hot spell in Busia, flowering beans began to wilt.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "sorghum": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kunatarajiwa mvua ya wastani, karibu milimita 8 kwa siku, na joto la juu karibu nyuzi joto 29; hali ni sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Tuko katika mwisho wa msimu wa mvua fupi, ambao huisha mwezi Desemba.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baada ya mvua kukosa Busia, watafiti wa ICRISAT na KALRO walieleza kuwa wakulima waliolima mtama badala ya mahindi waliathirika kidogo.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 8 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "After failed rains in Busia, researchers from ICRISAT and KALRO reported that farmers who grew sorghum instead of maize were hit less hard.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "cassava": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii huko Busia kutakuwa na mvua ya wastani ya milimita 8 kila siku na joto la juu la nyuzi joto 29 kila siku bila mabadiliko.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba ni mwisho wa msimu wa mvua fupi nchini Kenya.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baadhi ya wakulima wa Busia wanasema muhogo uliwasaidia familia zao wakati mavuno ya mahindi yalipofeli.",
+        "facts": [
+         "F08"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 8 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Some farmers in Busia say cassava fed their families when the maize harvest failed.",
+        "facts": [
+         "F08"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "cowpeas": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kunatarajiwa mvua ya wastani, karibu milimita 8 kwa siku, na joto la juu karibu nyuzi joto 29; hali ni sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Tuko katika mwisho wa msimu wa mvua fupi, ambao huisha mwezi Desemba.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baada ya mvua kukosa Busia, watafiti wa ICRISAT na KALRO walieleza kuwa kulima kunde badala ya mahindi kuliwasaidia wakulima.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 8 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "After failed rains in Busia, researchers from ICRISAT and KALRO reported that growing cowpeas instead of maize helped farmers.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "sweet potatoes": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii huko Busia kutakuwa na mvua ya wastani ya milimita 8 kwa siku na joto la juu la nyuzi joto 29, na hali hii inafanana kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi nchini Kenya.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Viazi vitamu hupandwa hasa kwa ajili ya matumizi ya nyumbani.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 8 mm a day, with highs near 29 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "In Busia, sweet potatoes are grown mainly for food at home.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    }
+   }
+  },
+  "101990961244800395": {
+   "area": "Nambale",
+   "bucket": {
+    "rain_mm": 6,
+    "temp_max": 30,
+    "same_every_day": true,
+    "season": "short-late"
+   },
+   "crops": {
+    "maize": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kutakuwa na mvua ya wastani ya milimita 6 kwa siku na joto la juu la nyuzi joto 30, na hali hii itakuwa sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Kilimo cha Busia ni cha kiwango kidogo na mahindi hulimwa hasa kwa ajili ya matumizi ya nyumbani.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Expect moderate rain of about 6 mm a day, with highs near 30 degrees, and this weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "December marks the end of the short rains in the area.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "During a past dry spell with high temperatures, maize and beans in Busia that were flowering began to wilt.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     }
+    },
+    "beans": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kuna mvua ya wastani ya milimita 6 kwa siku na joto la juu la nyuzi joto 30, na hali hii inafanana kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Katika ukame uliopita zamani wenye joto la juu, maharagwe huko Busia yalianza kunyauka wakati wa maua, ambayo ni hatua inayohitaji unyevu.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 30 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Beans need moist weather while they are flowering; in a past dry, hot spell in Busia, flowering beans began to wilt.",
+        "facts": [
+         "F09"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "sorghum": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kunatarajiwa mvua ya wastani, karibu milimita 6 kwa siku, na joto la juu karibu nyuzi joto 30; hali ni sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Tuko katika mwisho wa msimu wa mvua fupi, ambao huisha mwezi Desemba.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baada ya mvua kukosa Busia, watafiti wa ICRISAT na KALRO walieleza kuwa wakulima waliolima mtama badala ya mahindi waliathirika kidogo.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 30 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "After failed rains in Busia, researchers from ICRISAT and KALRO reported that farmers who grew sorghum instead of maize were hit less hard.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "cassava": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii huko Busia kutakuwa na mvua ya wastani ya milimita 6 kila siku na joto la juu la nyuzi joto 30 kila siku bila mabadiliko.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba ni mwisho wa msimu wa mvua fupi nchini Kenya.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baadhi ya wakulima wa Busia wanasema muhogo uliwasaidia familia zao wakati mavuno ya mahindi yalipofeli.",
+        "facts": [
+         "F08"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 30 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Some farmers in Busia say cassava fed their families when the maize harvest failed.",
+        "facts": [
+         "F08"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "cowpeas": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii kunatarajiwa mvua ya wastani, karibu milimita 6 kwa siku, na joto la juu karibu nyuzi joto 30; hali ni sawa kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Tuko katika mwisho wa msimu wa mvua fupi, ambao huisha mwezi Desemba.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Baada ya mvua kukosa Busia, watafiti wa ICRISAT na KALRO walieleza kuwa kulima kunde badala ya mahindi kuliwasaidia wakulima.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 30 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "After failed rains in Busia, researchers from ICRISAT and KALRO reported that growing cowpeas instead of maize helped farmers.",
+        "facts": [
+         "F07"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    },
+    "sweet potatoes": {
+     "sw": {
+      "sentences": [
+       {
+        "text": "Wiki hii huko Busia kutakuwa na mvua ya wastani ya milimita 6 kwa siku na joto la juu la nyuzi joto 30, na hali hii inafanana kila siku.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "Desemba inaashiria mwisho wa msimu wa mvua fupi nchini Kenya.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "Viazi vitamu hupandwa hasa kwa ajili ya matumizi ya nyumbani.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "ai",
+      "model": "models/gemini-3.5-flash-lite"
+     },
+     "en": {
+      "sentences": [
+       {
+        "text": "Moderate rain is expected this week, about 6 mm a day, with highs near 30 degrees; the weather is similar every day.",
+        "facts": [
+         "DATA"
+        ]
+       },
+       {
+        "text": "We are at the end of the short rains, which end in December.",
+        "facts": [
+         "F03"
+        ]
+       },
+       {
+        "text": "In Busia, sweet potatoes are grown mainly for food at home.",
+        "facts": [
+         "F01"
+        ]
+       }
+      ],
+      "source": "template",
+      "model": null
+     }
+    }
+   }
+  }
+ }
+}

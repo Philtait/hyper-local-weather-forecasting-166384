@@ -222,3 +222,6 @@ data/
 
 # Course reference material (do not publish)
 docs/reference/
+
+# Crop guide response cache (scripts/build_crop_guide.py)
+reports/crop_guide_cache/
