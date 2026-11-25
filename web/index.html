@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Imarika | Weather advice for farmers in Busia County</title>
+  <meta name="description" content="Seven-day weather advice for smallholder farmers in Busia County, Kenya, from local weather stations.">
+  <meta name="theme-color" content="#1F4D36">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="preload" href="fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/fraunces-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip" href="#map-section">Skip to the map</a>
+  <div id="synthetic-banner" class="banner banner-synthetic" role="alert" hidden>SYNTHETIC PREVIEW DATA - NOT REAL FORECASTS</div>
+  <div id="offline-banner" class="banner banner-offline" role="status" hidden></div>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#top" aria-label="Imarika, back to top">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#1F4D36"/><path d="M8 19c2-5 6-8 8-12 2 4 6 7 8 12a8 8 0 0 1-16 0z" fill="#F4EFE3"/><path d="M12 21c1 2 3 3 5 3" stroke="#1F4D36" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        <span>Imarika</span>
+      </a>
+      <nav class="site-nav secondary" aria-label="Sections">
+        <a href="#map-section">Map</a>
+        <a href="#week">This week</a>
+        <a href="#sms">SMS demo</a>
+        <a href="#how">How it works</a>
+        <a href="#trust">Reliability</a>
+        <a href="#about">About</a>
+      </nav>
+      <button id="present-toggle" class="btn btn-ghost btn-small" type="button" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M12 16v4M8 20h8"/></svg>
+        <span>Presentation mode</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- 1. Hero -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-inner">
+        <div class="hero-copy fade-in">
+          <p class="eyebrow">Busia County, Kenya</p>
+          <h1 id="hero-title">Weather advice for the week ahead, from stations in your area.</h1>
+          <p class="lead">Imarika turns readings from local weather stations into a 7-day forecast and simple advice on floods, planting and spraying, shared on the web and by text message.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#map-section">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>
+              Open the map</a>
+            <a class="btn btn-secondary" href="#sms">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/></svg>
+              See an SMS alert</a>
+          </div>
+        </div>
+        <dl class="hero-stats fade-in" aria-label="This week at a glance">
+          <div class="stat"><dt>Stations reporting</dt><dd id="stat-reporting">–</dd></div>
+          <div class="stat"><dt>Stations with alerts this week</dt><dd id="stat-alerts">–</dd></div>
+          <div class="stat"><dt>Forecast issued on</dt><dd id="stat-issued">–</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- 2. Map and station panel -->
+    <section id="map-section" class="section" aria-labelledby="map-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="map-title">Station map</h2>
+          <p id="issued-line" class="muted">Choose a station on the map or in the list to see its forecast.</p>
+        </div>
+        <div class="map-layout">
+          <aside class="card station-list secondary-soft" aria-labelledby="list-title">
+            <h3 id="list-title" class="card-title">Stations</h3>
+            <label class="search">
+              <span class="sr-only">Search stations by number or area</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+              <input id="station-search" type="search" placeholder="Search by number or area" autocomplete="off">
+            </label>
+            <div class="sort-row">
+              <label for="station-sort">Sort</label>
+              <select id="station-sort">
+                <option value="alerts">Alerts first</option>
+                <option value="name">Station number</option>
+                <option value="area">Area</option>
+              </select>
+            </div>
+            <ul id="station-items" class="station-items" aria-label="Station list"></ul>
+          </aside>
+
+          <div class="map-column">
+            <div class="card map-card">
+              <div id="map" class="map" role="region" aria-label="Map of Busia County with weather stations"></div>
+              <p id="map-notice" class="map-notice" role="status" hidden></p>
+            </div>
+            <ul id="legend" class="legend" aria-label="Map key"></ul>
+          </div>
+
+          <article id="panel" class="card panel" aria-live="polite" aria-labelledby="panel-name">
+            <p class="muted">Loading stations...</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. This week -->
+    <section id="week" class="section section-tint" aria-labelledby="week-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="week-title">This week in Busia</h2>
+          <p class="muted">Every alert across all stations, most serious first.</p>
+        </div>
+        <div id="alert-cards" class="alert-grid"></div>
+      </div>
+    </section>
+
+    <!-- 4. SMS demo -->
+    <section id="sms" class="section" aria-labelledby="sms-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="sms-title">The same advice by text message</h2>
+          <p class="muted">Farmers without a smartphone get one short message with one clear action.</p>
+        </div>
+        <div id="sms-demo" class="sms-layout"></div>
+      </div>
+    </section>
+
+    <!-- 5. How it works -->
+    <section id="how" class="section section-tint" aria-labelledby="how-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="how-title">How it works</h2>
+          <p class="muted">From a sensor in a field to advice on a phone.</p>
+        </div>
+        <ol id="pipeline" class="pipeline"></ol>
+      </div>
+    </section>
+
+    <!-- 6. Trust -->
+    <section id="trust" class="section" aria-labelledby="trust-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="trust-title">How much to trust it</h2>
+          <p class="muted">What has been measured, what has not, and what was fixed in the data.</p>
+        </div>
+        <div id="trust-body" class="trust-grid"></div>
+      </div>
+    </section>
+
+    <!-- 7. About -->
+    <section id="about" class="section section-tint" aria-labelledby="about-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="about-title">About and credits</h2>
+        </div>
+        <div id="about-body" class="about-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Final-year project, Strathmore University. Philip Tait. Supervisor: Ms. J. Kirui.</p>
+    </div>
+  </footer>
+
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
