@@ -69,12 +69,6 @@ INSIGHT_STATUS = {
     ("flood_alert", "warning"): "warning", ("flood_alert", "watch"): "watch",
     ("planting_window", "advisory"): "planting", ("rain_delay", "advisory"): "delay",
 }
-SCENARIOS = [
-    ("dry", "Dry week", [0, 0, 0, 0.5, 0, 0, 0]),
-    ("normal", "Normal rains", [0, 3, 0, 0, 4, 0, 2]),
-    ("planting", "Planting rains", [0, 0, 0, 6, 5, 8, 4]),
-    ("heavy", "Heavy rain", [2, 8, 35, 62, 12, 4, 0]),
-]
 VARIABLES = {
     "air_temperature": ("Temperature", "°C"),
     "air_humidity": ("Humidity", "%"),
@@ -257,7 +251,7 @@ def operations(rows, insights, as_of, config):
 
 
 # =============================================================================
-# Stations, scenarios
+# Stations
 # =============================================================================
 def status_block(code):
     label, colour = STATUS[code]
@@ -395,29 +389,6 @@ def build_stations(forecast, status, latest, features, config, history=None, var
             "days_with_data_14d": sum(day["readings_received"] > 0 for day in past) if past else None,
         })
     return stations
-
-
-def build_scenarios(as_of, config):
-    out = []
-    dates = [as_of + timedelta(days=offset) for offset in range(1, 8)]
-    for key, title, rain in SCENARIOS:
-        frame = pd.DataFrame({"device_id": "Scenario", "date": dates, "rain_mm": rain, "rain_upper": rain,
-                              "temp_min": float("nan"), "temp_max": float("nan"), "wind_max": float("nan")})
-        insights = generate_insights(frame, config)
-        code = status_key(insights, True)
-        main = main_insight(insights, code)
-        ordered = ([main] if main else []) + [item for item in insights if item is not main]
-        days = list(zip(dates, rain))
-        described = [describe(item, days, "Scenario", config) for item in ordered]
-        out.append({
-            "key": key, "title": title,
-            "rain_mm": rain, "dates": [day.isoformat() for day in dates],
-            "status": status_block(code),
-            "what_to_do": what_to_do(code, insights, config),
-            "insights": described,
-            "sms_text": described[0]["sms_text"] if described else None,
-        })
-    return out
 
 
 # =============================================================================
@@ -646,7 +617,6 @@ def build(deploy_dir, out_dir, reports_dir, synthetic=False):
     }
     write_json(out_dir / "meta.json", meta)
     write_json(out_dir / "stations.json", {"synthetic": bool(synthetic), "stations": stations})
-    write_json(out_dir / "scenarios.json", {"scenarios": build_scenarios(as_of, config)})
     write_json(out_dir / "model_results.json", model_results(reports_dir))
     write_json(out_dir / "data_quality.json", data_quality(reports_dir))
     if BOUNDARIES.is_file():

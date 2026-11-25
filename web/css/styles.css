@@ -320,9 +320,23 @@ textarea.field { max-width: 640px; resize: vertical; }
 .sms-result.ok { color: var(--st-planting-fg); }
 .sms-result.fail { color: var(--st-warning-fg); }
 .sms-result-line { display: block; margin-top: 4px; }
-.crop-guide { margin-top: 8px; }
-.crop-note { color: var(--text-2); margin: 6px 0 0; font-size: 16px; }
+.station-group + .station-group { margin-top: 14px; }
+.station-group .choice-group { margin: 0 0 8px; }
+.station-buttons { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.station-btn { font: inherit; display: flex; flex-direction: column; gap: 2px; text-align: left; min-height: 56px;
+  padding: 10px 14px; border-radius: 10px; border: 2px solid var(--border); background: var(--white); color: var(--text); cursor: pointer; }
+.station-btn:hover:not(:disabled) { border-color: var(--leaf); }
+.station-btn[aria-pressed="true"] { background: var(--leaf); border-color: var(--leaf); color: var(--white); }
+.station-btn:disabled { cursor: not-allowed; background: var(--soft); color: var(--text-2); border-style: dashed; }
+.station-name { font-weight: 600; font-size: 16px; }
+.station-meta { font-size: 14px; }
+.station-btn[aria-pressed="true"] .station-meta { color: var(--white); }
+.message-option + .message-option { margin-top: 8px; }
+.message-option .crop-grid { margin: 10px 0 4px; }
+.choice.disabled { cursor: not-allowed; background: var(--soft); color: var(--text-2); }
+.choice-note { display: block; font-size: 15px; color: var(--text-2); margin-top: 2px; }
 .lang-switch { display: inline-flex; margin: 10px 0 12px; border: 2px solid var(--border); border-radius: 10px; overflow: hidden; }
+.choice-list > .lang-switch { align-self: flex-start; margin-top: 0; }
 .lang-btn { font: inherit; font-size: 16px; font-weight: 500; min-height: 44px; padding: 8px 18px; border: 0;
   background: var(--white); color: var(--text); cursor: pointer; }
 .lang-btn + .lang-btn { border-left: 2px solid var(--border); }
@@ -332,7 +346,10 @@ textarea.field { max-width: 640px; resize: vertical; }
   border: 2px solid var(--border); background: var(--white); color: var(--text); cursor: pointer; text-align: center; }
 .crop-btn:hover { border-color: var(--leaf); }
 .crop-btn[aria-pressed="true"] { background: var(--leaf); border-color: var(--leaf); color: var(--white); }
-@media (max-width: 420px) { .crop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 420px) {
+  .crop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .station-buttons { grid-template-columns: minmax(0, 1fr); }
+}
 
 /* Contact */
 .contact-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin: 8px 0 20px; }

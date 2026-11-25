@@ -1,114 +1,80 @@
-/* SMS demo: choose an area and a message, preview the exact text, send it to the sandbox simulator.
-   The server looks the text up again from data/; the browser only sends which message was chosen.
-   Crop guide messages are built by js/sms-message.js, the same builder the send function uses. */
+/* SMS demo: choose a station and a message, preview the exact text, send it to the sandbox simulator.
+   Messages come from the station's own data: latest readings, the crop guide, or the weather alert.
+   js/sms-message.js builds the text here and in the send function, so the preview is what is sent.
+   The browser sends only which message was chosen: {scenario, station, crop, lang, phone}. */
 (function () {
   "use strict";
   var I = window.Imarika, t = I.t, esc = I.esc, B = window.ImarikaSmsMessage;
   var PHONE = /^\+254[17]\d{8}$/;
-  var LIMIT = 160;
-  var CROP = "crop:";
-  var state = { stations: [], scenarios: [], guide: null, area: null, choice: null, lang: "en" };
+  var state = { stations: [], guide: null, station: null, scenario: "latest", crop: B.CROPS[0], lang: "en" };
 
   function $(id) { return document.getElementById(id); }
-  function stationFor(area) {
-    return state.stations.filter(function (s) { return s.area === area; }).sort(I.bySeverity)[0];
-  }
+  function data() { return { stations: state.stations, guide: state.guide }; }
+  function byId(id) { return B.findStation(state.stations, id); }
 
-  /* Each choice: {id, label, text, body} where body is what the server needs to find the text itself. */
-  function choices() {
-    var list = [], s = stationFor(state.area);
-    if (s) {
-      var advice = (s.insights || [])[0];
-      list.push(advice
-        ? { id: "current", label: t("sms.current", { station: s.name }), text: advice.sms_text, body: { station: s.id, advisory: advice.key } }
-        : { id: "current", label: t("sms.no_current", { station: s.name }), text: null, body: null });
-    }
-    state.scenarios.forEach(function (sc) {
-      list.push({ id: "scenario-" + sc.key, label: t("sms.scenario_" + sc.key), text: sc.sms_text,
-                  body: sc.sms_text ? { scenario: sc.key } : null, dry: !sc.sms_text });
-    });
-    return list;
-  }
-
-  function renderAreas() {
+  function renderStations() {
     var areas = {};
-    state.stations.forEach(function (s) { if (s.area) areas[s.area] = true; });
-    $("sms-areas").innerHTML = Object.keys(areas).sort().map(function (a) {
-      return '<button type="button" class="area-btn" aria-pressed="' + (a === state.area) + '" data-area="' + esc(a) + '">' + esc(a) + "</button>";
+    state.stations.forEach(function (s) { (areas[s.area || "Busia"] = areas[s.area || "Busia"] || []).push(s); });
+    $("sms-stations").innerHTML = Object.keys(areas).sort().map(function (area) {
+      var list = areas[area].slice().sort(function (a, b) { return a.id < b.id ? -1 : 1; });
+      return '<div class="station-group"><p class="choice-group">' + esc(area) + '</p><div class="station-buttons">' +
+        list.map(function (s) {
+          var ok = B.selectable(s);
+          var meta = ok ? t("sms.last_reading", { time: B.readingTime(s.last_reading_utc, "en") }) : t("sms.not_sending");
+          return '<button type="button" class="station-btn" data-station="' + esc(s.id) + '" aria-pressed="' +
+            (s.id === state.station) + '"' + (ok ? "" : " disabled") + '><span class="station-name">' +
+            esc(t("sms.station_label", { area: s.area || "Busia", id: s.id })) + '</span><span class="station-meta">' +
+            esc(meta) + "</span></button>";
+        }).join("") + "</div></div>";
     }).join("");
   }
 
-  /* The crop guide uses the same station as "this week's advice"; only a station with a forecast has one. */
-  function cropStation() {
-    var s = stationFor(state.area);
-    if (!s || !state.guide || B.stations(state.guide).indexOf(s.id) < 0 || !(s.forecast || []).length) return { station: s, ok: false };
-    return { station: s, ok: true };
+  function option(id, label, enabled, note, extra) {
+    return '<div class="message-option"><label class="choice' + (enabled ? "" : " disabled") + '"><input type="radio" name="message" value="' +
+      id + '"' + (state.scenario === id && enabled ? " checked" : "") + (enabled ? "" : " disabled") + "><span>" + esc(label) +
+      (note ? '<span class="choice-note">' + esc(note) + "</span>" : "") + "</span></label>" + (extra || "") + "</div>";
   }
 
-  function cropChoice(crop) {
-    var cs = cropStation();
-    if (!cs.ok) return null;
-    var built = B.buildCropMessage(state.guide, cs.station.id, crop, state.lang);
-    return { id: CROP + crop, label: t("sms.crops." + state.lang + "." + crop), text: built && built.text,
-             parts: built && built.parts,
-             body: built ? { scenario: "crop_guide", station: cs.station.id, crop: crop, lang: state.lang } : null };
-  }
-
-  function renderChoices() {
-    var list = choices();
-    var cropActive = state.choice && state.choice.indexOf(CROP) === 0 && cropStation().ok;
-    if (!cropActive && !list.some(function (c) { return c.id === state.choice; })) {
-      state.choice = (list.filter(function (c) { return c.text; })[0] || list[0]).id;
-    }
-    $("sms-messages").innerHTML = list.map(function (c, i) {
-      var heading = i === 1 ? '<p class="choice-group">' + esc(t("sms.examples")) + "</p>" : "";
-      return heading + '<label class="choice"><input type="radio" name="message" value="' + esc(c.id) + '"' +
-        (c.id === state.choice ? " checked" : "") + "><span>" + esc(c.label) + "</span></label>";
-    }).join("");
-    renderCrops();
-    preview();
-  }
-
-  function renderCrops() {
-    var cs = cropStation();
-    var html = '<p class="choice-group" id="crop-group-title">' + esc(t("sms.crop_group")) + "</p>";
-    if (!cs.ok) {
-      html += '<p class="crop-note">' + esc(cs.station && state.guide
-        ? t("sms.crop_none", { station: cs.station.name }) : t("sms.crop_unavailable")) + "</p>";
-      $("sms-crops").innerHTML = html;
-      return;
-    }
-    html += '<div class="lang-switch" role="group" aria-label="' + esc(t("sms.lang_label")) + '">' +
+  function renderMessages() {
+    var can = B.available(data(), state.station);
+    if (!can[state.scenario]) state.scenario = "latest";
+    var langs = '<div class="lang-switch" role="group" aria-label="' + esc(t("sms.lang_label")) + '">' +
       B.LANGS.map(function (lang) {
         return '<button type="button" class="lang-btn" data-lang="' + lang + '" aria-pressed="' + (lang === state.lang) + '">' +
           esc(t("sms.lang_" + lang)) + "</button>";
       }).join("") + "</div>";
-    html += '<div class="crop-grid" role="group" aria-labelledby="crop-group-title">' + B.CROPS.map(function (crop) {
-      return '<button type="button" class="crop-btn" data-crop="' + esc(crop) + '" aria-pressed="' +
-        (state.choice === CROP + crop) + '">' + esc(t("sms.crops." + state.lang + "." + crop)) + "</button>";
-    }).join("") + "</div>";
-    $("sms-crops").innerHTML = html;
+    var crops = can.crop_guide ? '<div class="crop-grid" role="group" aria-label="' + esc(t("sms.msg_crop")) + '">' +
+      B.CROPS.map(function (crop) {
+        return '<button type="button" class="crop-btn" data-crop="' + esc(crop) + '" aria-pressed="' +
+          (state.scenario === "crop_guide" && state.crop === crop) + '">' + esc(t("sms.crops." + state.lang + "." + crop)) + "</button>";
+      }).join("") + "</div>" : "";
+    $("sms-messages").innerHTML = langs +
+      option("latest", t("sms.msg_latest"), can.latest, can.latest ? "" : t("sms.not_sending")) +
+      option("crop_guide", t("sms.msg_crop"), can.crop_guide, can.crop_guide ? "" : t("sms.crop_none_station"), crops) +
+      option("alert", t("sms.msg_alert"), can.alert,
+             can.alert ? (state.lang === "sw" ? t("sms.alert_english") : "") : t("sms.alert_none"));
+    preview();
   }
 
-  function current() {
-    if (state.choice && state.choice.indexOf(CROP) === 0) return cropChoice(state.choice.slice(CROP.length));
-    return choices().filter(function (c) { return c.id === state.choice; })[0];
+  function request() {
+    var r = { scenario: state.scenario, station: state.station, lang: state.lang };
+    if (state.scenario === "crop_guide") r.crop = state.crop;
+    return r;
   }
 
   function preview() {
-    var c = current(), box = $("sms-text");
-    if (c && c.text) {
-      box.textContent = c.text;
+    var built = state.station ? B.buildMessage(data(), request()) : null, box = $("sms-text");
+    if (built) {
+      box.textContent = built.text;
       box.classList.remove("empty");
-      // Short messages keep "x of 160 characters"; longer ones show the real count and number of messages.
-      $("sms-count").textContent = c.text.length <= LIMIT ? t("sms.counter", { n: c.text.length })
-        : t("sms.counter_parts", { n: c.text.length, parts: B.smsParts(c.text.length) });
+      $("sms-count").textContent = built.parts === 1 ? t("sms.counter_one", { n: built.chars })
+        : t("sms.counter_parts", { n: built.chars, parts: built.parts });
     } else {
-      box.textContent = c && c.dry ? t("sms.dry_none") : t("sms.nothing");
+      box.textContent = t("sms.nothing");
       box.classList.add("empty");
       $("sms-count").textContent = "";
     }
-    $("sms-send").disabled = !(c && c.body);
+    $("sms-send").disabled = !built;
   }
 
   function result(kind, text, extra) {
@@ -134,15 +100,14 @@
     }
     $("sms-phone-error").textContent = "";
     $("sms-phone").removeAttribute("aria-invalid");
-    var c = current();
-    if (!c || !c.body) { result("fail", t("sms.nothing")); return; }
+    if (!state.station || !B.buildMessage(data(), request())) { result("fail", t("sms.nothing")); return; }
     var button = $("sms-send");
     button.disabled = true;
     result("", t("sms.sending"));
     var ctrl = window.AbortController ? new AbortController() : null;
     var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 15000);
     fetch("api/send-sms", { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(Object.assign({ phone: raw }, c.body)), signal: ctrl ? ctrl.signal : undefined })
+      body: JSON.stringify(Object.assign({ phone: raw }, request())), signal: ctrl ? ctrl.signal : undefined })
       .then(function (r) {
         if ((r.headers.get("content-type") || "").indexOf("application/json") < 0) throw new Error("no service");
         return r.json();
@@ -156,35 +121,34 @@
   }
 
   I.ready.then(function () {
-    return Promise.all([I.getJSON("data/stations.json"), I.getJSON("data/scenarios.json"),
-                        I.getJSON("data/crop_guide.json").catch(function () { return null; })]);
+    return Promise.all([I.getJSON("data/stations.json"), I.getJSON("data/crop_guide.json").catch(function () { return null; })]);
   }).then(function (res) {
     state.stations = res[0].stations;
-    state.scenarios = res[1].scenarios;
-    state.guide = res[2];
-    var first = state.stations.filter(function (s) { return s.active && s.insights.length; }).sort(I.bySeverity)[0] || state.stations[0];
-    state.area = first ? first.area : null;
-    renderAreas();
-    renderChoices();
-    $("sms-areas").addEventListener("click", function (e) {
-      var b = e.target.closest(".area-btn");
-      if (!b) return;
-      state.area = b.getAttribute("data-area");
-      state.choice = "current";
-      renderAreas();
-      renderChoices();
+    state.guide = res[1];
+    var first = state.stations.filter(B.selectable).sort(function (a, b) {
+      return (a.area || "") < (b.area || "") ? -1 : (a.area || "") > (b.area || "") ? 1 : a.id < b.id ? -1 : 1;
+    })[0];
+    state.station = first ? first.id : null;
+    renderStations();
+    renderMessages();
+    $("sms-stations").addEventListener("click", function (e) {
+      var b = e.target.closest(".station-btn");
+      if (!b || b.disabled) return;
+      state.station = b.getAttribute("data-station");
+      state.scenario = "latest";
+      renderStations();
+      renderMessages();
       result("", "");
     });
     $("sms-messages").addEventListener("change", function (e) {
-      // A test scenario replaces any selected crop: only one message is active at a time.
-      if (e.target.name === "message") { state.choice = e.target.value; renderCrops(); preview(); result("", ""); }
+      if (e.target.name === "message") { state.scenario = e.target.value; renderMessages(); result("", ""); }
     });
-    $("sms-crops").addEventListener("click", function (e) {
+    $("sms-messages").addEventListener("click", function (e) {
       var lang = e.target.closest(".lang-btn"), crop = e.target.closest(".crop-btn");
       if (lang) state.lang = lang.getAttribute("data-lang");
-      else if (crop) state.choice = CROP + crop.getAttribute("data-crop");
+      else if (crop) { state.scenario = "crop_guide"; state.crop = crop.getAttribute("data-crop"); }
       else return;
-      renderChoices();
+      renderMessages();
       result("", "");
     });
     $("sms-phone").addEventListener("input", function () { $("sms-phone-error").textContent = ""; });
