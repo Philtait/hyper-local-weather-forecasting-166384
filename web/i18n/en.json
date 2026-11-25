@@ -82,9 +82,7 @@
     "up_to": "up to {max}°C"
   },
   "images": {
-    "field_alt": "Illustration of a maize field after rain in western Kenya",
-    "station_alt": "Illustration of a weather station standing in a maize field",
-    "farmer_alt": "Illustration of a farmer checking a message on a phone at the edge of a maize field"
+    "station_alt": "Illustration of a weather station standing in a maize field"
   },
   "offline": {
     "saved": "You appear to be offline. Showing the saved forecast from {date}."
@@ -214,8 +212,7 @@
   "sms": {
     "title": "See the SMS a farmer receives",
     "page_title": "SMS demo: Imarika",
-    "lead": "Pick a station and a message built from its own data, then send it to a test phone number.",
-    "farmer_alt": "Illustration of a farmer checking a message on a phone at the edge of a maize field",
+    "lead": "Choose a station and a message, then send it to a test phone.",
     "step1": "Choose a station",
     "choose_area": "Choose an area",
     "show_off": "Show stations not sending data ({n})",

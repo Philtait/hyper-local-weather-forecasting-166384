@@ -592,8 +592,7 @@ class PagesTests(unittest.TestCase):
         self.assertIn('id="sms-areas"', sms)
         self.assertIn('id="sms-off-toggle" aria-expanded="false" aria-controls="sms-off" hidden', sms)
         self.assertIn('id="sms-off" hidden', sms)
-        self.assertNotIn('loading="lazy"', sms)                       # the hero image is above the fold
-        self.assertIn('class="page-hero-media"', sms)
+        self.assertIn('class="band page-top hero-banner hero-sms"', sms)  # slim banner, photo as CSS background
         sms_js = (WEB / "js" / "sms.js").read_text(encoding="utf-8")
         self.assertIn('box.lang = ', sms_js)                          # Kiswahili text is marked lang="sw"
         how = (WEB / "how-it-works.html").read_text(encoding="utf-8")
@@ -609,7 +608,7 @@ class PagesTests(unittest.TestCase):
         self.assertIn('<ul class="status-counts" id="status-counts"></ul>', text)   # filled from data/
         self.assertIn('<span id="hero-week-text"></span>', text)
         # First screen: one h1, one primary button to the map and one secondary to the SMS demo.
-        hero = re.search(r'<div class="page-hero">.*?<div class="page-hero-media">', text, re.S).group(0)
+        hero = re.search(r'<section class="band page-top hero-banner hero-home".*?</section>', text, re.S).group(0)
         self.assertEqual(hero.count("<h1"), 1)
         self.assertIn('class="btn btn-primary" href="map.html"', hero)
         self.assertIn('class="btn btn-secondary" href="sms.html"', hero)
@@ -651,6 +650,34 @@ class PagesTests(unittest.TestCase):
             self.assertIn("js/units.js", scripts, page)
         for page in self.PAGES + ["station.html"]:
             self.assertIn('class="band page-top', (WEB / page).read_text(encoding="utf-8"), page)  # one top padding
+
+    def test_hero_images(self):
+        """Home and the SMS demo use the photos as decorative CSS backgrounds under a dark-green overlay;
+        no other page puts an image behind its content. The contrast on the rendered hero is checked in
+        tests/node/hero_contrast.test.js."""
+        css = (WEB / "css" / "styles.css").read_text(encoding="utf-8")
+        home_css = re.search(r"\n\.hero-home \{[^}]*\}", css).group(0)
+        self.assertIn('url("../img/about-field.webp")', home_css)
+        self.assertIn("rgba(15, 61, 46, .74) 52%", home_css)                 # strong behind the text, then fading
+        self.assertIn("rgba(15, 61, 46, .35) 100%", home_css)
+        self.assertIn('url("../img/farmer.webp")', css)
+        self.assertIn("background-size: cover", css)
+        for name, image in [("index.html", "about-field.webp"), ("sms.html", "farmer.webp")]:
+            text = (WEB / name).read_text(encoding="utf-8")
+            self.assertIn(f'<link rel="preload" href="img/{image}" as="image" type="image/webp"', text)
+            main = re.search(r"<main.*?</main>", text, re.S).group(0)
+            self.assertNotIn("<img", main, name)                              # decorative: no img, no alt text
+            self.assertIn("hero-banner", main)
+        for name in ["how-it-works.html", "map.html", "station.html", "contact.html"]:
+            text = (WEB / name).read_text(encoding="utf-8")
+            self.assertNotIn("hero-banner", text, name)
+            self.assertNotIn("background-image", text, name)
+        how = (WEB / "how-it-works.html").read_text(encoding="utf-8")
+        self.assertIn('<img src="img/station.webp"', how)                     # the station image stays a card
+        worker = (WEB / "sw.js").read_text(encoding="utf-8")
+        for image in ["img/about-field.webp", "img/farmer.webp", "img/station.webp"]:
+            self.assertIn(f'"{image}"', worker)
+            self.assertLess((WEB / image).stat().st_size, 150 * 1024, image)
 
     def test_how_it_works_keeps_the_honest_limits_in_view(self):
         how = (WEB / "how-it-works.html").read_text(encoding="utf-8")
